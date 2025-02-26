@@ -1,4 +1,4 @@
-const CACHE_NAME = "gfap-cache-v2"; // Increment version on update
+const CACHE_NAME = "gfap-cache-v3"; // Increment version on update
 const urlsToCache = [
     "/",
     "/index.html",
