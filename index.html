@@ -76,29 +76,28 @@
     </footer>
     
     <script>
-        function checkBleedingRisk() {
-            const gfap = parseFloat(document.getElementById('gfap').value);
-            const age = parseInt(document.getElementById('age').value);
-            const resultDiv = document.getElementById('result');
+    function calculateICHProbability(gfap) {
+        let A = -3.05;  // Baseline adjustment
+        let B = 0.0060; // Growth factor
 
-            if (isNaN(gfap) || isNaN(age)) {
-                resultDiv.innerHTML = "Bitte geben Sie gültige Werte für GFAP und Alter ein.";
-                return;
-            }
+        let probability = 100 / (1 + Math.exp(-(A + B * gfap)));
+        return probability.toFixed(2) + "%"; // Returning a percentage with 2 decimal places
+    }
 
-            let riskMessage = "";
+    function checkICHProbability() {
+        let gfap = parseFloat(document.getElementById('gfap').value);
+        let resultDiv = document.getElementById('result');
 
-            if (gfap > 300 && age > 50) {
-                riskMessage = "Hohe Wahrscheinlichkeit einer Blutung. Dringende Abklärung empfohlen.";
-            } else if (gfap > 200 && age > 40) {
-                riskMessage = "Moderates Risiko einer Blutung. Klinische Korrelation ratsam.";
-            } else {
-                riskMessage = "Niedrige Wahrscheinlichkeit einer Blutung. Überwachung und Nachsorge empfohlen.";
-            }
-
-            resultDiv.innerHTML = `Ergebnis: ${riskMessage}`;
+        if (isNaN(gfap) || gfap < 0) {
+            resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert ein.";
+            return;
         }
-    </script>
+
+        let ichRisk = calculateICHProbability(gfap);
+        resultDiv.innerHTML = `Geschätzte Wahrscheinlichkeit einer intrakraniellen Blutung: <strong>${ichRisk}</strong>`;
+    }
+</script>
+
 
     <!-- Service Worker Registration -->
 <script>
