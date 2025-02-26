@@ -1,15 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GFAP Check">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="manifest" href="manifest.json">
-
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GFAP Check">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
     <title>GFAP Blutungsrisiko-Check</title>
     <style>
         body {
@@ -49,64 +47,59 @@
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
-            }
+        }
         footer {
             margin-top: 30px;
             font-size: 14px;
             color: #888;
-        
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GFAP Blutungsrisiko-Check</h1>
-        <p>Geben Sie den GFAP-Wert und das Alter ein, um die Blutungswahrscheinlichkeit zu überprüfen.</p>
+        <p>Geben Sie den GFAP-Wert ein, um die Wahrscheinlichkeit einer intrakraniellen Blutung zu überprüfen.</p>
         <form id="gfapForm">
             <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)" required><br>
-            <input type="number" id="age" placeholder="Alter eingeben (Jahre)" required><br>
-            <button type="button" onclick="checkBleedingRisk()">Risiko prüfen</button>
+            <button type="button" onclick="checkICHProbability()">Risiko prüfen</button>
         </form>
         <div class="result" id="result"></div>
     </div>
     
-<footer>
+    <footer>
         <p>&copy; 2025 iGFAP - Alle Rechte vorbehalten.</p>
         <p>Hosted by <strong>Neurologie, RKH Klinikum Ludwigsburg</strong></p>
     </footer>
     
     <script>
-    function calculateICHProbability(gfap) {
-        let A = -3.05;  // Baseline adjustment
-        let B = 0.0060; // Growth factor
-
-        let probability = 100 / (1 + Math.exp(-(A + B * gfap)));
-        return probability.toFixed(2) + "%"; // Returning a percentage with 2 decimal places
-    }
-
-    function checkICHProbability() {
-        let gfap = parseFloat(document.getElementById('gfap').value);
-        let resultDiv = document.getElementById('result');
-
-        if (isNaN(gfap) || gfap < 0) {
-            resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert ein.";
-            return;
+        function calculateICHProbability(gfap) {
+            let A = -3.05;  // Baseline adjustment
+            let B = 0.0060; // Growth factor
+            let probability = 100 / (1 + Math.exp(-(A + B * gfap)));
+            return probability.toFixed(2) + "%"; // Returning a percentage with 2 decimal places
         }
 
-        let ichRisk = calculateICHProbability(gfap);
-        resultDiv.innerHTML = `Geschätzte Wahrscheinlichkeit einer intrakraniellen Blutung: <strong>${ichRisk}</strong>`;
-    }
-</script>
+        function checkICHProbability() {
+            let gfap = parseFloat(document.getElementById('gfap').value);
+            let resultDiv = document.getElementById('result');
 
+            if (isNaN(gfap) || gfap < 0) {
+                resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert ein.";
+                return;
+            }
+
+            let ichRisk = calculateICHProbability(gfap);
+            resultDiv.innerHTML = `Geschätzte Wahrscheinlichkeit einer intrakraniellen Blutung: <strong>${ichRisk}</strong>`;
+        }
+    </script>
 
     <!-- Service Worker Registration -->
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then(() => console.log("Service Worker Registered"))
-            .catch(error => console.log("Service Worker Registration Failed", error));
-    }
-</script>
-
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log("Service Worker Registered"))
+                .catch(error => console.log("Service Worker Registration Failed", error));
+        }
+    </script>
 </body>
 </html>
