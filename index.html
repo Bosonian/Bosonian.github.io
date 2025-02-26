@@ -11,10 +11,10 @@
     <title>GFAP Blutungsrisiko-Check</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Open Sans', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa;
+            background-color: #f4f7f9;
             text-align: center;
             color: #333;
         }
@@ -23,15 +23,15 @@
             margin: 50px auto;
             padding: 20px;
             background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
         }
         input, button {
-            width: 80%;
-            padding: 10px;
+            width: 85%;
+            padding: 12px;
             margin: 10px 0;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
         }
         button {
@@ -39,35 +39,33 @@
             color: white;
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #0056b3;
         }
         .result {
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
+            color: #007bff;
         }
         footer {
             margin-top: 30px;
             font-size: 14px;
-            color: #888;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GFAP Blutungsrisiko-Check</h1>
-        <p>Geben Sie den GFAP-Wert oder die Wahrscheinlichkeit ein, um den anderen Wert zu berechnen.</p>
+        <p>Geben Sie den GFAP-Wert ein, um die Wahrscheinlichkeit einer intrakraniellen Blutung zu überprüfen.</p>
         
         <form id="gfapForm">
             <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)"><br>
             <button type="button" onclick="checkICHProbability()">Risiko prüfen</button>
-        </form>
-        
-        <form id="probabilityForm">
-            <input type="number" id="probability" placeholder="Wahrscheinlichkeit eingeben (%)"><br>
-            <button type="button" onclick="checkGFAPValue()">GFAP-Wert berechnen</button>
+            <button type="button" onclick="resetForm()" style="background-color: #dc3545;">Zurücksetzen</button>
         </form>
         
         <div class="result" id="result"></div>
@@ -75,7 +73,6 @@
     
     <footer>
         <p>&copy; 2025 iGFAP - Alle Rechte vorbehalten.</p>
-        <p>Hosted by <strong>Neurologie, RKH Klinikum Ludwigsburg</strong></p>
     </footer>
     
     <script>
@@ -98,25 +95,10 @@
             let ichRisk = calculateICHProbability(gfap);
             resultDiv.innerHTML = `Geschätzte Wahrscheinlichkeit einer intrakraniellen Blutung: <strong>${ichRisk}</strong>`;
         }
-
-        function calculateGFAP(probability) {
-            let A = -1.90;  // Baseline adjustment
-            let B = 0.0016; // Growth factor
-            let gfap = (-Math.log((100 / probability) - 1) - A) / B;
-            return gfap.toFixed(2) + " pg/mL"; // Returning GFAP value with 2 decimal places
-        }
-
-        function checkGFAPValue() {
-            let probability = parseFloat(document.getElementById('probability').value);
-            let resultDiv = document.getElementById('result');
-
-            if (isNaN(probability) || probability <= 0 || probability >= 100) {
-                resultDiv.innerHTML = "Bitte geben Sie eine gültige Wahrscheinlichkeit ein (zwischen 0 und 100).";
-                return;
-            }
-
-            let gfapValue = calculateGFAP(probability);
-            resultDiv.innerHTML = `Geschätzter GFAP-Wert: <strong>${gfapValue}</strong>`;
+        
+        function resetForm() {
+            document.getElementById('gfap').value = "";
+            document.getElementById('result').innerHTML = "";
         }
     </script>
 
