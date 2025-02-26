@@ -58,11 +58,18 @@
 <body>
     <div class="container">
         <h1>GFAP Blutungsrisiko-Check</h1>
-        <p>Geben Sie den GFAP-Wert ein, um die Wahrscheinlichkeit einer intrakraniellen Blutung zu überprüfen.</p>
+        <p>Geben Sie den GFAP-Wert oder die Wahrscheinlichkeit ein, um den anderen Wert zu berechnen.</p>
+        
         <form id="gfapForm">
-            <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)" required><br>
+            <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)"><br>
             <button type="button" onclick="checkICHProbability()">Risiko prüfen</button>
         </form>
+        
+        <form id="probabilityForm">
+            <input type="number" id="probability" placeholder="Wahrscheinlichkeit eingeben (%)"><br>
+            <button type="button" onclick="checkGFAPValue()">GFAP-Wert berechnen</button>
+        </form>
+        
         <div class="result" id="result"></div>
     </div>
     
@@ -73,8 +80,8 @@
     
     <script>
         function calculateICHProbability(gfap) {
-            let A = -3.05;  // Baseline adjustment
-            let B = 0.0060; // Growth factor
+            let A = -1.90;  // Baseline adjustment (Updated based on Prof. Förch's data)
+            let B = 0.0016; // Growth factor (Updated based on patient data)
             let probability = 100 / (1 + Math.exp(-(A + B * gfap)));
             return probability.toFixed(2) + "%"; // Returning a percentage with 2 decimal places
         }
@@ -90,6 +97,26 @@
 
             let ichRisk = calculateICHProbability(gfap);
             resultDiv.innerHTML = `Geschätzte Wahrscheinlichkeit einer intrakraniellen Blutung: <strong>${ichRisk}</strong>`;
+        }
+
+        function calculateGFAP(probability) {
+            let A = -1.90;  // Baseline adjustment
+            let B = 0.0016; // Growth factor
+            let gfap = (-Math.log((100 / probability) - 1) - A) / B;
+            return gfap.toFixed(2) + " pg/mL"; // Returning GFAP value with 2 decimal places
+        }
+
+        function checkGFAPValue() {
+            let probability = parseFloat(document.getElementById('probability').value);
+            let resultDiv = document.getElementById('result');
+
+            if (isNaN(probability) || probability <= 0 || probability >= 100) {
+                resultDiv.innerHTML = "Bitte geben Sie eine gültige Wahrscheinlichkeit ein (zwischen 0 und 100).";
+                return;
+            }
+
+            let gfapValue = calculateGFAP(probability);
+            resultDiv.innerHTML = `Geschätzter GFAP-Wert: <strong>${gfapValue}</strong>`;
         }
     </script>
 
