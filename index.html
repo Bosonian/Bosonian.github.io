@@ -77,8 +77,8 @@
     
     <script>
         function calculateICHProbability(gfap) {
-            let A = -1.90;  // Baseline adjustment (Updated based on Prof. Förch's data)
-            let B = 0.0016; // Growth factor (Updated based on patient data)
+            let A = -4.34;  // Baseline adjustment from Gemini model
+            let B = 0.00248; // Growth factor from Gemini model
             let probability = 100 / (1 + Math.exp(-(A + B * gfap)));
             return probability.toFixed(2) + "%"; // Returning a percentage with 2 decimal places
         }
