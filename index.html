@@ -1,76 +1,123 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <!-- CSS bleibt unverändert -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFAP Blutungsrisiko-Check</title>
+    
     <style>
-        /* ... existierender CSS-Code ... */
-        
-        /* NEU: Ergebnis-Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #ffffff;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .input-group input {
+            width: 90%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            outline: none;
+            text-align: center;
+        }
+        .button-group button {
+            width: 90%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .primary:hover {
+            background-color: #0056b3;
+        }
+        .secondary {
+            background-color: #dc3545;
+            color: white;
+        }
+        .secondary:hover {
+            background-color: #b52b3a;
+        }
         .result {
             margin-top: 1.5rem;
             padding: 1rem;
             border-radius: 8px;
             background: #f8f9fa;
             color: #2c3e50;
-            min-height: 80px;
+            font-size: 18px;
+            font-weight: bold;
+            display: none; /* Initially hidden */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>GFAP Blutungsrisiko-Check</h1>
-
+        <h1>🧠 GFAP Blutungsrisiko-Check</h1>
+        <p>Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:</p>
+        
         <div class="input-group">
             <input type="number" 
-                   id="gfapInput" <!-- ID hinzugefügt -->
-                   placeholder="GFAP-Wert in pg/mL eingeben"
-                   inputmode="numeric">
+                   id="gfapInput"
+                   placeholder="GFAP-Wert hier eingeben"
+                   inputmode="numeric"
+                   min="29" max="10001">
         </div>
 
         <div class="button-group">
-            <button class="primary" onclick="calculateRisk()">Risiko berechnen</button> <!-- onclick hinzugefügt -->
-            <button class="secondary" onclick="resetForm()">Zurücksetzen</button> <!-- onclick hinzugefügt -->
+            <button class="primary" onclick="calculateRisk()">Berechnen</button>
+            <button class="secondary" onclick="resetForm()">Zurücksetzen</button>
         </div>
 
-        <div class="result" id="result"></div> <!-- Ergebnis-Container hinzugefügt -->
+        <div class="result" id="result"></div>
     </div>
 
-    <!-- JavaScript hinzugefügt -->
     <script>
-        // Berechnungsfunktion
         function calculateICHProbability(gfap) {
-            gfap = Math.max(29, Math.min(gfap, 10001));
+            gfap = Math.max(29, Math.min(gfap, 10001)); // Ensure within range
             const A = -5.3520, B = 0.0049;
             return 100 / (1 + Math.exp(-(A + B * gfap)));
         }
 
-        // Hauptfunktion
         function calculateRisk() {
             const input = document.getElementById('gfapInput');
             const resultDiv = document.getElementById('result');
-            
-            if(!input.value || isNaN(input.value)) {
-                resultDiv.innerHTML = "Bitte gültigen GFAP-Wert eingeben!";
+
+            if (!input.value || isNaN(input.value) || input.value < 29 || input.value > 10001) {
+                resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert zwischen 29 und 10001 ein!";
+                resultDiv.style.display = "block";
                 return;
             }
 
             const probability = calculateICHProbability(parseFloat(input.value));
-            resultDiv.innerHTML = `
-                <strong>Ergebnis:</strong><br>
-                ${probability.toFixed(1)}% Wahrscheinlichkeit
-            `;
+            resultDiv.innerHTML = `<strong>Ergebnis:</strong><br> ${probability.toFixed(1)}% Wahrscheinlichkeit`;
+            resultDiv.style.display = "block";
         }
 
-        // Reset-Funktion
         function resetForm() {
             document.getElementById('gfapInput').value = '';
             document.getElementById('result').innerHTML = '';
+            document.getElementById('result').style.display = "none";
         }
     </script>
 
     <footer>
-        <p>© 2024 Medizinische Algorithmen GmbH<br>
-        Alle Berechnungen basieren auf peer-reviewter Forschung</p>
+        <p>© 2024 Medizinische Algorithmen GmbH | Alle Berechnungen basieren auf peer-reviewter Forschung</p>
     </footer>
 </body>
 </html>
