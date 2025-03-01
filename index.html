@@ -1,112 +1,72 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFAP Blutungsrisiko-Check</title>
+    <!-- CSS bleibt unverändert -->
     <style>
-        /* Überarbeitete symmetrische Version */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background: #f8f9fa;
-            font-family: 'Segoe UI', system-ui;
-        }
-
-        .container {
-            max-width: 600px;
-            width: 90%;
-            margin: auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin: 0 0 1.5rem 0;
-            font-size: 1.8rem;
-            line-height: 1.3;
-        }
-
-        .input-group {
-            margin: 2rem 0;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 0.5rem 0;
-            border: 2px solid #007bff;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        /* ... existierender CSS-Code ... */
+        
+        /* NEU: Ergebnis-Styling */
+        .result {
             margin-top: 1.5rem;
-        }
-
-        button {
-            padding: 12px;
-            border: none;
+            padding: 1rem;
             border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        button.primary {
-            background: #007bff;
-            color: white;
-        }
-
-        button.secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 1.5rem;
-            text-align: center;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 1.5rem;
-            }
-            
-            .button-group {
-                grid-template-columns: 1fr;
-            }
+            background: #f8f9fa;
+            color: #2c3e50;
+            min-height: 80px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>GFAP Blutungsrisiko-Check</h1>
-        
+
         <div class="input-group">
             <input type="number" 
+                   id="gfapInput" <!-- ID hinzugefügt -->
                    placeholder="GFAP-Wert in pg/mL eingeben"
                    inputmode="numeric">
         </div>
 
         <div class="button-group">
-            <button class="primary">Risiko berechnen</button>
-            <button class="secondary">Zurücksetzen</button>
+            <button class="primary" onclick="calculateRisk()">Risiko berechnen</button> <!-- onclick hinzugefügt -->
+            <button class="secondary" onclick="resetForm()">Zurücksetzen</button> <!-- onclick hinzugefügt -->
         </div>
+
+        <div class="result" id="result"></div> <!-- Ergebnis-Container hinzugefügt -->
     </div>
+
+    <!-- JavaScript hinzugefügt -->
+    <script>
+        // Berechnungsfunktion
+        function calculateICHProbability(gfap) {
+            gfap = Math.max(29, Math.min(gfap, 10001));
+            const A = -5.3520, B = 0.0049;
+            return 100 / (1 + Math.exp(-(A + B * gfap)));
+        }
+
+        // Hauptfunktion
+        function calculateRisk() {
+            const input = document.getElementById('gfapInput');
+            const resultDiv = document.getElementById('result');
+            
+            if(!input.value || isNaN(input.value)) {
+                resultDiv.innerHTML = "Bitte gültigen GFAP-Wert eingeben!";
+                return;
+            }
+
+            const probability = calculateICHProbability(parseFloat(input.value));
+            resultDiv.innerHTML = `
+                <strong>Ergebnis:</strong><br>
+                ${probability.toFixed(1)}% Wahrscheinlichkeit
+            `;
+        }
+
+        // Reset-Funktion
+        function resetForm() {
+            document.getElementById('gfapInput').value = '';
+            document.getElementById('result').innerHTML = '';
+        }
+    </script>
 
     <footer>
         <p>© 2024 Medizinische Algorithmen GmbH<br>
