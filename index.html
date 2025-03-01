@@ -1,60 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="GFAP Check">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="manifest" href="manifest.json">
-    <title>GFAP Blutungsrisiko-Check</title>
+    <!-- ... (existing head content) ... -->
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f9;
-            text-align: center;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-        }
-        input, button {
-            width: 85%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            margin-top: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            color: #007bff;
-        }
-        footer {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #666;
-        }
+        /* Add to existing styles */
+        .risk-low { color: green; }
+        .risk-medium { color: orange; }
+        .risk-high { color: red; }
+        .note { font-size: 14px; color: #666; }
     </style>
 </head>
 <body>
@@ -63,7 +16,8 @@
         <p>Geben Sie den GFAP-Wert ein, um die Wahrscheinlichkeit einer intrakraniellen Blutung zu überprüfen.</p>
         
         <form id="gfapForm">
-            <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)"><br>
+            <label for="gfap" style="display: none;">GFAP-Wert</label>
+            <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)" aria-label="GFAP-Wert"><br>
             <button type="button" onclick="checkICHProbability()">Risiko prüfen</button>
             <button type="button" onclick="resetForm()" style="background-color: #dc3545;">Zurücksetzen</button>
         </form>
@@ -71,43 +25,50 @@
         <div class="result" id="result"></div>
     </div>
     
-    <footer>
-        <p>&copy; 2025 iGFAP - Alle Rechte vorbehalten.</p>
-    </footer>
-    
     <script>
         function calculateICHProbability(gfap) {
-            let A = -4.34;  // Baseline adjustment from Gemini model
-            let B = 0.00248; // Growth factor from Gemini model
-            let probability = 100 / (1 + Math.exp(-(A + B * gfap)));
-            return probability.toFixed(2) + "%"; // Returning a percentage with 2 decimal places
+            gfap = Math.max(29, Math.min(gfap, 10001)); // Censor values
+            const A = -5.3520, B = 0.0049;
+            const probability = 100 / (1 + Math.exp(-(A + B * gfap)));
+            return probability;
         }
 
         function checkICHProbability() {
-            let gfap = parseFloat(document.getElementById('gfap').value);
-            let resultDiv = document.getElementById('result');
+            const gfap = parseFloat(document.getElementById('gfap').value);
+            const resultDiv = document.getElementById('result');
 
             if (isNaN(gfap) || gfap < 0) {
                 resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert ein.";
                 return;
             }
 
-            let ichRisk = calculateICHProbability(gfap);
-            resultDiv.innerHTML = `Geschätzte Wahrscheinlichkeit einer intrakraniellen Blutung: <strong>${ichRisk}</strong>`;
+            const probability = calculateICHProbability(gfap);
+            let riskLevel = "";
+            if (probability < 10) riskLevel = "Niedriges Risiko 🟢";
+            else if (probability < 50) riskLevel = "Mittleres Risiko 🟡";
+            else riskLevel = "Hohes Risiko 🔴";
+
+            let note = "";
+            if (gfap < 29 || gfap > 10001) {
+                note = `<br><small class="note">Hinweis: Werte unter 29 oder über 10,001 werden als 29 bzw. 10,001 behandelt.</small>`;
+            }
+
+            resultDiv.innerHTML = `
+                Geschätzte Wahrscheinlichkeit: <strong>${probability.toFixed(1)}%</strong><br>
+                <span class="${getRiskClass(probability)}">${riskLevel}</span>
+                ${note}
+            `;
         }
-        
+
+        function getRiskClass(probability) {
+            if (probability < 10) return "risk-low";
+            else if (probability < 50) return "risk-medium";
+            else return "risk-high";
+        }
+
         function resetForm() {
             document.getElementById('gfap').value = "";
             document.getElementById('result').innerHTML = "";
-        }
-    </script>
-
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log("Service Worker Registered"))
-                .catch(error => console.log("Service Worker Registration Failed", error));
         }
     </script>
 </body>
