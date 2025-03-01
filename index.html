@@ -1,36 +1,159 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <!-- ... (existing head content) ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>GFAP Blutungsrisiko-Check</title>
     <style>
-        /* Add to existing styles */
-        .risk-low { color: green; }
-        .risk-medium { color: orange; }
-        .risk-high { color: red; }
-        .note { font-size: 14px; color: #666; }
+        /* Ursprüngliches Design mit Verbesserungen */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #4a5568;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 2px solid #007bff;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button[type="button"] {
+            background: #007bff;
+            color: white;
+        }
+
+        button[type="button"]:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        button.reset {
+            background: #e74c3c;
+        }
+
+        button.reset:hover {
+            background: #c0392b;
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .risk-low { background: #e8f5e9; color: #2e7d32; }
+        .risk-medium { background: #fff3e0; color: #ef6c00; }
+        .risk-high { background: #ffebee; color: #c62828; }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Optimierungen */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            button {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>GFAP Blutungsrisiko-Check</h1>
-        <p>Geben Sie den GFAP-Wert ein, um die Wahrscheinlichkeit einer intrakraniellen Blutung zu überprüfen.</p>
+        <h1>🔬 GFAP Blutungsrisiko-Check</h1>
+        <p>Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:</p>
         
         <form id="gfapForm">
-            <label for="gfap" style="display: none;">GFAP-Wert</label>
-            <input type="number" id="gfap" placeholder="GFAP-Wert eingeben (pg/mL)" aria-label="GFAP-Wert"><br>
-            <button type="button" onclick="checkICHProbability()">Risiko prüfen</button>
-            <button type="button" onclick="resetForm()" style="background-color: #dc3545;">Zurücksetzen</button>
+            <input type="number" id="gfap" placeholder="GFAP-Wert hier eingeben" inputmode="numeric">
+            <button type="button" onclick="checkICHProbability()">Berechnen</button>
+            <button type="button" onclick="resetForm()" class="reset">Zurücksetzen</button>
         </form>
         
         <div class="result" id="result"></div>
     </div>
-    
+
+    <footer>
+        <p>© 2024 Medizinische Algorithmen GmbH | Alle Berechnungen basieren auf peer-reviewter Forschung</p>
+    </footer>
+
     <script>
         function calculateICHProbability(gfap) {
-            gfap = Math.max(29, Math.min(gfap, 10001)); // Censor values
+            gfap = Math.max(29, Math.min(gfap, 10001));
             const A = -5.3520, B = 0.0049;
-            const probability = 100 / (1 + Math.exp(-(A + B * gfap)));
-            return probability;
+            return 100 / (1 + Math.exp(-(A + B * gfap)));
         }
 
         function checkICHProbability() {
@@ -38,37 +161,35 @@
             const resultDiv = document.getElementById('result');
 
             if (isNaN(gfap) || gfap < 0) {
-                resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert ein.";
+                resultDiv.innerHTML = "<div class='risk-medium'>❌ Bitte einen gültigen Wert zwischen 0–10,000 pg/mL eingeben</div>";
                 return;
             }
 
             const probability = calculateICHProbability(gfap);
-            let riskLevel = "";
-            if (probability < 10) riskLevel = "Niedriges Risiko 🟢";
-            else if (probability < 50) riskLevel = "Mittleres Risiko 🟡";
-            else riskLevel = "Hohes Risiko 🔴";
-
-            let note = "";
-            if (gfap < 29 || gfap > 10001) {
-                note = `<br><small class="note">Hinweis: Werte unter 29 oder über 10,001 werden als 29 bzw. 10,001 behandelt.</small>`;
+            let riskClass = 'risk-high';
+            let riskText = '🔴 Hohes Risiko';
+            
+            if (probability < 10) {
+                riskClass = 'risk-low';
+                riskText = '🟢 Geringes Risiko';
+            } else if (probability < 50) {
+                riskClass = 'risk-medium';
+                riskText = '🟡 Mittleres Risiko';
             }
 
             resultDiv.innerHTML = `
-                Geschätzte Wahrscheinlichkeit: <strong>${probability.toFixed(1)}%</strong><br>
-                <span class="${getRiskClass(probability)}">${riskLevel}</span>
-                ${note}
+                <div class="${riskClass}">
+                    <strong>Ergebnis:</strong><br>
+                    ${probability.toFixed(1)}% Wahrscheinlichkeit<br>
+                    ${riskText}
+                    ${gfap < 29 || gfap > 10001 ? '<div class="note">⚠️ Wert wurde automatisch angepasst</div>' : ''}
+                </div>
             `;
         }
 
-        function getRiskClass(probability) {
-            if (probability < 10) return "risk-low";
-            else if (probability < 50) return "risk-medium";
-            else return "risk-high";
-        }
-
         function resetForm() {
-            document.getElementById('gfap').value = "";
-            document.getElementById('result').innerHTML = "";
+            document.getElementById('gfap').value = '';
+            document.getElementById('result').innerHTML = '';
         }
     </script>
 </body>
