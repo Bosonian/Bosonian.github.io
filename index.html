@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFAP Blutungsrisiko-Check</title>
-    
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -62,7 +62,12 @@
             color: #2c3e50;
             font-size: 18px;
             font-weight: bold;
-            display: none; /* Initially hidden */
+            display: none;
+        }
+        .warning {
+            font-size: 12px;
+            color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -70,7 +75,7 @@
     <div class="container">
         <h1>🧠 GFAP Blutungsrisiko-Check</h1>
         <p>Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:</p>
-        
+
         <div class="input-group">
             <input type="number" 
                    id="gfapInput"
@@ -85,13 +90,21 @@
         </div>
 
         <div class="result" id="result"></div>
+        <p class="warning"><strong>⚠️ Hinweis:</strong> Diese Berechnung dient ausschließlich Forschungszwecken. Keine klinischen Entscheidungen darauf basieren!</p>
     </div>
 
     <script>
         function calculateICHProbability(gfap) {
             gfap = Math.max(29, Math.min(gfap, 10001)); // Ensure within range
-            const A = -5.3520, B = 0.0049;
-            return 100 / (1 + Math.exp(-(A + B * gfap)));
+
+            if (gfap <= 0) {
+                return 0; // Log10 of zero or negative numbers is not defined
+            }
+
+            const logGFAP = Math.log10(gfap); // Log10 transformation
+            const linearScore = 36.72 * logGFAP - 50.48; // Apply the new regression formula
+
+            return 100 / (1 + Math.exp(-linearScore)); // Convert to probability
         }
 
         function calculateRisk() {
@@ -117,7 +130,7 @@
     </script>
 
     <footer>
-        <p>© 2025 iGFAP Alle Rechtevorbehalten</p>
+        <p>© 2025 iGFAP Alle Rechte vorbehalten</p>
     </footer>
 </body>
 </html>
