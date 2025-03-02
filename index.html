@@ -95,16 +95,18 @@
 
     <script>
         function calculateICHProbability(gfap) {
-            gfap = Math.max(29, Math.min(gfap, 10001)); // Ensure within range
+            // Ensure GFAP input is within expected range
+            gfap = Math.max(29, Math.min(gfap, 10001));
 
             if (gfap <= 0) {
-                return 0; // Log10 of zero or negative numbers is not defined
+                return 0; // Log10 is undefined for zero or negative values
             }
 
             const logGFAP = Math.log10(gfap); // Log10 transformation
-            const linearScore = 36.72 * logGFAP - 50.48; // Apply the new regression formula
+            let percentage = (36.72 * logGFAP) - 50.48; // Apply regression formula
 
-            return 100 / (1 + Math.exp(-linearScore)); // Convert to probability
+            // Ensure the output stays within 0% - 100%
+            return Math.max(0, Math.min(percentage, 100));
         }
 
         function calculateRisk() {
