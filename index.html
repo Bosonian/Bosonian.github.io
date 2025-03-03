@@ -92,6 +92,25 @@
             }
         }
 
+        function switchLanguage(lang) {
+            const texts = {
+                de: {
+                    title: "🧠 GFAP Blutungsrisiko-Check",
+                    codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
+                    description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
+                },
+                en: {
+                    title: "🧠 GFAP Bleeding Risk Check",
+                    codePrompt: "🔑 Please enter your access code:",
+                    description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
+                }
+            };
+            
+            document.getElementById("title").innerText = texts[lang].title;
+            document.getElementById("codePrompt").innerText = texts[lang].codePrompt;
+            document.getElementById("description").innerText = texts[lang].description;
+        }
+
         function calculateRisk() {
             const input = document.getElementById('gfapInput').value;
             const resultDiv = document.getElementById('result');
@@ -102,7 +121,6 @@
                 return;
             }
 
-            // Obfuscated formula
             const encodedFactor = atob("MzYuNzI="); // 36.72
             const encodedIntercept = atob("LTUwLjQ4"); // -50.48
             const logGFAP = Math.log10(input);
