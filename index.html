@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFAP Blutungsrisiko-Check</title>
 
+    <!-- Link to PWA manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Force PWA Theme Color -->
+    <meta name="theme-color" content="#007bff">
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -103,9 +109,9 @@
             }
 
             const logGFAP = Math.log10(gfap); // Log10 transformation
-            let percentage = (36.72 * logGFAP) - 50.48; // Apply regression formula
+            let percentage = (36.72 * logGFAP) - 50.48; // Apply direct formula
 
-            // Ensure the output stays within 0% - 100%
+            // Ensure the output stays between 0% - 100%
             return Math.max(0, Math.min(percentage, 100));
         }
 
@@ -129,6 +135,27 @@
             document.getElementById('result').innerHTML = '';
             document.getElementById('result').style.display = "none";
         }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log("Service Worker Registered:", reg))
+                .catch(err => console.log("Service Worker Failed:", err));
+        }
+
+        // Force Reload for Updates
+        let newWorker;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (newWorker) {
+                window.location.reload();
+            }
+        });
+
+        navigator.serviceWorker.register('/service-worker.js').then(reg => {
+            reg.onupdatefound = () => {
+                newWorker = reg.installing;
+            };
+        });
     </script>
 
     <footer>
