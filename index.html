@@ -64,8 +64,6 @@
             margin-top: 1.5rem;
             padding: 1rem;
             border-radius: 8px;
-            background: #f8f9fa;
-            color: #2c3e50;
             font-size: 18px;
             font-weight: bold;
             display: none;
@@ -75,59 +73,112 @@
             color: red;
             margin-top: 10px;
         }
+        .low-risk { background: #d4edda; color: #155724; } /* Green */
+        .moderate-risk { background: #fff3cd; color: #856404; } /* Yellow */
+        .high-risk { background: #f8d7da; color: #721c24; } /* Red */
+        .language-switch {
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
+    <!-- Safety Warning Popup -->
+    <script>
+        window.onload = function() {
+            alert("⚠️ Diese Berechnung dient ausschließlich Forschungszwecken. Keine klinischen Entscheidungen darauf basieren!");
+        };
+    </script>
+
     <div class="container">
-        <h1>🧠 GFAP Blutungsrisiko-Check</h1>
-        <p>Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:</p>
+        <h1 id="title">🧠 GFAP Blutungsrisiko-Check</h1>
 
-        <div class="input-group">
-            <input type="number" 
-                   id="gfapInput"
-                   placeholder="GFAP-Wert hier eingeben"
-                   inputmode="numeric"
-                   min="29" max="10001">
+        <!-- Language Switch -->
+        <div class="language-switch">
+            <button onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
+            <button onclick="switchLanguage('en')">🇬🇧 English</button>
         </div>
 
-        <div class="button-group">
-            <button class="primary" onclick="calculateRisk()">Berechnen</button>
-            <button class="secondary" onclick="resetForm()">Zurücksetzen</button>
+        <!-- Login Section -->
+        <div id="authSection">
+            <p id="loginPrompt">🔒 Bitte melden Sie sich an, um fortzufahren.</p>
+            <button onclick="loginWithStripe()">🔑 Zugang kaufen (€5/Monat)</button>
         </div>
 
-        <div class="result" id="result"></div>
-        <p class="warning"><strong>⚠️ Hinweis:</strong> Diese Berechnung dient ausschließlich Forschungszwecken. Keine klinischen Entscheidungen darauf basieren!</p>
+        <!-- Calculator Section (Hidden until login) -->
+        <div id="calculatorSection" style="display: none;">
+            <p id="description">Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:</p>
+
+            <div class="input-group">
+                <input type="number" 
+                    id="gfapInput"
+                    placeholder="GFAP-Wert hier eingeben"
+                    inputmode="numeric"
+                    min="29" max="10001">
+            </div>
+
+            <div class="button-group">
+                <button class="primary" onclick="calculateRisk()">Berechnen</button>
+                <button class="secondary" onclick="resetForm()">Zurücksetzen</button>
+            </div>
+
+            <div class="result" id="result"></div>
+        </div>
     </div>
 
     <script>
-        function calculateICHProbability(gfap) {
-            // Ensure GFAP input is within expected range
-            gfap = Math.max(29, Math.min(gfap, 10001));
-
-            if (gfap <= 0) {
-                return 0; // Log10 is undefined for zero or negative values
+        // Check if user is logged in
+        function checkAccess() {
+            const user = localStorage.getItem("userPaid");
+            if (user === "true") {
+                document.getElementById("authSection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
             }
-
-            const logGFAP = Math.log10(gfap); // Log10 transformation
-            let percentage = (36.72 * logGFAP) - 50.48; // Apply direct formula
-
-            // Ensure the output stays between 0% - 100%
-            return Math.max(0, Math.min(percentage, 100));
         }
 
-        function calculateRisk() {
-            const input = document.getElementById('gfapInput');
+        // Stripe Payment for Access
+        async function loginWithStripe() {
+            window.location.href = "https://buy.stripe.com/test_5kAdTg1dBfje4q4cMM"; // Replace with your Stripe payment link
+        }
+
+        async function calculateRisk() {
+            const input = document.getElementById('gfapInput').value;
             const resultDiv = document.getElementById('result');
 
-            if (!input.value || isNaN(input.value) || input.value < 29 || input.value > 10001) {
+            if (!input || isNaN(input) || input < 29 || input > 10001) {
                 resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert zwischen 29 und 10001 ein!";
                 resultDiv.style.display = "block";
                 return;
             }
 
-            const probability = calculateICHProbability(parseFloat(input.value));
-            resultDiv.innerHTML = `<strong>Ergebnis:</strong><br> ${probability.toFixed(1)}% Wahrscheinlichkeit`;
-            resultDiv.style.display = "block";
+            try {
+                const response = await fetch("https://green-sun-35dc.bosdeepak.workers.dev/calculate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ gfap: input })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerHTML = `⚠️ Fehler: ${data.error}`;
+                } else {
+                    resultDiv.innerHTML = `<strong>Ergebnis:</strong><br> ${data.probability.toFixed(1)}% Wahrscheinlichkeit`;
+
+                    if (data.probability <= 100) {
+                        resultDiv.className = "result low-risk";
+                    } else if (data.probability <= 1000) {
+                        resultDiv.className = "result moderate-risk";
+                    } else {
+                        resultDiv.className = "result high-risk";
+                    }
+                }
+
+                resultDiv.style.display = "block";
+
+            } catch (error) {
+                resultDiv.innerHTML = "❌ Serverfehler. Bitte versuchen Sie es später erneut.";
+                resultDiv.style.display = "block";
+            }
         }
 
         function resetForm() {
@@ -136,26 +187,18 @@
             document.getElementById('result').style.display = "none";
         }
 
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(reg => console.log("Service Worker Registered:", reg))
-                .catch(err => console.log("Service Worker Failed:", err));
+        // Language Switching Function
+        function switchLanguage(lang) {
+            if (lang === 'de') {
+                document.getElementById("title").innerText = "🧠 GFAP Blutungsrisiko-Check";
+                document.getElementById("description").innerText = "Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:";
+            } else if (lang === 'en') {
+                document.getElementById("title").innerText = "🧠 GFAP Bleeding Risk Check";
+                document.getElementById("description").innerText = "Enter the measured GFAP value (in pg/mL) to calculate the risk of intracranial bleeding:";
+            }
         }
 
-        // Force Reload for Updates
-        let newWorker;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (newWorker) {
-                window.location.reload();
-            }
-        });
-
-        navigator.serviceWorker.register('/service-worker.js').then(reg => {
-            reg.onupdatefound = () => {
-                newWorker = reg.installing;
-            };
-        });
+        window.onload = checkAccess;
     </script>
 
     <footer>
