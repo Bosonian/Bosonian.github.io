@@ -3,122 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFAP Blutungsrisiko-Check</title>
+    <title>GFAP Bleeding Risk Check</title>
 
-    <!-- Link to PWA manifest -->
     <link rel="manifest" href="/manifest.json">
-
-    <!-- Force PWA Theme Color -->
     <meta name="theme-color" content="#007bff">
 
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            background-color: #ffffff;
-            color: #2c3e50;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .input-group input {
-            width: 90%;
-            padding: 12px;
-            font-size: 18px;
-            border: 2px solid #007bff;
-            border-radius: 5px;
-            outline: none;
-            text-align: center;
-        }
-        .button-group button {
-            width: 90%;
-            padding: 12px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .primary {
-            background-color: #007bff;
-            color: white;
-        }
-        .primary:hover {
-            background-color: #0056b3;
-        }
-        .secondary {
-            background-color: #dc3545;
-            color: white;
-        }
-        .secondary:hover {
-            background-color: #b52b3a;
-        }
-        .result {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            display: none;
-        }
-        .warning {
-            font-size: 12px;
-            color: red;
-            margin-top: 10px;
-        }
+        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
+        .button-group button { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .primary { background-color: #007bff; color: white; }
+        .primary:hover { background-color: #0056b3; }
+        .secondary { background-color: #dc3545; color: white; }
+        .secondary:hover { background-color: #b52b3a; }
+        .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
+        .warning { font-size: 12px; color: red; margin-top: 10px; }
         .low-risk { background: #d4edda; color: #155724; } /* Green */
         .moderate-risk { background: #fff3cd; color: #856404; } /* Yellow */
         .high-risk { background: #f8d7da; color: #721c24; } /* Red */
-        .language-switch {
-            margin-top: 15px;
-        }
     </style>
 </head>
 <body>
-    <!-- Safety Warning Popup -->
     <script>
         window.onload = function() {
-            alert("⚠️ Diese Berechnung dient ausschließlich Forschungszwecken. Keine klinischen Entscheidungen darauf basieren!");
+            alert("⚠️ This calculation is for research purposes only. Do not use for clinical decisions!");
+            checkAccess();
         };
     </script>
 
     <div class="container">
-        <h1 id="title">🧠 GFAP Blutungsrisiko-Check</h1>
+        <h1 id="title">🧠 GFAP Bleeding Risk Check</h1>
 
         <!-- Language Switch -->
-        <div class="language-switch">
+        <div>
             <button onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
             <button onclick="switchLanguage('en')">🇬🇧 English</button>
         </div>
 
-        <!-- Login Section -->
-        <div id="authSection">
-            <p id="loginPrompt">🔒 Bitte melden Sie sich an, um fortzufahren.</p>
-            <button onclick="loginWithStripe()">🔑 Zugang kaufen (€5/Monat)</button>
+        <!-- Access Code Section -->
+        <div id="codeEntrySection">
+            <p id="codePrompt">🔑 Please enter your access code:</p>
+            <input type="text" id="accessCodeInput" placeholder="Enter code">
+            <button class="primary" onclick="validateAccessCode()">Confirm</button>
+            <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
         </div>
 
-        <!-- Calculator Section (Hidden until login) -->
+        <!-- Calculator Section (Hidden until access is granted) -->
         <div id="calculatorSection" style="display: none;">
-            <p id="description">Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:</p>
+            <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
 
             <div class="input-group">
-                <input type="number" 
-                    id="gfapInput"
-                    placeholder="GFAP-Wert hier eingeben"
-                    inputmode="numeric"
-                    min="29" max="10001">
+                <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10001">
             </div>
 
             <div class="button-group">
-                <button class="primary" onclick="calculateRisk()">Berechnen</button>
-                <button class="secondary" onclick="resetForm()">Zurücksetzen</button>
+                <button class="primary" onclick="calculateRisk()">Calculate</button>
+                <button class="secondary" onclick="resetForm()">Reset</button>
             </div>
 
             <div class="result" id="result"></div>
@@ -126,18 +67,27 @@
     </div>
 
     <script>
-        // Check if user is logged in
-        function checkAccess() {
-            const user = localStorage.getItem("userPaid");
-            if (user === "true") {
-                document.getElementById("authSection").style.display = "none";
+        const validCodes = [
+            "X9B7K2M4", "A8D2Q6Z3", "M5N8X2B9", "K7L3P9D4" // Replace with full list
+        ];
+
+        function validateAccessCode() {
+            const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+
+            if (validCodes.includes(inputCode)) {
+                localStorage.setItem("userHasAccess", "true");
+                document.getElementById("codeEntrySection").style.display = "none";
                 document.getElementById("calculatorSection").style.display = "block";
+            } else {
+                document.getElementById("accessError").style.display = "block";
             }
         }
 
-        // Stripe Payment for Access
-        async function loginWithStripe() {
-            window.location.href = "https://buy.stripe.com/test_5kAdTg1dBfje4q4cMM"; // Replace with your Stripe payment link
+        function checkAccess() {
+            if (localStorage.getItem("userHasAccess") === "true") {
+                document.getElementById("codeEntrySection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
+            }
         }
 
         async function calculateRisk() {
@@ -145,7 +95,7 @@
             const resultDiv = document.getElementById('result');
 
             if (!input || isNaN(input) || input < 29 || input > 10001) {
-                resultDiv.innerHTML = "Bitte geben Sie einen gültigen GFAP-Wert zwischen 29 und 10001 ein!";
+                resultDiv.innerHTML = "Please enter a valid GFAP value (29-10001)!";
                 resultDiv.style.display = "block";
                 return;
             }
@@ -158,11 +108,10 @@
                 });
 
                 const data = await response.json();
-
                 if (data.error) {
-                    resultDiv.innerHTML = `⚠️ Fehler: ${data.error}`;
+                    resultDiv.innerHTML = `⚠️ Error: ${data.error}`;
                 } else {
-                    resultDiv.innerHTML = `<strong>Ergebnis:</strong><br> ${data.probability.toFixed(1)}% Wahrscheinlichkeit`;
+                    resultDiv.innerHTML = `<strong>Result:</strong><br> ${data.probability.toFixed(1)}% probability`;
 
                     if (data.probability <= 100) {
                         resultDiv.className = "result low-risk";
@@ -176,7 +125,7 @@
                 resultDiv.style.display = "block";
 
             } catch (error) {
-                resultDiv.innerHTML = "❌ Serverfehler. Bitte versuchen Sie es später erneut.";
+                resultDiv.innerHTML = "❌ Server error. Please try again later.";
                 resultDiv.style.display = "block";
             }
         }
@@ -187,22 +136,21 @@
             document.getElementById('result').style.display = "none";
         }
 
-        // Language Switching Function
         function switchLanguage(lang) {
             if (lang === 'de') {
                 document.getElementById("title").innerText = "🧠 GFAP Blutungsrisiko-Check";
+                document.getElementById("codePrompt").innerText = "🔑 Bitte geben Sie Ihren Zugangscode ein:";
                 document.getElementById("description").innerText = "Geben Sie den gemessenen GFAP-Wert (in pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:";
-            } else if (lang === 'en') {
+            } else {
                 document.getElementById("title").innerText = "🧠 GFAP Bleeding Risk Check";
-                document.getElementById("description").innerText = "Enter the measured GFAP value (in pg/mL) to calculate the risk of intracranial bleeding:";
+                document.getElementById("codePrompt").innerText = "🔑 Please enter your access code:";
+                document.getElementById("description").innerText = "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:";
             }
         }
-
-        window.onload = checkAccess;
     </script>
 
     <footer>
-        <p>© 2025 iGFAP Alle Rechte vorbehalten</p>
+        <p>© 2025 iGFAP. All rights reserved.</p>
     </footer>
 </body>
 </html>
