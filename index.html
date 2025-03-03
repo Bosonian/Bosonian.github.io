@@ -63,8 +63,8 @@
             </div>
 
             <div class="button-group">
-                <button class="primary" onclick="calculateRisk()">Calculate</button>
-                <button class="secondary" onclick="resetForm()">Reset</button>
+                <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
+                <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
             </div>
 
             <div class="result" id="result"></div>
@@ -98,17 +98,23 @@
                     title: "🧠 GFAP Blutungsrisiko-Check",
                     codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
                     description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
+                    calculate: "Berechnen",
+                    reset: "Zurücksetzen"
                 },
                 en: {
                     title: "🧠 GFAP Bleeding Risk Check",
                     codePrompt: "🔑 Please enter your access code:",
                     description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
+                    calculate: "Calculate",
+                    reset: "Reset"
                 }
             };
             
             document.getElementById("title").innerText = texts[lang].title;
             document.getElementById("codePrompt").innerText = texts[lang].codePrompt;
             document.getElementById("description").innerText = texts[lang].description;
+            document.getElementById("calculateButton").innerText = texts[lang].calculate;
+            document.getElementById("resetButton").innerText = texts[lang].reset;
         }
 
         function calculateRisk() {
@@ -128,6 +134,11 @@
             
             resultDiv.innerHTML = `<strong>Result:</strong><br> ${probability.toFixed(1)}% probability`;
             resultDiv.style.display = "block";
+        }
+
+        function resetForm() {
+            document.getElementById("gfapInput").value = "";
+            document.getElementById("result").style.display = "none";
         }
     </script>
 
