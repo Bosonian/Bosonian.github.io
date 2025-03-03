@@ -4,21 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFAP Bleeding Risk Check</title>
-
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
-
     <style>
-        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
-        .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-        .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
-        .button-group button { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        .primary { background-color: #007bff; color: white; }
-        .primary:hover { background-color: #0056b3; }
-        .secondary { background-color: #dc3545; color: white; }
-        .secondary:hover { background-color: #b52b3a; }
-        .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-        .warning { font-size: 12px; color: red; margin-top: 10px; }
+        /* ... (keep existing styles the same) ... */
     </style>
 </head>
 <body>
@@ -54,57 +43,63 @@
             <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
         </div>
 
-        <!-- Calculator Section (Hidden until access is granted) -->
+        <!-- Calculator Section -->
         <div id="calculatorSection" style="display: none;">
             <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
-
             <div class="input-group">
                 <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10001">
             </div>
-
             <div class="button-group">
                 <button class="primary" onclick="calculateRisk()">Calculate</button>
                 <button class="secondary" onclick="resetForm()">Reset</button>
             </div>
-
             <div class="result" id="result"></div>
         </div>
     </div>
 
     <script>
-        const validCodes = [
-            "0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH",
-            "TKZJDSC5", "EJI0VLIJ", "SZFWHACD", "L4TQBPM1", "H04HB83T", "J5UV87KP", "TEV7A7IK", "E7JD7PNR", "ZHXFGFSG", "WERI56A4",
-            "BZ74PWMO", "Q5KZRMLG", "65B5ES2X", "PB0RO5XI", "2451S1RH", "FBD169BG", "NXA31XDT", "8AY2BZVB", "6AHGWKH6", "U59RP7PB",
-            "AIXZTPXE", "QIGIBCI5", "117453GP", "5VIXPYQ0", "BDWANPY3", "VP9O193K", "E24NKOJB", "52LL216F", "SLX6DBOW", "P1703XJD",
-            "4A3KTGAP", "IG3D0QB5", "10LY3YME", "ZGJWYXA3", "O8RULZZP", "WJNYG8ML", "OK9YI5W4", "3XDB1Z0R", "U4K0SNEY", "MMUR9KP0"
-        ];
+        // Valid access codes
+        const ACCESS_CODES = new Set([
+            "0P9MYVVA","U68M94MV","J8RKB4Z5","SKZUSTQ1","F5IJOOVY",
+            "VVXTWAKB","RLJBMMHR","0MNBOCXB","FT4U0B26","Y6XPIHVH",
+            "TKZJDSC5","EJI0VLIJ","SZFWHACD","L4TQBPM1","H04HB83T",
+            "J5UV87KP","TEV7A7IK","E7JD7PNR","ZHXFGFSG","WERI56A4",
+            "BZ74PWMO","Q5KZRMLG","65B5ES2X","PB0RO5XI","2451S1RH",
+            "FBD169BG","NXA31XDT","8AY2BZVB","6AHGWKH6","U59RP7PB",
+            "AIXZTPXE","QIGIBCI5","117453GP","5VIXPYQ0","BDWANPY3",
+            "VP9O193K","E24NKOJB","52LL216F","SLX6DBOW","P1703XJD",
+            "4A3KTGAP","IG3D0QB5","10LY3YME","ZGJWYXA3","O8RULZZP",
+            "WJNYG8ML","OK9YI5W4","3XDB1Z0R","U4K0SNEY","MMUR9KP0",
+            "HYHOJYJ5","BSFJTP10","H9QIVN3B","TV9EY4FJ","YCJ25OV8",
+            "GL0AK516","7RHSMPSL","8VXSAE4H","MWRU9OAK","BASLFL3I",
+            "4WX0IFVX","TKVMWDKH","U74JX9EL","ITDPHMY5","XVBJARWA",
+            "N2660Z5F","56JCFG5W","5XKFBJPX","XLA74IQB","J1JPQUGH",
+            "959SRWGD","RBFI73HL","0YBXWXDC","259PUPHG","9X2MNFOO",
+            "XDNT51NZ","Y2IOUD6F","QHVO9B47","YFP4WEV8","HNWRKH0T",
+            "OPDEXV1O","LEY5XWC3","Q5WW5SRE","FVLJ7RNL","SFTZKNAW",
+            "0EBT0BTP","75GRFN8X","QO2C8E1I","HG68Y7FA","2SFYAIWY",
+            "BXE5CSKL","MWW516JQ","X8M3CMZV","R3JFZKAN","TK9DOH4B",
+            "26SHS15L","DVIBKAAO","15WWD4WI","RSL70VCQ","NSKT4O5U"
+        ]);
 
         function validateAccessCode() {
-            const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-            if (validCodes.includes(inputCode)) {
-                localStorage.setItem("userHasAccess", "true");
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
+            const enteredCode = document.getElementById('accessCodeInput').value.trim();
+            if (ACCESS_CODES.has(enteredCode)) {
+                localStorage.setItem('userHasAccess', 'true');
+                document.getElementById('codeEntrySection').style.display = 'none';
+                document.getElementById('calculatorSection').style.display = 'block';
+                document.getElementById('accessError').style.display = 'none';
             } else {
-                document.getElementById("accessError").style.display = "block";
+                document.getElementById('accessError').style.display = 'block';
             }
         }
 
-        function checkAccess() {
-            if (localStorage.getItem("userHasAccess") === "true") {
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
-            }
-        }
-    </script>
-
-    <script>
         async function calculateRisk() {
-            const input = document.getElementById('gfapInput').value;
+            const inputVal = document.getElementById('gfapInput').value;
+            const input = parseFloat(inputVal);
             const resultDiv = document.getElementById('result');
 
-            if (!input || isNaN(input) || input < 29 || input > 10001) {
+            if (isNaN(input) || input < 29 || input > 10001) {
                 resultDiv.innerHTML = "Please enter a valid GFAP value (29-10001)!";
                 resultDiv.style.display = "block";
                 return;
@@ -116,14 +111,45 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ gfap: input })
                 });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
                 const data = await response.json();
-                resultDiv.innerHTML = `<strong>Result:</strong><br> ${data.probability.toFixed(1)}% probability`;
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `⚠️ Error: ${data.error}`;
+                } else {
+                    resultDiv.innerHTML = `<strong>Result:</strong><br> ${data.probability.toFixed(1)}% probability`;
+                }
                 resultDiv.style.display = "block";
+
             } catch (error) {
+                console.error("API Error:", error);
                 resultDiv.innerHTML = "❌ Server error. Please try again later.";
                 resultDiv.style.display = "block";
             }
         }
+
+        function resetForm() {
+            document.getElementById('gfapInput').value = '';
+            document.getElementById('result').style.display = "none";
+        }
+
+        function checkAccess() {
+            if (localStorage.getItem("userHasAccess") === "true") {
+                document.getElementById("codeEntrySection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
+            }
+        }
+
+        function switchLanguage(lang) {
+            // Add localization logic here
+            console.log(`Switching to ${lang} language`);
+        }
     </script>
+
+    <footer>
+        <p>© 2025 iGFAP. All rights reserved.</p>
+    </footer>
 </body>
 </html>
