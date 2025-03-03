@@ -72,6 +72,34 @@
     </div>
 
     <script>
+        const validCodes = [
+            "0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH",
+            "TKZJDSC5", "EJI0VLIJ", "SZFWHACD", "L4TQBPM1", "H04HB83T", "J5UV87KP", "TEV7A7IK", "E7JD7PNR", "ZHXFGFSG", "WERI56A4",
+            "BZ74PWMO", "Q5KZRMLG", "65B5ES2X", "PB0RO5XI", "2451S1RH", "FBD169BG", "NXA31XDT", "8AY2BZVB", "6AHGWKH6", "U59RP7PB",
+            "AIXZTPXE", "QIGIBCI5", "117453GP", "5VIXPYQ0", "BDWANPY3", "VP9O193K", "E24NKOJB", "52LL216F", "SLX6DBOW", "P1703XJD",
+            "4A3KTGAP", "IG3D0QB5", "10LY3YME", "ZGJWYXA3", "O8RULZZP", "WJNYG8ML", "OK9YI5W4", "3XDB1Z0R", "U4K0SNEY", "MMUR9KP0"
+        ];
+
+        function validateAccessCode() {
+            const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+            if (validCodes.includes(inputCode)) {
+                localStorage.setItem("userHasAccess", "true");
+                document.getElementById("codeEntrySection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
+            } else {
+                document.getElementById("accessError").style.display = "block";
+            }
+        }
+
+        function checkAccess() {
+            if (localStorage.getItem("userHasAccess") === "true") {
+                document.getElementById("codeEntrySection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
+            }
+        }
+    </script>
+
+    <script>
         async function calculateRisk() {
             const input = document.getElementById('gfapInput').value;
             const resultDiv = document.getElementById('result');
@@ -88,41 +116,14 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ gfap: input })
                 });
-
                 const data = await response.json();
-                console.log("API Response:", data);  // ✅ Debugging log
-
-                if (data.error) {
-                    resultDiv.innerHTML = `⚠️ Error: ${data.error}`;
-                } else {
-                    resultDiv.innerHTML = `<strong>Result:</strong><br> ${data.probability.toFixed(1)}% probability`;
-                }
-
+                resultDiv.innerHTML = `<strong>Result:</strong><br> ${data.probability.toFixed(1)}% probability`;
                 resultDiv.style.display = "block";
-
             } catch (error) {
-                console.error("API Fetch Error:", error);
                 resultDiv.innerHTML = "❌ Server error. Please try again later.";
                 resultDiv.style.display = "block";
             }
         }
-
-        function resetForm() {
-            document.getElementById('gfapInput').value = '';
-            document.getElementById('result').innerHTML = '';
-            document.getElementById('result').style.display = "none";
-        }
-
-        function checkAccess() {
-            if (localStorage.getItem("userHasAccess") === "true") {
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
-            }
-        }
     </script>
-
-    <footer>
-        <p>© 2025 iGFAP. All rights reserved.</p>
-    </footer>
 </body>
 </html>
