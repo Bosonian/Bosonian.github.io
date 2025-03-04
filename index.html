@@ -7,7 +7,7 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
     <style>
-        /* (Your existing CSS - plus styles for color coding) */
+        /* (Your existing CSS) */
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
         .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
@@ -60,7 +60,7 @@
             <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
 
             <div class="input-group">
-                <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="0" max="100000">
+                <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10000">
             </div>
 
             <div class="button-group">
@@ -135,8 +135,9 @@
         const inp = document.getElementById('gfapInput').value;
         const resDiv = document.getElementById('result');
 
-        if (!inp || isNaN(inp) || inp < 0) {
-            resDiv.innerHTML = "Please enter a valid GFAP value (non-negative)!";
+        // **CHANGE HERE:** Updated validation message
+        if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
+            resDiv.innerHTML = "Please enter a valid GFAP value (29-10000)!";
             resDiv.style.display = "block";
             return;
         }
@@ -178,7 +179,6 @@
         // --- Display Result (Probability AND Risk Category) ---
         const probabilityLabel = (currentLang === 'de') ? 'Wahrscheinlichkeit' : 'Probability';
         resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${probabilityLabel}: ${probability.toFixed(1)}%`;
-
         resDiv.style.display = "block";
     }
 
