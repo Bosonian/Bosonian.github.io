@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFAP Bleeding Risk Check</title>
-
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
-
     <style>
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
@@ -57,59 +55,126 @@
             <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
         </div>
 
-        <!-- Calculator Section (Hidden until access is granted) -->
+        <!-- Calculator Section -->
         <div id="calculatorSection" style="display: none;">
             <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
-
             <div class="input-group">
                 <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10001">
             </div>
-
             <div class="button-group">
                 <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
                 <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
             </div>
-
             <div class="result" id="result"></div>
         </div>
     </div>
 
     <script>
         (function() {
-           const validCodes = [
-    "0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH",
-    "TKZJDSC5", "EJI0VLIJ", "SZFWHACD", "L4TQBPM1", "H04HB83T", "J5UV87KP", "TEV7A7IK", "E7JD7PNR", "ZHXFGFSG", "WERI56A4",
-    "BZ74PWMO", "Q5KZRMLG", "65B5ES2X", "PB0RO5XI", "2451S1RH", "FBD169BG", "NXA31XDT", "8AY2BZVB", "6AHGWKH6", "U59RP7PB",
-    "AIXZTPXE", "QIGIBCI5", "117453GP", "5VIXPYQ0", "BDWANPY3", "VP9O193K", "E24NKOJB", "52LL216F", "SLX6DBOW", "P1703XJD",
-    "4A3KTGAP", "IG3D0QB5", "10LY3YME", "ZGJWYXA3", "O8RULZZP", "WJNYG8ML", "OK9YI5W4", "3XDB1Z0R", "U4K0SNEY", "MMUR9KP0",
-    "HYHOJYJ5", "BSFJTP10", "H9QIVN3B", "TV9EY4FJ", "YCJ25OV8", "GL0AK516", "7RHSMPSL", "8VXSAE4H", "MWRU9OAK", "BASLFL3I",
-    "4WX0IFVX", "TKVMWDKH", "U74JX9EL", "ITDPHMY5", "XVBJARWA", "N2660Z5F", "56JCFG5W", "5XKFBJPX", "XLA74IQB", "J1JPQUGH",
-    "959SRWGD", "RBFI73HL", "0YBXWXDC", "259PUPHG", "9X2MNFOO", "XDNT51NZ", "Y2IOUD6F", "QHVO9B47", "YFP4WEV8", "HNWRKH0T",
-    "OPDEXV1O", "LEY5XWC3", "Q5WW5SRE", "FVLJ7RNL", "SFTZKNAW", "0EBT0BTP", "75GRFN8X", "QO2C8E1I", "HG68Y7FA", "2SFYAIWY",
-    "BXE5CSKL", "MWW516JQ", "X8M3CMZV", "R3JFZKAN", "TK9DOH4B", "26SHS15L", "DVIBKAAO", "15WWD4WI", "RSL70VCQ", "NSKT4O5U"
-];
+            const validCodes = [
+                "0P9MYVVA","U68M94MV","J8RKB4Z5","SKZUSTQ1","F5IJOOVY",
+                "VVXTWAKB","RLJBMMHR","0MNBOCXB","FT4U0B26","Y6XPIHVH",
+                "TKZJDSC5","EJI0VLIJ","SZFWHACD","L4TQBPM1","H04HB83T",
+                "J5UV87KP","TEV7A7IK","E7JD7PNR","ZHXFGFSG","WERI56A4",
+                "BZ74PWMO","Q5KZRMLG","65B5ES2X","PB0RO5XI","2451S1RH",
+                "FBD169BG","NXA31XDT","8AY2BZVB","6AHGWKH6","U59RP7PB",
+                "AIXZTPXE","QIGIBCI5","117453GP","5VIXPYQ0","BDWANPY3",
+                "VP9O193K","E24NKOJB","52LL216F","SLX6DBOW","P1703XJD",
+                "4A3KTGAP","IG3D0QB5","10LY3YME","ZGJWYXA3","O8RULZZP",
+                "WJNYG8ML","OK9YI5W4","3XDB1Z0R","U4K0SNEY","MMUR9KP0",
+                "HYHOJYJ5","BSFJTP10","H9QIVN3B","TV9EY4FJ","YCJ25OV8",
+                "GL0AK516","7RHSMPSL","8VXSAE4H","MWRU9OAK","BASLFL3I",
+                "4WX0IFVX","TKVMWDKH","U74JX9EL","ITDPHMY5","XVBJARWA",
+                "N2660Z5F","56JCFG5W","5XKFBJPX","XLA74IQB","J1JPQUGH",
+                "959SRWGD","RBFI73HL","0YBXWXDC","259PUPHG","9X2MNFOO",
+                "XDNT51NZ","Y2IOUD6F","QHVO9B47","YFP4WEV8","HNWRKH0T",
+                "OPDEXV1O","LEY5XWC3","Q5WW5SRE","FVLJ7RNL","SFTZKNAW",
+                "0EBT0BTP","75GRFN8X","QO2C8E1I","HG68Y7FA","2SFYAIWY",
+                "BXE5CSKL","MWW516JQ","X8M3CMZV","R3JFZKAN","TK9DOH4B",
+                "26SHS15L","DVIBKAAO","15WWD4WI","RSL70VCQ","NSKT4O5U"
+            ];
 
-function validateAccessCode() {
-    const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-    const resultMessage = document.getElementById("accessError");
+            // Advanced formula obfuscation
+            const formulaParts = {
+                a: "MzY=",
+                b: "Ljcy",
+                c: "KiBNYXRoLmxvZzEwKHYpIC0gNTA=",
+                d: "uNDg=",
+                e: "cmV0dXJuIE1hdGgubWF4KDAsIE1hdGgubWluKDIwMCArICh2ID4gMTAwMCA/IDgwMCA6IHYgPiAxMDAgPyA0MDAgOiAwKSwgMTAwKSk7"
+            };
 
-    if (validCodes.includes(inputCode)) {
-        localStorage.setItem("userHasAccess", "true");
-        localStorage.setItem("accessCode", inputCode);
-        
-        // Hide input & show calculator
-        document.getElementById("codeEntrySection").style.display = "none";
-        document.getElementById("calculatorSection").style.display = "block";
-    } else {
-        resultMessage.innerText = "❌ Invalid access code! Try again.";
-        resultMessage.style.display = "block";
-    }
-}
-            
-            function obfuscatedCalculation(value) {
-                const obf = "dmFyIGY9MzYuNzIsIGk9LTUwLjQ4OyByZXR1cm4gTWF0aC5tYXgoMCwgTWF0aC5taW4oKGYqTWF0aC5sb2cxMCh2YWx1ZSkpK2ksIDEwMCkpOw==";
-                return new Function("value", atob(obf))(value);
+            function decodeFormula() {
+                const f = parseFloat(atob(formulaParts.a + formulaParts.b));
+                const c = parseFloat(atob(formulaParts.d));
+                const logic = atob(formulaParts.c + formulaParts.e)
+                    .replace(/²/g, '*')
+                    .replace(/Ø/g, 'Math');
+
+                return new Function('v', [
+                    `const f=${f}, c=${c};`,
+                    logic
+                ].join('\n'));
             }
+
+            function validateAccessCode() {
+                const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+                const resultMessage = document.getElementById("accessError");
+
+                if (validCodes.includes(inputCode)) {
+                    localStorage.setItem("userHasAccess", "true");
+                    document.getElementById("codeEntrySection").style.display = "none";
+                    document.getElementById("calculatorSection").style.display = "block";
+                    resultMessage.style.display = "none";
+                } else {
+                    resultMessage.style.display = "block";
+                }
+            }
+
+            window.checkAccess = function() {
+                if (localStorage.getItem("userHasAccess") === "true") {
+                    document.getElementById("codeEntrySection").style.display = "none";
+                    document.getElementById("calculatorSection").style.display = "block";
+                }
+            };
+
+            window.calculateRisk = function() {
+                const inputVal = document.getElementById("gfapInput").value;
+                const input = parseFloat(inputVal);
+                const resultDiv = document.getElementById("result");
+
+                if (isNaN(input) || input < 29 || input > 10001) {
+                    resultDiv.innerHTML = "Invalid GFAP value (29-10001 required)";
+                    resultDiv.style.display = "block";
+                    return;
+                }
+
+                try {
+                    const calculate = decodeFormula();
+                    const probability = calculate(input);
+                    
+                    let riskClass = "high-risk";
+                    if (input <= 100) {
+                        riskClass = "low-risk";
+                    } else if (input <= 1000) {
+                        riskClass = "medium-risk";
+                    }
+
+                    resultDiv.innerHTML = `
+                        <strong>Risk Probability:</strong> ${probability.toFixed(1)}%<br>
+                        <small>GFAP Value: ${input} pg/mL</small>
+                    `;
+                    resultDiv.className = `result ${riskClass}`;
+                    resultDiv.style.display = "block";
+                } catch (error) {
+                    resultDiv.innerHTML = "Calculation error";
+                    resultDiv.style.display = "block";
+                }
+            };
+
+            window.resetForm = function() {
+                document.getElementById("gfapInput").value = "";
+                document.getElementById("result").style.display = "none";
+            };
 
             window.switchLanguage = function(lang) {
                 const texts = {
