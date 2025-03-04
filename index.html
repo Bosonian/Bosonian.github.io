@@ -22,6 +22,7 @@
         .low-risk { color: green; }
         .medium-risk { color: orange; }
         .high-risk { color: red; }
+        .risk-legend { margin-top: 0.5rem; font-size: 0.8rem; color: #666; display: none;} /* Initially hidden */
     </style>
 </head>
 <body>
@@ -68,7 +69,7 @@
             </div>
 
             <div class="result" id="result"></div>
-             <div id="riskLegend" style="margin-top: 1rem; font-size: 0.8rem; color: #666;">
+             <div id="riskLegend" class="risk-legend">
                 <p><span class="low-risk">Low Risk:</span> GFAP < 100 pg/mL</p>
                 <p><span class="medium-risk">Medium Risk:</span> 101 pg/mL &le; GFAP &le; 1000 pg/mL</p>
                 <p><span class="high-risk">High Risk:</span> GFAP > 1000 pg/mL</p>
@@ -125,27 +126,14 @@
     function calculateRisk() {
         const inp = document.getElementById('gfapInput').value;
         const resDiv = document.getElementById('result');
+        const legendDiv = document.getElementById('riskLegend'); // Get the legend div
 
         if (!inp || isNaN(inp) || inp < 0) { // Allow any non-negative value
             resDiv.innerHTML = "Please enter a valid GFAP value (non-negative)!";
             resDiv.style.display = "block";
+            legendDiv.style.display = "none"; // Hide legend on error
             return;
         }
-
-    //Obfuscated formula (still present, but now just for demonstration)
-    const f1 = '27.63';
-    const f2 = '90.01';
-    const i1 = '84.05-';
-    const i2 = '';
-
-    const combinedF = f1.split('').reverse().join('') + f2.split('').reverse().join('');
-    const combinedI = i1.split('').reverse().join('') + i2.split('').reverse().join('');
-
-    const calcFunc = new Function('gfap', `
-        const f = parseFloat(String.fromCharCode(${combinedF.split("").map(c=>c.charCodeAt(0)).join(',')}));
-        const i = parseFloat(String.fromCharCode(${combinedI.split("").map(c => c.charCodeAt(0)).join(',')}));
-        return "Calculation not used"; // We're not actually using the formula
-    `);
 
         const gfapValue = parseFloat(inp); // Get the numeric GFAP value
         let riskLevel = '';
@@ -164,11 +152,13 @@
 
         resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}:</strong> ${gfapValue} pg/mL`;
         resDiv.style.display = "block";
+        legendDiv.style.display = "block"; // Show the legend
 }
 
     function resetForm() {
         document.getElementById("gfapInput").value = "";
         document.getElementById("result").style.display = "none";
+        document.getElementById("riskLegend").style.display = "none"; // Hide legend on reset
     }
     </script>
 
