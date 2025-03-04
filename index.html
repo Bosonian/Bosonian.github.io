@@ -7,7 +7,6 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
     <style>
-        /* (Your existing CSS - plus styles for color coding) */
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
         .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
@@ -80,23 +79,23 @@
     <script>
     const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
 
-        function validateAccessCode() {
-            const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-            if (validCodes.includes(inputCode)) {
-                localStorage.setItem("userHasAccess", "true");
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
-            } else {
-                document.getElementById("accessError").style.display = "block";
-            }
+    function validateAccessCode() {
+        const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+        if (validCodes.includes(inputCode)) {
+            localStorage.setItem("userHasAccess", "true");
+            document.getElementById("codeEntrySection").style.display = "none";
+            document.getElementById("calculatorSection").style.display = "block";
+        } else {
+            document.getElementById("accessError").style.display = "block";
         }
+    }
 
-        function checkAccess() {
-            if (localStorage.getItem("userHasAccess") === "true") {
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
-            }
+    function checkAccess() {
+        if (localStorage.getItem("userHasAccess") === "true") {
+            document.getElementById("codeEntrySection").style.display = "none";
+            document.getElementById("calculatorSection").style.display = "block";
         }
+    }
 
     function switchLanguage(lang) {
         const texts = {
@@ -122,7 +121,7 @@
         document.getElementById("calculateButton").innerText = texts[lang].calculate;
         document.getElementById("resetButton").innerText = texts[lang].reset;
     }
-    
+
         function calculateRisk() {
             const inp = document.getElementById('gfapInput').value;
             const resDiv = document.getElementById('result');
@@ -131,7 +130,7 @@
             if (!inp || isNaN(inp) || inp < 0) {
                 resDiv.innerHTML = "Please enter a valid GFAP value (non-negative)!";
                 resDiv.style.display = "block";
-                legendDiv.style.display = "none";
+                legendDiv.style.display = "none"; // Hide legend on error
                 return;
             }
 
@@ -173,7 +172,7 @@
             resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}:</strong> ${gfapValue} pg/mL<br>
                                 Probability: ${probability.toFixed(1)}%`;
             resDiv.style.display = "block";
-            legendDiv.style.display = "block";
+            legendDiv.style.display = "block"; // Show the legend
         }
 
         function resetForm() {
