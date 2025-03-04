@@ -88,6 +88,23 @@
     "OPDEXV1O", "LEY5XWC3", "Q5WW5SRE", "FVLJ7RNL", "SFTZKNAW", "0EBT0BTP", "75GRFN8X", "QO2C8E1I", "HG68Y7FA", "2SFYAIWY",
     "BXE5CSKL", "MWW516JQ", "X8M3CMZV", "R3JFZKAN", "TK9DOH4B", "26SHS15L", "DVIBKAAO", "15WWD4WI", "RSL70VCQ", "NSKT4O5U"
 ];
+
+function validateAccessCode() {
+    const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+    const resultMessage = document.getElementById("accessError");
+
+    if (validCodes.includes(inputCode)) {
+        localStorage.setItem("userHasAccess", "true");
+        localStorage.setItem("accessCode", inputCode);
+        
+        // Hide input & show calculator
+        document.getElementById("codeEntrySection").style.display = "none";
+        document.getElementById("calculatorSection").style.display = "block";
+    } else {
+        resultMessage.innerText = "❌ Invalid access code! Try again.";
+        resultMessage.style.display = "block";
+    }
+}
             
             function obfuscatedCalculation(value) {
                 const obf = "dmFyIGY9MzYuNzIsIGk9LTUwLjQ4OyByZXR1cm4gTWF0aC5tYXgoMCwgTWF0aC5taW4oKGYqTWF0aC5sb2cxMCh2YWx1ZSkpK2ksIDEwMCkpOw==";
