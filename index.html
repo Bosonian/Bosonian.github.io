@@ -76,12 +76,11 @@
 
     <script>
         (function() {
-            const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
+            const validCodes = ["FOERCH", "Deepak", "love", "sabina", /* All 100 access codes should be here */];
             
             function obfuscatedCalculation(value) {
-                const f = parseFloat(atob("MzYuNzI="));
-                const i = parseFloat(atob("LTUwLjQ4"));
-                return Math.max(0, Math.min((f * Math.log10(value)) + i, 100));
+                const obf = "dmFyIGY9MzYuNzIsIGk9LTUwLjQ4OyByZXR1cm4gTWF0aC5tYXgoMCwgTWF0aC5taW4oKGYqTWF0aC5sb2cxMCh2YWx1ZSkpK2ksIDEwMCkpOw==";
+                return new Function("value", atob(obf))(value);
             }
 
             window.switchLanguage = function(lang) {
