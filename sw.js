@@ -1,4 +1,4 @@
-const CACHE_NAME = "gfap-cache-v37"; // Increment version
+const CACHE_NAME = "gfap-cache-v38"; // Increment version
 const OFFLINE_URL = '/offline.html';
 const urlsToCache = [
   '/',
