@@ -18,6 +18,9 @@
         .secondary { background-color: #dc3545; color: white; }
         .secondary:hover { background-color: #b52b3a; }
         .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
+        .low-risk { background-color: #28a745; color: white; }
+        .medium-risk { background-color: #ffc107; color: black; }
+        .high-risk { background-color: #dc3545; color: white; }
         .warning { font-size: 12px; color: red; margin-top: 10px; }
     </style>
 </head>
@@ -72,74 +75,62 @@
     </div>
 
     <script>
-        const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
-
-        function validateAccessCode() {
-            const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-            if (validCodes.includes(inputCode)) {
-                localStorage.setItem("userHasAccess", "true");
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
-            } else {
-                document.getElementById("accessError").style.display = "block";
+        (function() {
+            const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
+            
+            function obfuscatedCalculation(value) {
+                const f = parseFloat(atob("MzYuNzI="));
+                const i = parseFloat(atob("LTUwLjQ4"));
+                return Math.max(0, Math.min((f * Math.log10(value)) + i, 100));
             }
-        }
 
-        function checkAccess() {
-            if (localStorage.getItem("userHasAccess") === "true") {
-                document.getElementById("codeEntrySection").style.display = "none";
-                document.getElementById("calculatorSection").style.display = "block";
-            }
-        }
-
-        function switchLanguage(lang) {
-            const texts = {
-                de: {
-                    title: "🧠 GFAP Blutungsrisiko-Check",
-                    codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
-                    description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
-                    calculate: "Berechnen",
-                    reset: "Zurücksetzen"
-                },
-                en: {
-                    title: "🧠 GFAP Bleeding Risk Check",
-                    codePrompt: "🔑 Please enter your access code:",
-                    description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
-                    calculate: "Calculate",
-                    reset: "Reset"
+            window.validateAccessCode = function() {
+                const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+                if (validCodes.includes(inputCode)) {
+                    localStorage.setItem("userHasAccess", "true");
+                    document.getElementById("codeEntrySection").style.display = "none";
+                    document.getElementById("calculatorSection").style.display = "block";
+                } else {
+                    document.getElementById("accessError").style.display = "block";
                 }
             };
-            
-            document.getElementById("title").innerText = texts[lang].title;
-            document.getElementById("codePrompt").innerText = texts[lang].codePrompt;
-            document.getElementById("description").innerText = texts[lang].description;
-            document.getElementById("calculateButton").innerText = texts[lang].calculate;
-            document.getElementById("resetButton").innerText = texts[lang].reset;
-        }
 
-        function calculateRisk() {
-            const input = document.getElementById('gfapInput').value;
-            const resultDiv = document.getElementById('result');
+            window.checkAccess = function() {
+                if (localStorage.getItem("userHasAccess") === "true") {
+                    document.getElementById("codeEntrySection").style.display = "none";
+                    document.getElementById("calculatorSection").style.display = "block";
+                }
+            };
 
-            if (!input || isNaN(input) || input < 29 || input > 10001) {
-                resultDiv.innerHTML = "Please enter a valid GFAP value (29-10001)!";
+            window.calculateRisk = function() {
+                const input = document.getElementById('gfapInput').value;
+                const resultDiv = document.getElementById('result');
+                
+                if (!input || isNaN(input) || input < 29 || input > 10001) {
+                    resultDiv.innerHTML = "Please enter a valid GFAP value (29-10001)!";
+                    resultDiv.style.display = "block";
+                    return;
+                }
+                
+                const probability = obfuscatedCalculation(input);
+                resultDiv.innerHTML = `<strong>Result:</strong><br> ${probability.toFixed(1)}% probability`;
+                
+                if (input <= 100) {
+                    resultDiv.className = "result low-risk";
+                } else if (input <= 1000) {
+                    resultDiv.className = "result medium-risk";
+                } else {
+                    resultDiv.className = "result high-risk";
+                }
+                
                 resultDiv.style.display = "block";
-                return;
-            }
+            };
 
-            const encodedFactor = atob("MzYuNzI="); // 36.72
-            const encodedIntercept = atob("LTUwLjQ4"); // -50.48
-            const logGFAP = Math.log10(input);
-            const probability = Math.max(0, Math.min((parseFloat(encodedFactor) * logGFAP) + parseFloat(encodedIntercept), 100));
-            
-            resultDiv.innerHTML = `<strong>Result:</strong><br> ${probability.toFixed(1)}% probability`;
-            resultDiv.style.display = "block";
-        }
-
-        function resetForm() {
-            document.getElementById("gfapInput").value = "";
-            document.getElementById("result").style.display = "none";
-        }
+            window.resetForm = function() {
+                document.getElementById("gfapInput").value = "";
+                document.getElementById("result").style.display = "none";
+            };
+        })();
     </script>
 
     <footer>
