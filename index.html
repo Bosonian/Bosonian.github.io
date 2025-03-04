@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GFAP Bleeding Risk Check</title>
+
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
+
     <style>
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
@@ -16,21 +18,19 @@
         .secondary { background-color: #dc3545; color: white; }
         .secondary:hover { background-color: #b52b3a; }
         .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-        .low-risk { background-color: #28a745; color: white; }
-        .medium-risk { background-color: #ffc107; color: black; }
-        .high-risk { background-color: #dc3545; color: white; }
         .warning { font-size: 12px; color: red; margin-top: 10px; }
     </style>
 </head>
 <body>
-
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js')
                 .then(registration => console.log("Service Worker registered with scope:", registration.scope))
                 .catch(error => console.log("Service Worker registration failed:", error));
         }
+    </script>
 
+    <script>
         window.onload = function() {
             alert("⚠️ This calculation is for research purposes only. Do not use for clinical decisions!");
             checkAccess();
@@ -54,94 +54,92 @@
             <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
         </div>
 
-        <!-- Calculator Section -->
+        <!-- Calculator Section (Hidden until access is granted) -->
         <div id="calculatorSection" style="display: none;">
             <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
+
             <div class="input-group">
                 <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10001">
             </div>
+
             <div class="button-group">
-                <button class="primary" onclick="calculateRisk()">Calculate</button>
-                <button class="secondary" onclick="resetForm()">Reset</button>
+                <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
+                <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
             </div>
+
             <div class="result" id="result"></div>
         </div>
     </div>
 
     <script>
-        (function() {
-            const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5"]; // Trimmed list for brevity
+        const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
 
-            function decodeFormula() {
-                try {
-                    const a = parseFloat(atob("MzY="));  
-                    const b = parseFloat(atob("Ljcy"));  
-                    const c = parseFloat(atob("LTQ4"));  
-                    return function(v) {
-                        return Math.max(0, Math.min(100, 200 + (v > 1000 ? 800 : v > 100 ? 400 : 0)));
-                    };
-                } catch (error) {
-                    console.error("Formula decoding error:", error);
-                    return null;
+        function validateAccessCode() {
+            const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+            if (validCodes.includes(inputCode)) {
+                localStorage.setItem("userHasAccess", "true");
+                document.getElementById("codeEntrySection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
+            } else {
+                document.getElementById("accessError").style.display = "block";
+            }
+        }
+
+        function checkAccess() {
+            if (localStorage.getItem("userHasAccess") === "true") {
+                document.getElementById("codeEntrySection").style.display = "none";
+                document.getElementById("calculatorSection").style.display = "block";
+            }
+        }
+
+        function switchLanguage(lang) {
+            const texts = {
+                de: {
+                    title: "🧠 GFAP Blutungsrisiko-Check",
+                    codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
+                    description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
+                    calculate: "Berechnen",
+                    reset: "Zurücksetzen"
+                },
+                en: {
+                    title: "🧠 GFAP Bleeding Risk Check",
+                    codePrompt: "🔑 Please enter your access code:",
+                    description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
+                    calculate: "Calculate",
+                    reset: "Reset"
                 }
+            };
+            
+            document.getElementById("title").innerText = texts[lang].title;
+            document.getElementById("codePrompt").innerText = texts[lang].codePrompt;
+            document.getElementById("description").innerText = texts[lang].description;
+            document.getElementById("calculateButton").innerText = texts[lang].calculate;
+            document.getElementById("resetButton").innerText = texts[lang].reset;
+        }
+
+        function calculateRisk() {
+            const input = document.getElementById('gfapInput').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!input || isNaN(input) || input < 29 || input > 10001) {
+                resultDiv.innerHTML = "Please enter a valid GFAP value (29-10001)!";
+                resultDiv.style.display = "block";
+                return;
             }
 
-            window.validateAccessCode = function() {
-                const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-                if (validCodes.includes(inputCode)) {
-                    localStorage.setItem("userHasAccess", "true");
-                    document.getElementById("codeEntrySection").style.display = "none";
-                    document.getElementById("calculatorSection").style.display = "block";
-                } else {
-                    document.getElementById("accessError").style.display = "block";
-                }
-            };
+            const encodedFactor = atob("MzYuNzI="); // 36.72
+            const encodedIntercept = atob("LTUwLjQ4"); // -50.48
+            const logGFAP = Math.log10(input);
+            const probability = Math.max(0, Math.min((parseFloat(encodedFactor) * logGFAP) + parseFloat(encodedIntercept), 100));
+            
+            resultDiv.innerHTML = `<strong>Result:</strong><br> ${probability.toFixed(1)}% probability`;
+            resultDiv.style.display = "block";
+        }
 
-            window.checkAccess = function() {
-                if (localStorage.getItem("userHasAccess") === "true") {
-                    document.getElementById("codeEntrySection").style.display = "none";
-                    document.getElementById("calculatorSection").style.display = "block";
-                }
-            };
-
-            window.calculateRisk = function() {
-                const inputVal = document.getElementById("gfapInput").value;
-                const input = parseFloat(inputVal);
-                const resultDiv = document.getElementById("result");
-
-                if (isNaN(input) || input < 29 || input > 10001) {
-                    resultDiv.innerHTML = "Invalid GFAP value (29-10001 required)";
-                    resultDiv.style.display = "block";
-                    return;
-                }
-
-                try {
-                    const calculate = decodeFormula();
-                    if (!calculate) {
-                        resultDiv.innerHTML = "Error: Calculation function not loaded.";
-                        resultDiv.style.display = "block";
-                        return;
-                    }
-
-                    const probability = calculate(input);
-                    let riskClass = input <= 100 ? "low-risk" : input <= 1000 ? "medium-risk" : "high-risk";
-
-                    resultDiv.innerHTML = `<strong>Risk Probability:</strong> ${probability.toFixed(1)}%<br>
-                                           <small>GFAP Value: ${input} pg/mL</small>`;
-                    resultDiv.className = `result ${riskClass}`;
-                    resultDiv.style.display = "block";
-                } catch (error) {
-                    console.error("Calculation error:", error);
-                    resultDiv.innerHTML = "Calculation error";
-                    resultDiv.style.display = "block";
-                }
-            };
-
-            window.resetForm = function() {
-                document.getElementById("gfapInput").value = "";
-                document.getElementById("result").style.display = "none";
-            };
-        })();
+        function resetForm() {
+            document.getElementById("gfapInput").value = "";
+            document.getElementById("result").style.display = "none";
+        }
     </script>
 
     <footer>
