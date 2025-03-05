@@ -36,41 +36,46 @@
             cursor: pointer;
             color: #007bff; /* Or any color you prefer */
         }
-		/* Modal Styles */
-		.modal {
-		    display: none; /* Hidden by default */
-		    position: fixed; /* Stay in place */
-		    z-index: 1; /* Sit on top */
-		    left: 0;
-		    top: 0;
-		    width: 100%; /* Full width */
-		    height: 100%; /* Full height */
-		    overflow: auto; /* Enable scroll if needed */
-		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-		}
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
 
-		.modal-content {
-		    background-color: #fefefe;
-		    margin: 15% auto; /* 15% from the top and centered */
-		    padding: 20px;
-		    border: 1px solid #888;
-		    width: 80%; /* Could be more or less, depending on screen size */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
             border-radius: 10px;
-		}
+        }
 
-		.close {
-		    color: #aaa;
-		    float: right;
-		    font-size: 28px;
-		    font-weight: bold;
-		}
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
 
-		.close:hover,
-		.close:focus {
-		    color: black;
-		    text-decoration: none;
-		    cursor: pointer;
-		}
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .title-line {
+           display: flex;
+           flex-direction: column; /* Stack elements vertically */
+           align-items: center; /* Center horizontally */
+        }
 
     </style>
 </head>
@@ -83,7 +88,8 @@
         // Define texts *outside* of switchLanguage - making it global
         const texts = {
             de: {
-                title: "🧠 GFAP Blutungsrisiko-Check für Koma GCS (3-8)",
+                title: "🧠 GFAP Blutungsrisiko-Check", //removed for Koma GCS (3-8)
+                titleGCS: "für Koma GCS (3-8)", //added coma gcs line
                 codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
                 description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
                 calculate: "Berechnen",
@@ -94,12 +100,13 @@
                 probability: "Wahrscheinlichkeit",
                 alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
                 validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-10000)!",
-				installButton: "App installieren", //Text for the install button
-				iosInstructions: "Um diese App auf Ihrem iPhone zu installieren, tippen Sie auf das 'Teilen'-Symbol und dann auf 'Zum Home-Bildschirm hinzufügen'.",
+                installButton: "App installieren", //Text for the install button
+                iosInstructions: "Um diese App auf Ihrem iPhone zu installieren, tippen Sie auf das 'Teilen'-Symbol und dann auf 'Zum Home-Bildschirm hinzufügen'.",
                 androidInstructions: "Um diese App zu installieren, tippen Sie auf die Menü-Schaltfläche (drei Punkte) und dann auf 'Zum Startbildschirm hinzufügen' oder 'Installieren'."
             },
             en: {
-                title: "🧠 GFAP Bleeding Risk Check for Coma GCS (3-8)",
+                title: "🧠 GFAP Bleeding Risk Check", //removed for Koma GCS (3-8)
+                titleGCS: "for Coma GCS (3-8)",  //added coma gcs line
                 codePrompt: "🔑 Please enter your access code:",
                 description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
                 calculate: "Calculate",
@@ -110,24 +117,24 @@
                 probability: "Probability",
                 alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
                 validationError: "Please enter a valid GFAP value (29-10000)!",
-				installButton: "Install App",
-				iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
+                installButton: "Install App",
+                iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
                 androidInstructions: "To install this app, tap the menu button (three dots) and then 'Add to Home screen' or 'Install'."
             }
         };
 
-		window.addEventListener('beforeinstallprompt', (e) => {
-		    // Prevent the default browser prompt
-		    e.preventDefault();
-		    // Stash the event so it can be triggered later.
-		    deferredPrompt = e;
-		    // Show the install button *only* for Android (not iOS)
-		    if (!isIOS) {
-		        document.getElementById('androidInstallIcon').style.display = 'inline-block';
-		    }
-		});
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the default browser prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Show the install button *only* for Android (not iOS)
+            if (!isIOS) {
+                document.getElementById('androidInstallIcon').style.display = 'inline-block';
+            }
+        });
 
-		window.onload = function() {
+        window.onload = function() {
             // Detect iOS
             if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
                 isIOS = true;
@@ -139,51 +146,53 @@
             switchLanguage(currentLang); // Now texts is guaranteed to be defined
         };
 
-		function showInstallInstructions(platform) {
-			// Get the modal
-			var modal = document.getElementById("myModal");
-			var modalContent = document.getElementById("modalText");
+        function showInstallInstructions(platform) {
+            // Get the modal
+            var modal = document.getElementById("myModal");
+            var modalContent = document.getElementById("modalText");
 
-			if (platform === 'ios') {
-			  modalContent.textContent = texts[currentLang].iosInstructions;
-			} else {
-				if (deferredPrompt) {
-					// Show the install prompt
-					deferredPrompt.prompt();
-					// Wait for the user to respond to the prompt
-					deferredPrompt.userChoice.then((choiceResult) => {
-						if (choiceResult.outcome === 'accepted') {
-						console.log('User accepted the install prompt');
-						} else {
-						console.log('User dismissed the install prompt');
-						}
-						deferredPrompt = null;
-					});
-					return;//Important to avoid showing the modal.
-				}
-			  modalContent.textContent = texts[currentLang].androidInstructions;
-			}
+            if (platform === 'ios') {
+              modalContent.textContent = texts[currentLang].iosInstructions;
+            } else {
+                if (deferredPrompt) {
+                    // Show the install prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        } else {
+                        console.log('User dismissed the install prompt');
+                        }
+                        deferredPrompt = null;
+                    });
+                    return;//Important to avoid showing the modal.
+                }
+              modalContent.textContent = texts[currentLang].androidInstructions;
+            }
 
-			// Show the modal
-			modal.style.display = "block";
+            // Show the modal
+            modal.style.display = "block";
 
-			// When the user clicks on <span> (x), close the modal
-			document.getElementsByClassName("close")[0].onclick = function() {
-			  modal.style.display = "none";
-			}
+            // When the user clicks on <span> (x), close the modal
+            document.getElementsByClassName("close")[0].onclick = function() {
+              modal.style.display = "none";
+            }
 
-			// When the user clicks anywhere outside of the modal, close it
-			window.onclick = function(event) {
-			  if (event.target == modal) {
-			    modal.style.display = "none";
-			  }
-			}
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+              if (event.target == modal) {
+                modal.style.display = "none";
+              }
+            }
         }
     </script>
 
     <div class="container">
+      <div class="title-line">
         <h1 id="title">🧠 GFAP Bleeding Risk Check</h1>
-
+        <span id="titleGCS"></span>
+      </div>
         <div>
             <button onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
             <button onclick="switchLanguage('en')">🇬🇧 English</button>
@@ -210,16 +219,16 @@
              <div class="install-icons">
                 <i id="iosInstallIcon" class="fab fa-apple" onclick="showInstallInstructions('ios')" style="display: none;"></i>
                 <i id="androidInstallIcon" class="fab fa-android" onclick="showInstallInstructions('android')" style="display: none;"></i>
-           </div>
+             </div>
             <div class="result" id="result"></div>
         </div>
     </div>
-	<div id="myModal" class="modal">
-	  <div class="modal-content">
-	    <span class="close">&times;</span>
-	    <p id="modalText"></p>
-	  </div>
-	</div>
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modalText"></p>
+      </div>
+    </div>
 
     <script>
     const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
@@ -251,7 +260,8 @@
     function switchLanguage(lang) {
         currentLang = lang;
 
-		document.getElementById("title").innerText = texts[currentLang].title;
+        document.getElementById("title").innerText = texts[currentLang].title;
+        document.getElementById("titleGCS").innerText = texts[currentLang].titleGCS; //set sub title
         document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
         document.getElementById("description").innerText = texts[currentLang].description;
         document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
