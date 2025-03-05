@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* (Your existing CSS - plus styles for the icons and modal) */
+        /* (Your existing CSS) */
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
         .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
@@ -83,7 +83,7 @@
         // Define texts *outside* of switchLanguage - making it global
         const texts = {
             de: {
-                title: "🧠 GFAP Blutungsrisiko-Check",
+                title: "🧠 GFAP Blutungsrisiko-Check für Koma GCS (3-8)",
                 codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
                 description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
                 calculate: "Berechnen",
@@ -94,11 +94,12 @@
                 probability: "Wahrscheinlichkeit",
                 alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
                 validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-10000)!",
-                iosInstructions: "Um diese App auf Ihrem iPhone zu installieren, tippen Sie auf das 'Teilen'-Symbol und dann auf 'Zum Home-Bildschirm hinzufügen'.",
+				installButton: "App installieren", //Text for the install button
+				iosInstructions: "Um diese App auf Ihrem iPhone zu installieren, tippen Sie auf das 'Teilen'-Symbol und dann auf 'Zum Home-Bildschirm hinzufügen'.",
                 androidInstructions: "Um diese App zu installieren, tippen Sie auf die Menü-Schaltfläche (drei Punkte) und dann auf 'Zum Startbildschirm hinzufügen' oder 'Installieren'."
             },
             en: {
-                title: "🧠 GFAP Bleeding Risk Check",
+                title: "🧠 GFAP Bleeding Risk Check for Coma GCS (3-8)",
                 codePrompt: "🔑 Please enter your access code:",
                 description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
                 calculate: "Calculate",
@@ -109,24 +110,25 @@
                 probability: "Probability",
                 alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
                 validationError: "Please enter a valid GFAP value (29-10000)!",
-                iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
+				installButton: "Install App",
+				iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
                 androidInstructions: "To install this app, tap the menu button (three dots) and then 'Add to Home screen' or 'Install'."
             }
         };
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the default browser prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            deferredPrompt = e;
-            // Show the install button *only* for Android (not iOS)
-            if (!isIOS) {
-                document.getElementById('androidInstallIcon').style.display = 'inline-block';
-            }
-        });
+		window.addEventListener('beforeinstallprompt', (e) => {
+		    // Prevent the default browser prompt
+		    e.preventDefault();
+		    // Stash the event so it can be triggered later.
+		    deferredPrompt = e;
+		    // Show the install button *only* for Android (not iOS)
+		    if (!isIOS) {
+		        document.getElementById('androidInstallIcon').style.display = 'inline-block';
+		    }
+		});
 
-        window.onload = function() {
-             // Detect iOS
+		window.onload = function() {
+            // Detect iOS
             if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
                 isIOS = true;
             }
@@ -137,7 +139,7 @@
             switchLanguage(currentLang); // Now texts is guaranteed to be defined
         };
 
-        function showInstallInstructions(platform) {
+		function showInstallInstructions(platform) {
 			// Get the modal
 			var modal = document.getElementById("myModal");
 			var modalContent = document.getElementById("modalText");
@@ -177,7 +179,6 @@
 			  }
 			}
         }
-
     </script>
 
     <div class="container">
@@ -206,22 +207,18 @@
                 <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
                 <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
             </div>
-            <div class="install-icons">
+             <div class="install-icons">
                 <i id="iosInstallIcon" class="fab fa-apple" onclick="showInstallInstructions('ios')" style="display: none;"></i>
                 <i id="androidInstallIcon" class="fab fa-android" onclick="showInstallInstructions('android')" style="display: none;"></i>
            </div>
-
             <div class="result" id="result"></div>
         </div>
     </div>
-
 	<div id="myModal" class="modal">
-
 	  <div class="modal-content">
 	    <span class="close">&times;</span>
 	    <p id="modalText"></p>
 	  </div>
-
 	</div>
 
     <script>
@@ -250,38 +247,41 @@
             // The beforeinstallprompt event handler will show the Android icon if appropriate
         }
     }
-   function switchLanguage(lang) {
-    currentLang = lang;
 
-    document.getElementById("title").innerText = texts[currentLang].title;
-    document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
-    document.getElementById("description").innerText = texts[currentLang].description;
-    document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
-    document.getElementById("resetButton").innerText = texts[currentLang].reset;
+    function switchLanguage(lang) {
+        currentLang = lang;
 
-     alert(texts[currentLang].alert);
+		document.getElementById("title").innerText = texts[currentLang].title;
+        document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
+        document.getElementById("description").innerText = texts[currentLang].description;
+        document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
+        document.getElementById("resetButton").innerText = texts[currentLang].reset;
 
-     // Update the result display if it's already visible
-     if (document.getElementById("result").style.display === "block") {
-        calculateRisk(); // Recalculate to update the displayed text
+        //  alert(texts[currentLang].alert); We don't need it anymore
+
+        // Update the result display if it's already visible
+        if (document.getElementById("result").style.display === "block") {
+            calculateRisk(); // Recalculate to update the displayed text
+        }
     }
-}
 
     function calculateRisk() {
-        const inp = document.getElementById('gfapInput').value;
-        const resDiv = document.getElementById('result');
+    const inp = document.getElementById('gfapInput').value;
+    const resDiv = document.getElementById('result');
 
-        if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
-            resDiv.innerHTML = texts[currentLang].validationError;
-            resDiv.style.display = "block";
-            return;
-        }
+    if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
+        resDiv.innerHTML = texts[currentLang].validationError;
+        resDiv.style.display = "block";
+        return;
+    }
 
+    // --- Display the warning and wait for user confirmation ---
+    if (confirm(texts[currentLang].alert)) {
         const gfapValue = parseFloat(inp);
         let riskLevel = '';
         let riskText = '';
 
-         // --- Risk Categorization (Based on Raw GFAP) ---
+        // --- Risk Categorization (Based on Raw GFAP) ---
         if (gfapValue <= 100) {
             riskLevel = 'low-risk';
             riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk';
@@ -315,8 +315,8 @@
         const probabilityLabel = (currentLang === 'de') ? 'Wahrscheinlichkeit' : 'Probability';
         resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${probabilityLabel}: ${probability.toFixed(1)}%`;
         resDiv.style.display = "block";
-    }
-
+    } //If they click cancel the result is not displayed.
+}
     function resetForm() {
         document.getElementById("gfapInput").value = "";
         document.getElementById("result").style.display = "none";
