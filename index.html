@@ -6,9 +6,16 @@
     <title>GFAP Bleeding Risk Check</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Security Improvement: CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://cdnjs.cloudflare.com; script-src 'self'; font-src 'self' https://cdnjs.cloudflare.com;">
+
+    <!-- FontAwesome with Integrity -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
-		/* (Your existing CSS) */
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
         .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
@@ -18,93 +25,131 @@
         .secondary { background-color: #dc3545; color: white; }
         .secondary:hover { background-color: #b52b3a; }
         .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-        .warning { font-size: 12px; color: red; margin-top: 10px; }
-        /* Color Coding */
         .low-risk { color: green; }
         .medium-risk { color: orange; }
         .high-risk { color: red; }
-
-        /* Install Icon Styles */
-        .install-icons {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .install-icons i {
-            font-size: 24px; /* Adjust as needed */
-            margin: 0 10px;
-            cursor: pointer;
-            color: #007bff; /* Or any color you prefer */
-        }
-		/* Modal Styles */
-		.modal {
-		    display: none; /* Hidden by default */
-		    position: fixed; /* Stay in place */
-		    z-index: 1; /* Sit on top */
-		    left: 0;
-		    top: 0;
-		    width: 100%; /* Full width */
-		    height: 100%; /* Full height */
-		    overflow: auto; /* Enable scroll if needed */
-		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-		}
-
-		.modal-content {
-		    background-color: #fefefe;
-		    margin: 15% auto; /* 15% from the top and centered */
-		    padding: 20px;
-		    border: 1px solid #888;
-		    width: 80%; /* Could be more or less, depending on screen size */
-            border-radius: 10px;
-		}
-
-		.close {
-		    color: #aaa;
-		    float: right;
-		    font-size: 28px;
-		    font-weight: bold;
-		}
-
-		.close:hover,
-		.close:focus {
-		    color: black;
-		    text-decoration: none;
-		    cursor: pointer;
-		}
-
+        .install-icons { text-align: center; margin-top: 10px; }
+        .install-icons i { font-size: 24px; margin: 0 10px; cursor: pointer; color: #007bff; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; border-radius: 10px; text-align: left; }
+        .close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: black; }
     </style>
 </head>
 <body>
+
+    <div class="container">
+        <h1>GFAP Bleeding Risk Check</h1>
+        <div class="input-group">
+            <input type="number" id="gfapInput" placeholder="Enter GFAP Value">
+        </div>
+        <div class="button-group">
+            <button class="primary" onclick="calculateRisk()">Check Risk</button>
+            <button class="secondary" onclick="resetForm()">Reset</button>
+        </div>
+        <p id="result" class="result"></p>
+
+        <!-- Install Icons -->
+        <div class="install-icons">
+            <i id="androidInstallIcon" class="fab fa-android" style="display: none;" onclick="installPWA()"></i>
+            <i id="iosInstallIcon" class="fab fa-apple" style="display: none;" onclick="showInstallInstructions('ios')"></i>
+        </div>
+    </div>
+
+    <!-- Modal for Install Instructions -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p id="modalText">Installation instructions will be displayed here.</p>
+        </div>
+    </div>
+
     <script>
         let deferredPrompt;
         let isIOS = false;
-        let currentLang = 'en'; // Default language
-        let texts = {}; // Will hold the loaded JSON data
 
-		window.addEventListener('beforeinstallprompt', (e) => {
-		    // Prevent the default browser prompt
-		    e.preventDefault();
-		    // Stash the event so it can be triggered later.
-		    deferredPrompt = e;
-		    // Show the install button *only* for Android (not iOS)
-		    if (!isIOS) {
-		        document.getElementById('androidInstallIcon').style.display = 'inline-block';
-		    }
-		});
+        window.onload = function() {
+            // Detect iOS
+            isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-		window.onload = function() {
-             // Detect iOS
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-                isIOS = true;
+            // Install icon visibility
+            if (isIOS) {
+                document.getElementById('iosInstallIcon').style.display = 'inline-block';
             }
-            // Get user's preferred language
-            let userLang = navigator.language || navigator.userLanguage;
-            currentLang = userLang.startsWith('de') ? 'de' : 'en';
-            checkAccess();
-			loadTexts(currentLang); // Load texts and *then* initialize
+
+            // Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log("Service Worker Registered", reg))
+                .catch(err => console.log("Service Worker Failed", err));
+            }
         };
 
-		function showInstallInstructions(platform) {
-			// Get the modal
-			var modal = document.getElementById("myModal");
-			var modalContent = document.getElementById("modalText");
+        // Handle install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('androidInstallIcon').style.display = 'inline-block';
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(choice => {
+                    if (choice.outcome === 'accepted') {
+                        console.log('User installed the PWA');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        function showInstallInstructions(platform) {
+            let modal = document.getElementById("myModal");
+            let modalText = document.getElementById("modalText");
+
+            if (platform === "ios") {
+                modalText.innerHTML = "To install the app on iOS:<br>1. Open this page in Safari.<br>2. Tap the Share button.<br>3. Select 'Add to Home Screen'.";
+            }
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        function calculateRisk() {
+            let input = document.getElementById("gfapInput").value;
+            let result = document.getElementById("result");
+
+            if (input === "" || isNaN(input)) {
+                result.innerHTML = "Please enter a valid GFAP value.";
+                result.className = "result high-risk";
+                result.style.display = "block";
+                return;
+            }
+
+            let value = parseFloat(input);
+            if (value < 5) {
+                result.innerHTML = "Low Risk";
+                result.className = "result low-risk";
+            } else if (value < 15) {
+                result.innerHTML = "Medium Risk";
+                result.className = "result medium-risk";
+            } else {
+                result.innerHTML = "High Risk";
+                result.className = "result high-risk";
+            }
+            result.style.display = "block";
+        }
+
+        function resetForm() {
+            document.getElementById("gfapInput").value = "";
+            document.getElementById("result").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
