@@ -135,7 +135,6 @@
         const inp = document.getElementById('gfapInput').value;
         const resDiv = document.getElementById('result');
 
-        // **CHANGE HERE:** Updated validation message
         if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
             resDiv.innerHTML = "Please enter a valid GFAP value (29-10000)!";
             resDiv.style.display = "block";
@@ -147,7 +146,7 @@
         let riskText = '';
 
          // --- Risk Categorization (Based on Raw GFAP) ---
-        if (gfapValue < 100) {
+        if (gfapValue <= 100) { // Corrected condition: <= 100
             riskLevel = 'low-risk';
             riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk';
         } else if (gfapValue >= 101 && gfapValue <= 1000) {
