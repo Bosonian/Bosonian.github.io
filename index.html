@@ -8,11 +8,70 @@
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* General Styles */
-        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #f8f9fa; /* Lighter background */ color: #2c3e50; margin: 0; padding: 0; }
-        .container { max-width: 600px; /* Slightly wider */ margin: 30px auto; /* Reduced top/bottom margin */ padding: 30px; /* More padding */ background-color: white; border-radius: 15px; /* Larger border-radius */ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* More subtle shadow */ }
+        /* (Your existing CSS) */
+        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
+        .button-group button { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .primary { background-color: #007bff; color: white; }
+        .primary:hover { background-color: #0056b3; }
+        .secondary { background-color: #dc3545; color: white; }
+        .secondary:hover { background-color: #b52b3a; }
+        .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
+        .warning { font-size: 12px; color: red; margin-top: 10px; }
+        /* Color Coding */
+        .low-risk { color: green; }
+        .medium-risk { color: orange; }
+        .high-risk { color: red; }
 
-        /* Title Styles */
+        /* Install Icon Styles */
+        .install-icons {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .install-icons i {
+            font-size: 24px; /* Adjust as needed */
+            margin: 0 10px;
+            cursor: pointer;
+            color: #007bff; /* Or any color you prefer */
+        }
+		/* Modal Styles */
+		.modal {
+		    display: none; /* Hidden by default */
+		    position: fixed; /* Stay in place */
+		    z-index: 1; /* Sit on top */
+		    left: 0;
+		    top: 0;
+		    width: 100%; /* Full width */
+		    height: 100%; /* Full height */
+		    overflow: auto; /* Enable scroll if needed */
+		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+		}
+
+		.modal-content {
+		    background-color: #fefefe;
+		    margin: 15% auto; /* 15% from the top and centered */
+		    padding: 20px;
+		    border: 1px solid #888;
+		    width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+		}
+
+		.close {
+		    color: #aaa;
+		    float: right;
+		    font-size: 28px;
+		    font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+		    color: black;
+		    text-decoration: none;
+		    cursor: pointer;
+		}
+         /* Title Styles */
         .title-container {
             display: flex;
             flex-direction: column; /* Stack elements vertically */
@@ -63,84 +122,6 @@
             color: white;
             font-weight: bold;
         }
-
-        /* Input and Button Styles */
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group input {
-            width: 100%; /* Full width */
-            padding: 15px;
-            font-size: 1rem;
-            border: 2px solid #ced4da; /* Lighter border */
-            border-radius: 8px;
-            outline: none;
-            text-align: center;
-            box-sizing: border-box; /* Include padding and border in width */
-        }
-
-        .button-group {
-			display: flex;
-            flex-direction: column;
-            gap: 10px;/* Add space between buttons*/
-			align-items: center; /* Center horizontally */
-		}
-
-        .button-group button {
-            width: 80%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.3s; /* Smooth transition */
-        }
-        .primary { background-color: #007bff; color: white; }
-        .primary:hover { background-color: #0056b3; }
-        .secondary { background-color: #dc3545; color: white; }
-        .secondary:hover { background-color: #b52b3a; }
-
-        /* Result Styles */
-        .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-
-        /* Color Coding */
-        .low-risk { color: green; }
-        .medium-risk { color: orange; }
-        .high-risk { color: red; }
-
-        /* Install Icon Styles */
-        .install-icons {
-            text-align: center;
-            margin-top: 15px;
-        }
-        .install-icons i {
-            font-size: 28px; /* Larger icons */
-            margin: 0 15px;   /* More space between icons */
-            cursor: pointer;
-            color: #3498db; /* A different shade of blue */
-            transition: transform 0.2s; /* Add a transition */
-        }
-        .install-icons i:hover {
-            transform: scale(1.1); /* Slightly enlarge on hover */
-        }
-
-        /* Modal Styles */
-        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; border-radius: 10px; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
-        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
-        /* Responsive adjustments */
-		@media (max-width: 768px) {
-		    .container {
-		        margin: 20px; /* Less margin on small screens */
-		        padding: 15px;
-		    }
-			.button-group button {
-                width: 90%; /* Wider button in small screens*/
-            }
-		}
-
     </style>
 </head>
 <body>
@@ -206,8 +187,9 @@
             // Get user's preferred language
             let userLang = navigator.language || navigator.userLanguage;
             currentLang = userLang.startsWith('de') ? 'de' : 'en';
+			console.log("Initial language:", currentLang); // Debugging
             checkAccess();
-            switchLanguage(currentLang); // Now texts is guaranteed to be defined
+            switchLanguage(currentLang);
         };
 
 		function showInstallInstructions(platform) {
@@ -250,7 +232,6 @@
 			  }
 			}
         }
-
     </script>
 
     <div class="container">
@@ -258,6 +239,7 @@
 		    <div class="title-main"><i class="fas fa-brain"></i><span id="title"></span></div>
 		    <div class="title-sub" id="titleSub"></div>
 		</div>
+
         <div class="lang-switch">
             <button onclick="switchLanguage('de')" id="deButton">🇩🇪 Deutsch</button>
             <button onclick="switchLanguage('en')" id="enButton">🇬🇧 English</button>
@@ -298,43 +280,31 @@
     <script>
     const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
 
-    function validateAccessCode() {
-        const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-        if (validCodes.includes(inputCode)) {
-            localStorage.setItem("userHasAccess", "true");
-            document.getElementById("codeEntrySection").style.display = "none";
-            document.getElementById("calculatorSection").style.display = "block";
-        } else {
-            document.getElementById("accessError").style.display = "block";
-        }
-    }
+	function validateAccessCode() {
+		const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+		console.log("Input code:", inputCode); // Debugging
+		if (validCodes.includes(inputCode)) {
+			console.log("Code is valid"); // Debugging
+			localStorage.setItem("userHasAccess", "true");
+			document.getElementById("codeEntrySection").style.display = "none";
+			document.getElementById("calculatorSection").style.display = "block";
+		} else {
+			console.log("Code is invalid"); // Debugging
+			document.getElementById("accessError").style.display = "block";
+		}
+	}
 
-    function checkAccess() {
-        if (localStorage.getItem("userHasAccess") === "true") {
-            document.getElementById("codeEntrySection").style.display = "none";
-            document.getElementById("calculatorSection").style.display = "block";
-        }
-        // Show appropriate install icon *after* access is checked
+	function checkAccess() {
+		console.log("checkAccess called"); // Debugging
+		const hasAccess = localStorage.getItem("userHasAccess") === "true";
+		console.log("localStorage hasAccess:", hasAccess); // Debugging
+
+		if (hasAccess) {
+			document.getElementById("codeEntrySection").style.display = "none";
+			document.getElementById("calculatorSection").style.display = "block";
+		}
+		 // Show appropriate install icon *after* access is checked AND calculator section is displayed
         if (isIOS) {
             document.getElementById('iosInstallIcon').style.display = 'inline-block';
         } else {
-            // The beforeinstallprompt event handler will show the Android icon if appropriate
-        }
-    }
-
-	function switchLanguage(lang) {
-		currentLang = lang;
-		// Add and remove the 'active' class
-		document.getElementById('deButton').classList.remove('active');
-		document.getElementById('enButton').classList.remove('active');
-		document.getElementById(lang + 'Button').classList.add('active');
-
-
-		document.getElementById("title").innerText = texts[currentLang].title;
-		document.getElementById("titleSub").innerText = texts[currentLang].titleSub; //Update subtitle
-        document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
-        document.getElementById("description").innerText = texts[currentLang].description;
-        document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
-        document.getElementById("resetButton").innerText = texts[currentLang].reset;
-
-        // Update the result display if it's already visible
+            // The beforeinstallprompt event handler will
