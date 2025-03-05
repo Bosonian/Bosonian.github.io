@@ -69,7 +69,7 @@
     </div>
 
     <script>
-    const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
+   const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
 
     function validateAccessCode() {
         const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
@@ -133,13 +133,17 @@
         }
     }
 
-    function calculateRisk() {
+        function calculateRisk() {
         const inp = document.getElementById('gfapInput').value;
         const resDiv = document.getElementById('result');
 
-        // Use the localized validation error message
         if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
-            resDiv.innerHTML = texts[currentLang].validationError; // Get translated error message
+            if (typeof texts !== 'undefined' && texts[currentLang] && texts[currentLang].validationError) {
+                resDiv.innerHTML = texts[currentLang].validationError;
+            } else {
+                // Fallback message in case texts is not yet available
+                resDiv.innerHTML = "Please enter a valid GFAP value (29-10000)!";
+            }
             resDiv.style.display = "block";
             return;
         }
