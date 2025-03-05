@@ -25,18 +25,14 @@
     </style>
 </head>
 <body>
-   <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => console.log("Service Worker registered with scope:", registration.scope))
-                .catch(error => console.log("Service Worker registration failed:", error));
-        }
-    </script>
-
     <script>
         window.onload = function() {
-            alert("⚠️ This calculation is for research purposes only. Do not use for clinical decisions!");
+            // Get user's preferred language
+            let userLang = navigator.language || navigator.userLanguage; // Fallback for older browsers
+            currentLang = userLang.startsWith('de') ? 'de' : 'en'; // Set to 'de' if German, 'en' otherwise
             checkAccess();
+            switchLanguage(currentLang); // Initialize language on load
+
         };
         let currentLang = 'en'; // Default language
     </script>
@@ -104,7 +100,9 @@
                 lowRisk: "Niedriges Risiko",
                 mediumRisk: "Mittleres Risiko",
                 highRisk: "Hohes Risiko",
-                probability: "Wahrscheinlichkeit"
+                probability: "Wahrscheinlichkeit",
+                alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
+                validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-10000)!" // German validation error
             },
             en: {
                 title: "🧠 GFAP Bleeding Risk Check",
@@ -115,7 +113,9 @@
                 lowRisk: "Low Risk",
                 mediumRisk: "Medium Risk",
                 highRisk: "High Risk",
-                probability: "Probability"
+                probability: "Probability",
+                alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
+                validationError: "Please enter a valid GFAP value (29-10000)!" // English validation error
             }
         };
 
@@ -124,6 +124,8 @@
         document.getElementById("description").innerText = texts[lang].description;
         document.getElementById("calculateButton").innerText = texts[lang].calculate;
         document.getElementById("resetButton").innerText = texts[lang].reset;
+
+        alert(texts[lang].alert);
 
          // Update the result display if it's already visible
          if (document.getElementById("result").style.display === "block") {
@@ -135,8 +137,9 @@
         const inp = document.getElementById('gfapInput').value;
         const resDiv = document.getElementById('result');
 
+        // Use the localized validation error message
         if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
-            resDiv.innerHTML = "Please enter a valid GFAP value (29-10000)!";
+            resDiv.innerHTML = texts[currentLang].validationError; // Get translated error message
             resDiv.style.display = "block";
             return;
         }
@@ -146,7 +149,7 @@
         let riskText = '';
 
          // --- Risk Categorization (Based on Raw GFAP) ---
-        if (gfapValue <= 100) { // Corrected condition: <= 100
+        if (gfapValue <= 100) {
             riskLevel = 'low-risk';
             riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk';
         } else if (gfapValue >= 101 && gfapValue <= 1000) {
