@@ -8,283 +8,103 @@
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* General Styles */
-        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #f8f9fa; /* Lighter background */ color: #2c3e50; margin: 0; padding: 0; }
-        .container { max-width: 600px; /* Slightly wider */ margin: 30px auto; /* Reduced top/bottom margin */ padding: 30px; /* More padding */ background-color: white; border-radius: 15px; /* Larger border-radius */ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* More subtle shadow */ }
-
-        /* Title Styles */
-        .title-container {
-            display: flex;
-            flex-direction: column; /* Stack elements vertically */
-            align-items: center;    /* Center horizontally */
-            margin-bottom: 20px;      /* Space below title */
-        }
-
-        .title-main {
-            font-size: 2.2rem; /* Larger font size */
-            font-weight: bold;
-            margin-bottom: 0.2rem;
-            display: flex;
-            align-items: center;
-
-        }
-        .title-main i{
-            margin-right: 0.5rem;
-        }
-
-        .title-sub {
-            font-size: 1rem;
-            color: #6c757d; /* Gray color for subtitle */
-        }
-
-        /* Language Switch Styles */
-        .lang-switch {
-            display: flex;
-            justify-content: center; /* Center the buttons */
-            margin-bottom: 20px;
-        }
-
-        .lang-switch button {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            margin: 0 10px;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background-color 0.3s; /* Smooth transition */
-        }
-
-        .lang-switch button:hover {
-            background-color: rgba(0, 0, 0, 0.05); /* Slight hover effect */
-        }
-         .lang-switch button.active {
-            background-color: #007bff; /* Active language button style */
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Input and Button Styles */
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group input {
-            width: 100%; /* Full width */
-            padding: 15px;
-            font-size: 1rem;
-            border: 2px solid #ced4da; /* Lighter border */
-            border-radius: 8px;
-            outline: none;
-            text-align: center;
-            box-sizing: border-box; /* Include padding and border in width */
-        }
-
-        .button-group {
-			display: flex;
-            flex-direction: column;
-            gap: 10px;/* Add space between buttons*/
-			align-items: center; /* Center horizontally */
-		}
-
-        .button-group button {
-            width: 80%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.3s; /* Smooth transition */
-        }
+		/* (Your existing CSS) */
+        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
+        .button-group button { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
         .primary { background-color: #007bff; color: white; }
         .primary:hover { background-color: #0056b3; }
         .secondary { background-color: #dc3545; color: white; }
         .secondary:hover { background-color: #b52b3a; }
-
-        /* Result Styles */
         .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-
+        .warning { font-size: 12px; color: red; margin-top: 10px; }
         /* Color Coding */
         .low-risk { color: green; }
         .medium-risk { color: orange; }
         .high-risk { color: red; }
 
-        /* Responsive adjustments */
-		@media (max-width: 768px) {
-		    .container {
-		        margin: 20px; /* Less margin on small screens */
-		        padding: 15px;
-		    }
-			.button-group button {
-                width: 90%; /* Wider button in small screens*/
-            }
+        /* Install Icon Styles */
+        .install-icons {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .install-icons i {
+            font-size: 24px; /* Adjust as needed */
+            margin: 0 10px;
+            cursor: pointer;
+            color: #007bff; /* Or any color you prefer */
+        }
+		/* Modal Styles */
+		.modal {
+		    display: none; /* Hidden by default */
+		    position: fixed; /* Stay in place */
+		    z-index: 1; /* Sit on top */
+		    left: 0;
+		    top: 0;
+		    width: 100%; /* Full width */
+		    height: 100%; /* Full height */
+		    overflow: auto; /* Enable scroll if needed */
+		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+		}
+
+		.modal-content {
+		    background-color: #fefefe;
+		    margin: 15% auto; /* 15% from the top and centered */
+		    padding: 20px;
+		    border: 1px solid #888;
+		    width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+		}
+
+		.close {
+		    color: #aaa;
+		    float: right;
+		    font-size: 28px;
+		    font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+		    color: black;
+		    text-decoration: none;
+		    cursor: pointer;
 		}
 
     </style>
 </head>
 <body>
     <script>
+        let deferredPrompt;
+        let isIOS = false;
         let currentLang = 'en'; // Default language
+        let texts = {}; // Will hold the loaded JSON data
 
-        // Define texts *outside* of switchLanguage - making it global
-        const texts = {
-            de: {
-                title: "GFAP Blutungsrisiko-Check",
-				titleSub: "für Koma GCS (3-8)",
-                codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
-                description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
-                calculate: "Berechnen",
-                reset: "Zurücksetzen",
-                lowRisk: "Niedriges Risiko",
-                mediumRisk: "Mittleres Risiko",
-                highRisk: "Hohes Risiko",
-                probability: "Wahrscheinlichkeit",
-                alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
-                validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-10000)!",
-            },
-            en: {
-                title: "GFAP Bleeding Risk Check",
-				titleSub: "for Coma GCS (3-8)",
-                codePrompt: "🔑 Please enter your access code:",
-                description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
-                calculate: "Calculate",
-                reset: "Reset",
-                lowRisk: "Low Risk",
-                mediumRisk: "Medium Risk",
-                highRisk: "High Risk",
-                probability: "Probability",
-                alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
-                validationError: "Please enter a valid GFAP value (29-10000)!",
-            }
-        };
+		window.addEventListener('beforeinstallprompt', (e) => {
+		    // Prevent the default browser prompt
+		    e.preventDefault();
+		    // Stash the event so it can be triggered later.
+		    deferredPrompt = e;
+		    // Show the install button *only* for Android (not iOS)
+		    if (!isIOS) {
+		        document.getElementById('androidInstallIcon').style.display = 'inline-block';
+		    }
+		});
 
 		window.onload = function() {
+             // Detect iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+                isIOS = true;
+            }
             // Get user's preferred language
             let userLang = navigator.language || navigator.userLanguage;
             currentLang = userLang.startsWith('de') ? 'de' : 'en';
-			console.log("Initial language:", currentLang); // Debugging
             checkAccess();
-            switchLanguage(currentLang); // Now texts is guaranteed to be defined
+			loadTexts(currentLang); // Load texts and *then* initialize
         };
-    </script>
 
-    <div class="container">
-		<div class="title-container">
-		    <div class="title-main"><i class="fas fa-brain"></i><span id="title"></span></div>
-		    <div class="title-sub" id="titleSub"></div>
-		</div>
-        <div class="lang-switch">
-            <button onclick="switchLanguage('de')" id="deButton">🇩🇪 Deutsch</button>
-            <button onclick="switchLanguage('en')" id="enButton">🇬🇧 English</button>
-        </div>
-
-        <div id="codeEntrySection">
-            <p id="codePrompt">🔑 Please enter your access code:</p>
-            <input type="text" id="accessCodeInput" placeholder="Enter code">
-            <button class="primary" onclick="validateAccessCode()">Confirm</button>
-            <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
-        </div>
-
-        <div id="calculatorSection" style="display: none;">
-            <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
-
-            <div class="input-group">
-                <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10000">
-            </div>
-
-            <div class="button-group">
-                <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
-                <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
-            </div>
-            <div class="result" id="result"></div>
-        </div>
-    </div>
-    <script>
-    const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
-
-	function validateAccessCode() {
-		const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-		console.log("Input code:", inputCode); // Debugging
-		if (validCodes.includes(inputCode)) {
-			console.log("Code is valid"); // Debugging
-			localStorage.setItem("userHasAccess", "true");
-			document.getElementById("codeEntrySection").style.display = "none";
-			document.getElementById("calculatorSection").style.display = "block";
-		} else {
-			console.log("Code is invalid"); // Debugging
-			document.getElementById("accessError").style.display = "block";
-		}
-	}
-
-	function checkAccess() {
-		console.log("checkAccess called"); // Debugging
-		const hasAccess = localStorage.getItem("userHasAccess") === "true";
-		console.log("localStorage hasAccess:", hasAccess); // Debugging
-
-		if (hasAccess) {
-			document.getElementById("codeEntrySection").style.display = "none";
-			document.getElementById("calculatorSection").style.display = "block";
-		}
-	}
-
-   function switchLanguage(lang) {
-		currentLang = lang;
-		// Add and remove the 'active' class
-		document.getElementById('deButton').classList.remove('active');
-		document.getElementById('enButton').classList.remove('active');
-		document.getElementById(lang + 'Button').classList.add('active');
-
-
-		document.getElementById("title").innerText = texts[currentLang].title;
-		document.getElementById("titleSub").innerText = texts[currentLang].titleSub; //Update subtitle
-        document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
-        document.getElementById("description").innerText = texts[currentLang].description;
-        document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
-        document.getElementById("resetButton").innerText = texts[currentLang].reset;
-
-        // Update the result display if it's already visible
-        if (document.getElementById("result").style.display === "block") {
-            calculateRisk(); // Recalculate to update the displayed text
-        }
-    }
-
-    function calculateRisk() {
-        const inp = document.getElementById('gfapInput').value;
-        const resDiv = document.getElementById('result');
-
-        if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
-            resDiv.innerHTML = texts[currentLang].validationError;
-            resDiv.style.display = "block";
-            return;
-        }
-
-        // --- Display the warning and wait for user confirmation ---
-        if (confirm(texts[currentLang].alert)) {
-            const gfapValue = parseFloat(inp);
-            let riskLevel = '';
-            let riskText = '';
-
-            // --- Risk Categorization (Based on Raw GFAP) ---
-            if (gfapValue <= 100) {
-                riskLevel = 'low-risk';
-                riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk';
-            } else if (gfapValue >= 101 && gfapValue <= 1000) {
-                riskLevel = 'medium-risk';
-                riskText = (currentLang === 'de') ? 'Mittleres Risiko' : 'Medium Risk';
-            } else {
-                riskLevel = 'high-risk';
-                riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk';
-            }
-
-            // --- Probability Calculation (Obfuscated Log Formula) ---
-            const f1 = '27.63';
-            const f2 = '90.01';
-            const i1 = '84.05-';
-            const i2 = '';
-
-            const combinedF = f1.split('').reverse().join('') + f2.split('').reverse().join('');
-            const combinedI = i1.split('').reverse().join('') + i2.split('').reverse().join('');
-
-            const calcFunc = new Function('gfap', `
-                const f = parseFloat(String.fromCharCode(${combinedF.split("").map(c => c.charCodeAt(0)).join(',')}));
-                const i = parseFloat(String.fromCharCode(${combinedI.split("
+		function showInstallInstructions(platform) {
+			// Get the modal
+			var modal = document.getElementById("myModal");
+			var modalContent = document.getElementById("modalText");
