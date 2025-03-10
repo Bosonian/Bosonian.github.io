@@ -6,9 +6,9 @@
     <title>GFAP Risk Check</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
-        /* (Your existing CSS) */
         body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
         .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
         .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
@@ -18,82 +18,25 @@
         .secondary { background-color: #dc3545; color: white; }
         .secondary:hover { background-color: #b52b3a; }
         .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
-        .warning { font-size: 12px; color: red; margin-top: 10px; }
-        /* Color Coding */
         .low-risk { color: green; }
         .medium-risk { color: orange; }
         .high-risk { color: red; }
-
-        /* Install Icon Styles */
-        .install-icons {
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .install-icons i {
-            font-size: 24px; /* Adjust as needed */
-            margin: 0 10px;
-            cursor: pointer;
-            color: #007bff; /* Or any color you prefer */
-        }
-        /* Modal Styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto; /* 15% from the top and centered */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
-            border-radius: 10px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .title-line {
-           display: flex;
-           flex-direction: column; /* Stack elements vertically */
-           align-items: center; /* Center horizontally */
-        }
-        /* Checkbox styles (optional) */
-        .checkbox-group label {
-            display: block; /* Each label on a new line */
-            margin-bottom: 5px;
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
-      <div class="title-line">
-        <h1 id="title">🧠 GFAP Risk Check</h1>
-      </div>
+        <div class="title-line">
+            <h1 id="title">🧠 GFAP Risk Check</h1>
+        </div>
+
+        <!-- LANGUAGE SWITCH -->
         <div>
             <button onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
             <button onclick="switchLanguage('en')">🇬🇧 English</button>
         </div>
 
+        <!-- ACCESS CODE SECTION -->
         <div id="codeEntrySection">
             <p id="codePrompt">🔑 Please enter your access code:</p>
             <input type="text" id="accessCodeInput" placeholder="Enter code">
@@ -101,12 +44,14 @@
             <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
         </div>
 
+        <!-- MODULE SELECTION -->
         <div id="moduleSelection" style="display: none;">
             <p id="modulePrompt">Select the relevant module:</p>
             <button class="primary" onclick="selectModule('coma')">Coma (GCS 3-8)</button>
             <button class="primary" onclick="selectModule('stroke')">Stroke</button>
         </div>
 
+        <!-- STROKE CHECKS -->
         <div id="strokeChecks" style="display: none;">
             <p id="strokeCheckPrompt">Please confirm the following for the stroke patient:</p>
             <div class="checkbox-group">
@@ -118,111 +63,207 @@
             <button class="primary" onclick="proceedToStrokeInput()">Proceed</button>
         </div>
 
+        <!-- CALCULATOR SECTION -->
         <div id="calculatorSection" style="display: none;">
             <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
-
             <div class="input-group">
                 <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10000">
-                <input type="number" id="ageInput" placeholder="Enter Age" inputmode="numeric" min="1" max="120" style="display: none;"> </div>
-
-            <div class="button-group">
-                <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
-                <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
+                <input type="number" id="ageInput" placeholder="Enter Age" inputmode="numeric" min="1" max="120" style="display: none;">
             </div>
-             <div class="install-icons">
-                <i id="iosInstallIcon" class="fab fa-apple" onclick="showInstallInstructions('ios')" style="display: none;"></i>
-                <i id="androidInstallIcon" class="fab fa-android" onclick="showInstallInstructions('android')" style="display: none;"></i>
-             </div>
+            <div class="button-group">
+                <button class="primary" onclick="calculateRisk()">Calculate</button>
+                <button class="secondary" onclick="resetForm()">Reset</button>
+            </div>
             <div class="result" id="result"></div>
         </div>
     </div>
-    <div id="myModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <p id="modalText"></p>
-      </div>
-    </div>
-
-    <script>
-        // ... (Your existing JavaScript code) ...
-
-        function selectModule(module) {
-            if (module === 'coma') {
-                document.getElementById('moduleSelection').style.display = 'none';
-                document.getElementById('calculatorSection').style.display = 'block';
-                document.getElementById('ageInput').style.display = 'none'; // Hide age input for coma
-            } else if (module === 'stroke') {
-                document.getElementById('moduleSelection').style.display = 'none';
-                document.getElementById('strokeChecks').style.display = 'block';
-            }
-        }
-
-        function proceedToStrokeInput() {
-            if (document.getElementById('timeWindowCheck').checked &&
-                document.getElementById('symptomHistoryCheck').checked &&
-                document.getElementById('traumaCheck').checked &&
-                document.getElementById('fastEdScoreCheck').checked) {
-                document.getElementById('strokeChecks').style.display = 'none';
-                document.getElementById('calculatorSection').style.display = 'block';
-                document.getElementById('ageInput').style.display = 'block'; // Show age input for stroke
-            } else {
-                alert('Please confirm all the conditions for the stroke patient before proceeding.');
-            }
-        }
-
-        function calculateRisk() {
-            const gfapInput = parseFloat(document.getElementById('gfapInput').value);
-            const ageInput = parseFloat(document.getElementById('ageInput').value);
-            const resDiv = document.getElementById('result');
-
-            if (isNaN(gfapInput) || gfapInput < 29 || gfapInput > 10000) {
-                resDiv.innerHTML = texts[currentLang].validationError;
-                resDiv.style.display = "block";
-                return;
-            }
-
-            if (confirm(texts[currentLang].alert)) {
-                let riskLevel = '';
-                let riskText = '';
-                let probability = 0;
-
-                if (document.getElementById('ageInput').style.display === 'block') {
-                    // Stroke module calculation
-                    if (gfapInput < 30) {
-                        riskText = (currentLang === 'de') ? 'Hohe Wahrscheinlichkeit für Hirninfarkt' : 'High probability of cerebral infarction';
-                        if (document.getElementById('fastEdScoreCheck').checked) {
-                            riskText += (currentLang === 'de') ? '<br>Hohe Wahrscheinlichkeit für "large vessel occlusion" (LVO)' : '<br>High probability of "large vessel occlusion" (LVO)';
-                        }
-                    } else {
-                        if (ageInput < 72) {
-                            if (gfapInput < 36.8) { riskLevel = 'low-risk'; riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk'; }
-                            else if (gfapInput > 49.2) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk'; probability = 85; }
-                            else if (gfapInput > 54.0) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Sehr hohes Risiko' : 'Very High Risk'; probability = 91; }
-                        } else if (ageInput >= 72 && ageInput <= 83) {
-                            if (gfapInput < 36.8) { riskLevel = 'low-risk'; riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk'; }
-                            else if (gfapInput > 107.3) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk'; probability = 83; }
-                            else if (gfapInput > 149.9) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Sehr hohes Risiko' : 'Very High Risk'; probability = 90; }
-                        } else if (ageInput > 83) {
-                            if (gfapInput < 36.8) { riskLevel = 'low-risk'; riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk'; }
-                            else if (gfapInput > 146.5) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk'; probability = 82; }
-                        }
-                    }
-                } else {
-                    // Coma module calculation (same as before)
-                    // ...
-                }
-
-                const probabilityLabel = (currentLang === 'de') ? 'Wahrscheinlichkeit' : 'Probability';
-                resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${probabilityLabel}: ${probability.toFixed(1)}%`;
-                resDiv.style.display = "block";
-            }
-        }
-
-        // ... (Rest of your existing JavaScript code) ...
-    </script>
 
     <footer>
         <p>© 2025 iGFAP. All rights reserved.</p>
     </footer>
+
+<script>
+    const VALID_CODES = ['1234', 'test2025'];
+
+    const texts = {
+        en: {
+            codePrompt: '🔑 Please enter your access code:',
+            accessError: '❌ Invalid access code!',
+            modulePrompt: 'Select the relevant module:',
+            strokeCheckPrompt: 'Please confirm the following for the stroke patient:',
+            description: 'Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:',
+            validationError: '❌ Please enter a valid GFAP value between 29 and 10000!',
+            alert: 'Do you want to proceed with the calculation?',
+            probabilityLabel: 'Probability'
+        },
+        de: {
+            codePrompt: '🔑 Bitte Zugangscode eingeben:',
+            accessError: '❌ Ungültiger Zugangscode!',
+            modulePrompt: 'Wähle das relevante Modul:',
+            strokeCheckPrompt: 'Bitte bestätigen Sie folgendes für den Schlaganfallpatienten:',
+            description: 'Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:',
+            validationError: '❌ Bitte einen gültigen GFAP-Wert zwischen 29 und 10000 eingeben!',
+            alert: 'Möchten Sie mit der Berechnung fortfahren?',
+            probabilityLabel: 'Wahrscheinlichkeit'
+        }
+    };
+
+    let currentLang = 'en'; // default language
+
+    window.onload = function() {
+        if (sessionStorage.getItem('accessGranted') === 'true') {
+            document.getElementById('codeEntrySection').style.display = 'none';
+            document.getElementById('moduleSelection').style.display = 'block';
+        }
+        if (sessionStorage.getItem('lang')) {
+            switchLanguage(sessionStorage.getItem('lang'));
+        }
+    };
+
+    function switchLanguage(lang) {
+        currentLang = lang;
+        sessionStorage.setItem('lang', currentLang);
+
+        document.getElementById('codePrompt').innerText = texts[lang].codePrompt;
+        document.getElementById('accessError').innerText = texts[lang].accessError;
+        document.getElementById('modulePrompt').innerText = texts[lang].modulePrompt;
+        document.getElementById('strokeCheckPrompt').innerText = texts[lang].strokeCheckPrompt;
+        document.getElementById('description').innerText = texts[lang].description;
+    }
+
+    function validateAccessCode() {
+        const enteredCode = document.getElementById('accessCodeInput').value.trim();
+        const errorMsg = document.getElementById('accessError');
+
+        if (VALID_CODES.includes(enteredCode)) {
+            document.getElementById('codeEntrySection').style.display = 'none';
+            document.getElementById('moduleSelection').style.display = 'block';
+            errorMsg.style.display = 'none';
+            sessionStorage.setItem('accessGranted', 'true');
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    function selectModule(module) {
+        document.getElementById('moduleSelection').style.display = 'none';
+
+        if (module === 'coma') {
+            document.getElementById('calculatorSection').style.display = 'block';
+            document.getElementById('ageInput').style.display = 'none';
+        } else if (module === 'stroke') {
+            document.getElementById('strokeChecks').style.display = 'block';
+        }
+    }
+
+    function proceedToStrokeInput() {
+        if (
+            document.getElementById('timeWindowCheck').checked &&
+            document.getElementById('symptomHistoryCheck').checked &&
+            document.getElementById('traumaCheck').checked &&
+            document.getElementById('fastEdScoreCheck').checked
+        ) {
+            document.getElementById('strokeChecks').style.display = 'none';
+            document.getElementById('calculatorSection').style.display = 'block';
+            document.getElementById('ageInput').style.display = 'block';
+        } else {
+            alert(currentLang === 'de'
+                ? 'Bitte bestätigen Sie alle Bedingungen für den Schlaganfallpatienten.'
+                : 'Please confirm all the conditions for the stroke patient.');
+        }
+    }
+
+    function calculateRisk() {
+        const gfapInput = parseFloat(document.getElementById('gfapInput').value);
+        const ageInputField = document.getElementById('ageInput');
+        const resDiv = document.getElementById('result');
+
+        if (isNaN(gfapInput) || gfapInput < 29 || gfapInput > 10000) {
+            resDiv.innerHTML = texts[currentLang].validationError;
+            resDiv.className = 'result high-risk';
+            resDiv.style.display = "block";
+            return;
+        }
+
+        if (!confirm(texts[currentLang].alert)) return;
+
+        let riskLevel = '';
+        let riskText = '';
+        let probability = 0;
+
+        if (ageInputField.style.display === 'block') {
+            const ageInput = parseFloat(ageInputField.value);
+
+            if (isNaN(ageInput)) {
+                resDiv.innerHTML = currentLang === 'de' ? '❌ Bitte Alter eingeben!' : '❌ Please enter age!';
+                resDiv.style.display = "block";
+                return;
+            }
+
+            if (gfapInput < 30) {
+                riskLevel = 'low-risk';
+                riskText = currentLang === 'de' ? 'Hohe Wahrscheinlichkeit für Hirninfarkt' : 'High probability of cerebral infarction';
+                probability = 10;
+            } else if (ageInput < 72) {
+                if (gfapInput < 36.8) {
+                    riskLevel = 'low-risk';
+                    riskText = currentLang === 'de' ? 'Niedriges Risiko' : 'Low Risk';
+                    probability = 20;
+                } else if (gfapInput > 54) {
+                    riskLevel = 'high-risk';
+                    riskText = currentLang === 'de' ? 'Sehr hohes Risiko' : 'Very High Risk';
+                    probability = 91;
+                } else {
+                    riskLevel = 'medium-risk';
+                    riskText = currentLang === 'de' ? 'Mittleres Risiko' : 'Medium Risk';
+                    probability = 50;
+                }
+            } else {
+                if (gfapInput < 36.8) {
+                    riskLevel = 'low-risk';
+                    riskText = currentLang === 'de' ? 'Niedriges Risiko' : 'Low Risk';
+                    probability = 10;
+                } else if (gfapInput > 149.9) {
+                    riskLevel = 'high-risk';
+                    riskText = currentLang === 'de' ? 'Sehr hohes Risiko' : 'Very High Risk';
+                    probability = 90;
+                } else {
+                    riskLevel = 'medium-risk';
+                    riskText = currentLang === 'de' ? 'Mittleres Risiko' : 'Medium Risk';
+                    probability = 60;
+                }
+            }
+
+        } else {
+            // Coma Module
+            if (gfapInput > 50) {
+                riskLevel = 'high-risk';
+                riskText = currentLang === 'de' ? 'Hohes Risiko für intrakranielle Blutung' : 'High risk of intracranial bleeding';
+                probability = 85;
+            } else {
+                riskLevel = 'low-risk';
+                riskText = currentLang === 'de' ? 'Niedriges Risiko' : 'Low risk';
+                probability = 10;
+            }
+        }
+
+        resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${texts[currentLang].probabilityLabel}: ${probability}%`;
+        resDiv.className = `result ${riskLevel}`;
+        resDiv.style.display = "block";
+    }
+
+    function resetForm() {
+        document.getElementById('gfapInput').value = '';
+        document.getElementById('ageInput').value = '';
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('calculatorSection').style.display = 'none';
+        document.getElementById('moduleSelection').style.display = 'block';
+
+        // Reset checkboxes
+        document.querySelectorAll('#strokeChecks input[type=checkbox]').forEach(cb => cb.checked = false);
+    }
+
+</script>
+
 </body>
 </html>
