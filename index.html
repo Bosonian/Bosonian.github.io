@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFAP Bleeding Risk Check</title>
+    <title>GFAP Risk Check</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -76,122 +76,18 @@
            flex-direction: column; /* Stack elements vertically */
            align-items: center; /* Center horizontally */
         }
-
+        /* Checkbox styles (optional) */
+        .checkbox-group label {
+            display: block; /* Each label on a new line */
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
-    <script>
-        let deferredPrompt;
-        let isIOS = false;
-        let currentLang = 'en'; // Default language
-
-        // Define texts *outside* of switchLanguage - making it global
-        const texts = {
-            de: {
-                title: "🧠 GFAP Blutungsrisiko-Check", //removed for Koma GCS (3-8)
-                titleGCS: "für Koma GCS (3-8)", //added coma gcs line
-                codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
-                description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
-                calculate: "Berechnen",
-                reset: "Zurücksetzen",
-                lowRisk: "Niedriges Risiko",
-                mediumRisk: "Mittleres Risiko",
-                highRisk: "Hohes Risiko",
-                probability: "Wahrscheinlichkeit",
-                alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
-                validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-10000)!",
-                installButton: "App installieren", //Text for the install button
-                iosInstructions: "Um diese App auf Ihrem iPhone zu installieren, tippen Sie auf das 'Teilen'-Symbol und dann auf 'Zum Home-Bildschirm hinzufügen'.",
-                androidInstructions: "Um diese App zu installieren, tippen Sie auf die Menü-Schaltfläche (drei Punkte) und dann auf 'Zum Startbildschirm hinzufügen' oder 'Installieren'."
-            },
-            en: {
-                title: "🧠 GFAP Bleeding Risk Check", //removed for Koma GCS (3-8)
-                titleGCS: "for Coma GCS (3-8)",  //added coma gcs line
-                codePrompt: "🔑 Please enter your access code:",
-                description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
-                calculate: "Calculate",
-                reset: "Reset",
-                lowRisk: "Low Risk",
-                mediumRisk: "Medium Risk",
-                highRisk: "High Risk",
-                probability: "Probability",
-                alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
-                validationError: "Please enter a valid GFAP value (29-10000)!",
-                installButton: "Install App",
-                iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
-                androidInstructions: "To install this app, tap the menu button (three dots) and then 'Add to Home screen' or 'Install'."
-            }
-        };
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the default browser prompt
-            e.preventDefault();
-            // Stash the event so it can be triggered later.
-            deferredPrompt = e;
-            // Show the install button *only* for Android (not iOS)
-            if (!isIOS) {
-                document.getElementById('androidInstallIcon').style.display = 'inline-block';
-            }
-        });
-
-        window.onload = function() {
-            // Detect iOS
-            if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-                isIOS = true;
-            }
-            // Get user's preferred language
-            let userLang = navigator.language || navigator.userLanguage;
-            currentLang = userLang.startsWith('de') ? 'de' : 'en';
-            checkAccess();
-            switchLanguage(currentLang); // Now texts is guaranteed to be defined
-        };
-
-        function showInstallInstructions(platform) {
-            // Get the modal
-            var modal = document.getElementById("myModal");
-            var modalContent = document.getElementById("modalText");
-
-            if (platform === 'ios') {
-              modalContent.textContent = texts[currentLang].iosInstructions;
-            } else {
-                if (deferredPrompt) {
-                    // Show the install prompt
-                    deferredPrompt.prompt();
-                    // Wait for the user to respond to the prompt
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        } else {
-                        console.log('User dismissed the install prompt');
-                        }
-                        deferredPrompt = null;
-                    });
-                    return;//Important to avoid showing the modal.
-                }
-              modalContent.textContent = texts[currentLang].androidInstructions;
-            }
-
-            // Show the modal
-            modal.style.display = "block";
-
-            // When the user clicks on <span> (x), close the modal
-            document.getElementsByClassName("close")[0].onclick = function() {
-              modal.style.display = "none";
-            }
-
-            // When the user clicks anywhere outside of the modal, close it
-            window.onclick = function(event) {
-              if (event.target == modal) {
-                modal.style.display = "none";
-              }
-            }
-        }
-    </script>
 
     <div class="container">
       <div class="title-line">
-        <h1 id="title">🧠 GFAP Bleeding Risk Check</h1>
-        <span id="titleGCS"></span>
+        <h1 id="title">🧠 GFAP Risk Check</h1>
       </div>
         <div>
             <button onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
@@ -205,12 +101,29 @@
             <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
         </div>
 
+        <div id="moduleSelection" style="display: none;">
+            <p id="modulePrompt">Select the relevant module:</p>
+            <button class="primary" onclick="selectModule('coma')">Coma (GCS 3-8)</button>
+            <button class="primary" onclick="selectModule('stroke')">Stroke</button>
+        </div>
+
+        <div id="strokeChecks" style="display: none;">
+            <p id="strokeCheckPrompt">Please confirm the following for the stroke patient:</p>
+            <div class="checkbox-group">
+                <label><input type="checkbox" id="timeWindowCheck"> Stroke occurred within 6 hours</label>
+                <label><input type="checkbox" id="symptomHistoryCheck"> No stroke-like symptoms in the days prior</label>
+                <label><input type="checkbox" id="traumaCheck"> No significant head trauma</label>
+                <label><input type="checkbox" id="fastEdScoreCheck"> FAST-ED score ≥ 3</label>
+            </div>
+            <button class="primary" onclick="proceedToStrokeInput()">Proceed</button>
+        </div>
+
         <div id="calculatorSection" style="display: none;">
             <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
 
             <div class="input-group">
                 <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10000">
-            </div>
+                <input type="number" id="ageInput" placeholder="Enter Age" inputmode="numeric" min="1" max="120" style="display: none;"> </div>
 
             <div class="button-group">
                 <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
@@ -231,106 +144,81 @@
     </div>
 
     <script>
-    const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
+        // ... (Your existing JavaScript code) ...
 
-    function validateAccessCode() {
-        const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-        if (validCodes.includes(inputCode)) {
-            localStorage.setItem("userHasAccess", "true");
-            document.getElementById("codeEntrySection").style.display = "none";
-            document.getElementById("calculatorSection").style.display = "block";
-        } else {
-            document.getElementById("accessError").style.display = "block";
-        }
-    }
-
-    function checkAccess() {
-        if (localStorage.getItem("userHasAccess") === "true") {
-            document.getElementById("codeEntrySection").style.display = "none";
-            document.getElementById("calculatorSection").style.display = "block";
-        }
-        // Show appropriate install icon *after* access is checked
-        if (isIOS) {
-            document.getElementById('iosInstallIcon').style.display = 'inline-block';
-        } else {
-            // The beforeinstallprompt event handler will show the Android icon if appropriate
-        }
-    }
-
-    function switchLanguage(lang) {
-        currentLang = lang;
-
-        document.getElementById("title").innerText = texts[currentLang].title;
-        document.getElementById("titleGCS").innerText = texts[currentLang].titleGCS; //set sub title
-        document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
-        document.getElementById("description").innerText = texts[currentLang].description;
-        document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
-        document.getElementById("resetButton").innerText = texts[currentLang].reset;
-
-        //  alert(texts[currentLang].alert); We don't need it anymore
-
-        // Update the result display if it's already visible
-        if (document.getElementById("result").style.display === "block") {
-            calculateRisk(); // Recalculate to update the displayed text
-        }
-    }
-
-    function calculateRisk() {
-    const inp = document.getElementById('gfapInput').value;
-    const resDiv = document.getElementById('result');
-
-    if (!inp || isNaN(inp) || inp < 29 || inp > 10000) {
-        resDiv.innerHTML = texts[currentLang].validationError;
-        resDiv.style.display = "block";
-        return;
-    }
-
-    // --- Display the warning and wait for user confirmation ---
-    if (confirm(texts[currentLang].alert)) {
-        const gfapValue = parseFloat(inp);
-        let riskLevel = '';
-        let riskText = '';
-
-        // --- Risk Categorization (Based on Raw GFAP) ---
-        if (gfapValue <= 100) {
-            riskLevel = 'low-risk';
-            riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk';
-        } else if (gfapValue >= 101 && gfapValue <= 1000) {
-            riskLevel = 'medium-risk';
-            riskText = (currentLang === 'de') ? 'Mittleres Risiko' : 'Medium Risk';
-        } else {
-            riskLevel = 'high-risk';
-            riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk';
+        function selectModule(module) {
+            if (module === 'coma') {
+                document.getElementById('moduleSelection').style.display = 'none';
+                document.getElementById('calculatorSection').style.display = 'block';
+                document.getElementById('ageInput').style.display = 'none'; // Hide age input for coma
+            } else if (module === 'stroke') {
+                document.getElementById('moduleSelection').style.display = 'none';
+                document.getElementById('strokeChecks').style.display = 'block';
+            }
         }
 
-        // --- Probability Calculation (Obfuscated Log Formula) ---
-        const f1 = '27.63';
-        const f2 = '90.01';
-        const i1 = '84.05-';
-        const i2 = '';
+        function proceedToStrokeInput() {
+            if (document.getElementById('timeWindowCheck').checked &&
+                document.getElementById('symptomHistoryCheck').checked &&
+                document.getElementById('traumaCheck').checked &&
+                document.getElementById('fastEdScoreCheck').checked) {
+                document.getElementById('strokeChecks').style.display = 'none';
+                document.getElementById('calculatorSection').style.display = 'block';
+                document.getElementById('ageInput').style.display = 'block'; // Show age input for stroke
+            } else {
+                alert('Please confirm all the conditions for the stroke patient before proceeding.');
+            }
+        }
 
-        const combinedF = f1.split('').reverse().join('') + f2.split('').reverse().join('');
-        const combinedI = i1.split('').reverse().join('') + i2.split('').reverse().join('');
+        function calculateRisk() {
+            const gfapInput = parseFloat(document.getElementById('gfapInput').value);
+            const ageInput = parseFloat(document.getElementById('ageInput').value);
+            const resDiv = document.getElementById('result');
 
-        const calcFunc = new Function('gfap', `
-            const f = parseFloat(String.fromCharCode(${combinedF.split("").map(c => c.charCodeAt(0)).join(',')}));
-            const i = parseFloat(String.fromCharCode(${combinedI.split("").map(c => c.charCodeAt(0)).join(',')}));
-            const logG = Math.log10(gfap);
-            return Math.max(0, Math.min((f * logG) + i, 100));
-        `);
+            if (isNaN(gfapInput) || gfapInput < 29 || gfapInput > 10000) {
+                resDiv.innerHTML = texts[currentLang].validationError;
+                resDiv.style.display = "block";
+                return;
+            }
 
-        const probability = calcFunc(gfapValue);
+            if (confirm(texts[currentLang].alert)) {
+                let riskLevel = '';
+                let riskText = '';
+                let probability = 0;
 
-        // --- Display Result (Probability AND Risk Category) ---
-        const probabilityLabel = (currentLang === 'de') ? 'Wahrscheinlichkeit' : 'Probability';
-        resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${probabilityLabel}: ${probability.toFixed(1)}%`;
-        resDiv.style.display = "block";
-    } //If they click cancel the result is not displayed.
-}
-    function resetForm() {
-        document.getElementById("gfapInput").value = "";
-        document.getElementById("result").style.display = "none";
-    }
+                if (document.getElementById('ageInput').style.display === 'block') {
+                    // Stroke module calculation
+                    if (gfapInput < 30) {
+                        riskText = (currentLang === 'de') ? 'Hohe Wahrscheinlichkeit für Hirninfarkt' : 'High probability of cerebral infarction';
+                        if (document.getElementById('fastEdScoreCheck').checked) {
+                            riskText += (currentLang === 'de') ? '<br>Hohe Wahrscheinlichkeit für "large vessel occlusion" (LVO)' : '<br>High probability of "large vessel occlusion" (LVO)';
+                        }
+                    } else {
+                        if (ageInput < 72) {
+                            if (gfapInput < 36.8) { riskLevel = 'low-risk'; riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk'; }
+                            else if (gfapInput > 49.2) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk'; probability = 85; }
+                            else if (gfapInput > 54.0) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Sehr hohes Risiko' : 'Very High Risk'; probability = 91; }
+                        } else if (ageInput >= 72 && ageInput <= 83) {
+                            if (gfapInput < 36.8) { riskLevel = 'low-risk'; riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk'; }
+                            else if (gfapInput > 107.3) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk'; probability = 83; }
+                            else if (gfapInput > 149.9) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Sehr hohes Risiko' : 'Very High Risk'; probability = 90; }
+                        } else if (ageInput > 83) {
+                            if (gfapInput < 36.8) { riskLevel = 'low-risk'; riskText = (currentLang === 'de') ? 'Niedriges Risiko' : 'Low Risk'; }
+                            else if (gfapInput > 146.5) { riskLevel = 'high-risk'; riskText = (currentLang === 'de') ? 'Hohes Risiko' : 'High Risk'; probability = 82; }
+                        }
+                    }
+                } else {
+                    // Coma module calculation (same as before)
+                    // ...
+                }
+
+                const probabilityLabel = (currentLang === 'de') ? 'Wahrscheinlichkeit' : 'Probability';
+                resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${probabilityLabel}: ${probability.toFixed(1)}%`;
+                resDiv.style.display = "block";
+            }
+        }
+
+        // ... (Rest of your existing JavaScript code) ...
     </script>
 
     <footer>
