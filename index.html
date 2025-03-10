@@ -2,153 +2,141 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GFAP Risk Check</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
-
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GFAP Bleeding Risk Check</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#007bff" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
-    :root {
-      --primary-color: #007bff;
-      --primary-hover: #0056b3;
-      --danger-color: #dc3545;
-      --danger-hover: #b52b3a;
-      --success-color: #28a745;
-      --background-color: #f9f9f9;
-      --text-color: #333;
-    }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: var(--background-color);
-      margin: 0;
-      padding: 0;
-      color: var(--text-color);
-    }
-
-    .container {
-      max-width: 400px;
-      margin: 60px auto;
-      padding: 30px 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-    }
-
-    .button-group, .language-buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      flex: 1;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    button.primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    button.primary:hover {
-      background-color: var(--primary-hover);
-      transform: translateY(-2px);
-    }
-
-    button.secondary {
-      background-color: var(--danger-color);
-      color: white;
-    }
-
-    button.secondary:hover {
-      background-color: var(--danger-hover);
-      transform: translateY(-2px);
-    }
-
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      margin-top: 8px;
-      margin-bottom: 15px;
-      transition: border-color 0.3s;
-    }
-
-    input[type="text"]:focus, input[type="number"]:focus {
-      border-color: var(--primary-color);
-      outline: none;
-    }
-
-    p {
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .checkbox-group {
-      text-align: left;
-      margin-bottom: 15px;
-    }
-
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      font-weight: 400;
-      margin-bottom: 10px;
-    }
-
-    .checkbox-group input {
-      margin-right: 10px;
-    }
-
-    .result {
-      display: none;
-      padding: 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .low-risk { background: #e6f4ea; color: var(--success-color); }
-    .medium-risk { background: #fff4e5; color: #ff9800; }
-    .high-risk { background: #fdecea; color: var(--danger-color); }
-
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 12px;
-      color: #aaa;
-    }
+    /* Basic styles for layout and color coding */
+    body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
+    .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+    .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
+    .button-group button { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+    button.primary { background-color: #007bff; color: white; }
+    button.primary:hover { background-color: #0056b3; }
+    button.secondary { background-color: #dc3545; color: white; }
+    button.secondary:hover { background-color: #b52b3a; }
+    .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
+    .low-risk { color: green; }
+    .medium-risk { color: orange; }
+    .high-risk { color: red; }
+    .install-icons { text-align: center; margin-top: 10px; }
+    .install-icons i { font-size: 24px; margin: 0 10px; cursor: pointer; color: #007bff; }
+    .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; border-radius: 10px; }
+    .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+    .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
+    .title-line { display: flex; flex-direction: column; align-items: center; }
+    /* Module selection styles */
+    #moduleSelection { display: none; margin-top: 20px; }
+    #moduleSelection .button-group { flex-direction: row; justify-content: center; gap: 20px; }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>🧠 GFAP Risk Check</h1>
+  <script>
+    let deferredPrompt;
+    let isIOS = false;
+    let currentLang = 'en'; // default language
+    let currentModule = ''; // "coma" or "stroke"
 
-    <!-- Language Buttons -->
-    <div class="language-buttons">
+    const texts = {
+      de: {
+        title: "🧠 GFAP Blutungsrisiko-Check",
+        titleGCS: "für Koma GCS (3-8)",
+        codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
+        description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
+        calculate: "Berechnen",
+        reset: "Zurücksetzen",
+        lowRisk: "Niedriges Risiko",
+        mediumRisk: "Mittleres Risiko",
+        highRisk: "Hohes Risiko",
+        probability: "Wahrscheinlichkeit",
+        alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
+        validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-100001)!",
+        installButton: "App installieren",
+        iosInstructions: "Um diese App auf Ihrem iPhone zu installieren, tippen Sie auf das 'Teilen'-Symbol und dann auf 'Zum Home-Bildschirm hinzufügen'.",
+        androidInstructions: "Um diese App zu installieren, tippen Sie auf die Menü-Schaltfläche (drei Punkte) und dann auf 'Zum Startbildschirm hinzufügen' oder 'Installieren'.",
+        moduleSelect: "Bitte wählen Sie ein Modul:",
+        comaModule: "Koma",
+        strokeModule: "Schlaganfall",
+        strokeLow: "Hohe Wahrscheinlichkeit für ischämischen Schlaganfall" // for gfap < 36.8
+      },
+      en: {
+        title: "🧠 GFAP Bleeding Risk Check",
+        titleGCS: "for Coma GCS (3-8)",
+        codePrompt: "🔑 Please enter your access code:",
+        description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
+        calculate: "Calculate",
+        reset: "Reset",
+        lowRisk: "Low Risk",
+        mediumRisk: "Medium Risk",
+        highRisk: "High Risk",
+        probability: "Probability",
+        alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
+        validationError: "Please enter a valid GFAP value (29-100001)!",
+        installButton: "Install App",
+        iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
+        androidInstructions: "To install this app, tap the menu button (three dots) and then 'Add to Home screen' or 'Install'.",
+        moduleSelect: "Please select a module:",
+        comaModule: "Coma",
+        strokeModule: "Stroke",
+        strokeLow: "High probability of ischemic stroke"
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isIOS) {
+        document.getElementById('androidInstallIcon').style.display = 'inline-block';
+      }
+    });
+
+    window.onload = function() {
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        isIOS = true;
+      }
+      let userLang = navigator.language || navigator.userLanguage;
+      currentLang = userLang.startsWith('de') ? 'de' : 'en';
+      checkAccess();
+      switchLanguage(currentLang);
+    };
+
+    function showInstallInstructions(platform) {
+      var modal = document.getElementById("myModal");
+      var modalContent = document.getElementById("modalText");
+      if (platform === 'ios') {
+        modalContent.textContent = texts[currentLang].iosInstructions;
+      } else {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('User accepted the install prompt');
+            } else {
+              console.log('User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+          });
+          return;
+        }
+        modalContent.textContent = texts[currentLang].androidInstructions;
+      }
+      modal.style.display = "block";
+      document.getElementsByClassName("close")[0].onclick = function() { modal.style.display = "none"; }
+      window.onclick = function(event) { if (event.target == modal) { modal.style.display = "none"; } }
+    }
+  </script>
+
+  <div class="container">
+    <div class="title-line">
+      <h1 id="title">🧠 GFAP Bleeding Risk Check</h1>
+      <span id="titleGCS"></span>
+    </div>
+    <div>
       <button onclick="switchLanguage('de')">🇩🇪 Deutsch</button>
       <button onclick="switchLanguage('en')">🇬🇧 English</button>
     </div>
@@ -158,197 +146,173 @@
       <p id="codePrompt">🔑 Please enter your access code:</p>
       <input type="text" id="accessCodeInput" placeholder="Enter code">
       <button class="primary" onclick="validateAccessCode()">Confirm</button>
-      <p id="accessError" style="color: var(--danger-color); display: none;">❌ Invalid access code!</p>
+      <p id="accessError" style="color: red; display: none;">❌ Invalid access code!</p>
     </div>
 
     <!-- Module Selection -->
-    <div id="moduleSelection" style="display: none;">
-      <p id="modulePrompt">Select the relevant module:</p>
+    <div id="moduleSelection">
+      <p id="moduleSelectText"></p>
       <div class="button-group">
-        <button class="primary" onclick="selectModule('coma')">Coma (GCS 3-8)</button>
-        <button class="primary" onclick="selectModule('stroke')">Stroke</button>
+        <button class="primary" onclick="selectModule('coma')">
+          <span id="comaModuleText"></span>
+        </button>
+        <button class="primary" onclick="selectModule('stroke')">
+          <span id="strokeModuleText"></span>
+        </button>
       </div>
     </div>
 
-    <!-- Stroke Checks -->
-    <div id="strokeChecks" style="display: none;">
-      <p id="strokeCheckPrompt">Please confirm the following for the stroke patient:</p>
-      <div class="checkbox-group">
-        <label><input type="checkbox" id="timeWindowCheck"> Stroke within 6 hours</label>
-        <label><input type="checkbox" id="symptomHistoryCheck"> No prior stroke-like symptoms</label>
-        <label><input type="checkbox" id="traumaCheck"> No significant head trauma</label>
-        <label><input type="checkbox" id="fastEdScoreCheck"> FAST-ED score ≥ 3</label>
-      </div>
-      <button class="primary" onclick="proceedToStrokeInput()">Proceed</button>
-    </div>
-
-    <!-- Calculator -->
+    <!-- Calculator Section -->
     <div id="calculatorSection" style="display: none;">
-      <p id="description">Enter the measured GFAP value (pg/mL):</p>
-      <input type="number" id="gfapInput" placeholder="GFAP value" min="29" max="10000">
-      <input type="number" id="ageInput" placeholder="Age" min="1" max="120" style="display: none;">
+      <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
+      <div class="input-group">
+        <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="100001">
+      </div>
       <div class="button-group">
-        <button class="primary" onclick="calculateRisk()">Calculate</button>
-        <button class="secondary" onclick="resetForm()">Reset</button>
+        <button class="primary" id="calculateButton" onclick="calculateRisk()">Calculate</button>
+        <button class="secondary" id="resetButton" onclick="resetForm()">Reset</button>
+      </div>
+      <div class="install-icons">
+        <i id="iosInstallIcon" class="fab fa-apple" onclick="showInstallInstructions('ios')" style="display: none;"></i>
+        <i id="androidInstallIcon" class="fab fa-android" onclick="showInstallInstructions('android')" style="display: none;"></i>
       </div>
       <div class="result" id="result"></div>
     </div>
   </div>
 
-  <footer>
-    <p>© 2025 iGFAP. All rights reserved.</p>
-  </footer>
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="modalText"></p>
+    </div>
+  </div>
 
   <script>
-    const VALID_CODES = ['1234', 'test2025', 'gfap2024'];
+    const validCodes = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB", "RLJBMMHR", "0MNBOCXB", "FT4U0B26", "Y6XPIHVH"];
 
-    const texts = {
-      en: {
-        codePrompt: '🔑 Please enter your access code:',
-        accessError: '❌ Invalid access code!',
-        modulePrompt: 'Select the relevant module:',
-        strokeCheckPrompt: 'Please confirm the following for the stroke patient:',
-        description: 'Enter the measured GFAP value (pg/mL):',
-        validationError: '❌ Please enter a valid GFAP value between 29 and 10000!',
-        alert: 'Do you want to proceed with the calculation?',
-        probabilityLabel: 'Probability'
-      },
-      de: {
-        codePrompt: '🔑 Bitte Zugangscode eingeben:',
-        accessError: '❌ Ungültiger Zugangscode!',
-        modulePrompt: 'Wähle das relevante Modul:',
-        strokeCheckPrompt: 'Bitte bestätigen Sie folgendes für den Schlaganfallpatienten:',
-        description: 'Geben Sie den gemessenen GFAP-Wert (pg/mL) ein:',
-        validationError: '❌ Bitte einen gültigen GFAP-Wert zwischen 29 und 10000 eingeben!',
-        alert: 'Möchten Sie mit der Berechnung fortfahren?',
-        probabilityLabel: 'Wahrscheinlichkeit'
+    function validateAccessCode() {
+      const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+      if (validCodes.includes(inputCode)) {
+        localStorage.setItem("userHasAccess", "true");
+        document.getElementById("codeEntrySection").style.display = "none";
+        // Show module selection instead of calculator immediately
+        document.getElementById("moduleSelection").style.display = "block";
+        // Set texts for module selection
+        document.getElementById("moduleSelectText").innerText = texts[currentLang].moduleSelect;
+        document.getElementById("comaModuleText").innerText = texts[currentLang].comaModule;
+        document.getElementById("strokeModuleText").innerText = texts[currentLang].strokeModule;
+      } else {
+        document.getElementById("accessError").style.display = "block";
       }
-    };
+    }
 
-    let currentLang = 'en';
-
-    window.onload = () => {
-      if (sessionStorage.getItem('accessGranted') === 'true') {
-        document.getElementById('codeEntrySection').style.display = 'none';
-        document.getElementById('moduleSelection').style.display = 'block';
+    function checkAccess() {
+      if (localStorage.getItem("userHasAccess") === "true") {
+        document.getElementById("codeEntrySection").style.display = "none";
+        document.getElementById("moduleSelection").style.display = "block";
+        document.getElementById("moduleSelectText").innerText = texts[currentLang].moduleSelect;
+        document.getElementById("comaModuleText").innerText = texts[currentLang].comaModule;
+        document.getElementById("strokeModuleText").innerText = texts[currentLang].strokeModule;
       }
-      if (sessionStorage.getItem('lang')) {
-        switchLanguage(sessionStorage.getItem('lang'));
+      if (isIOS) {
+        document.getElementById('iosInstallIcon').style.display = 'inline-block';
       }
-    };
+    }
 
     function switchLanguage(lang) {
       currentLang = lang;
-      sessionStorage.setItem('lang', lang);
-      document.getElementById('codePrompt').innerText = texts[lang].codePrompt;
-      document.getElementById('accessError').innerText = texts[lang].accessError;
-      document.getElementById('modulePrompt').innerText = texts[lang].modulePrompt;
-      document.getElementById('strokeCheckPrompt').innerText = texts[lang].strokeCheckPrompt;
-      document.getElementById('description').innerText = texts[lang].description;
+      document.getElementById("title").innerText = texts[currentLang].title;
+      document.getElementById("titleGCS").innerText = texts[currentLang].titleGCS;
+      document.getElementById("codePrompt").innerText = texts[currentLang].codePrompt;
+      document.getElementById("description").innerText = texts[currentLang].description;
+      document.getElementById("calculateButton").innerText = texts[currentLang].calculate;
+      document.getElementById("resetButton").innerText = texts[currentLang].reset;
+      document.getElementById("moduleSelectText").innerText = texts[currentLang].moduleSelect;
+      document.getElementById("comaModuleText").innerText = texts[currentLang].comaModule;
+      document.getElementById("strokeModuleText").innerText = texts[currentLang].strokeModule;
+      if (document.getElementById("result").style.display === "block") { calculateRisk(); }
     }
 
-    function validateAccessCode() {
-      const enteredCode = document.getElementById('accessCodeInput').value.trim();
-      const errorMsg = document.getElementById('accessError');
-
-      if (VALID_CODES.includes(enteredCode)) {
-        document.getElementById('codeEntrySection').style.display = 'none';
-        document.getElementById('moduleSelection').style.display = 'block';
-        errorMsg.style.display = 'none';
-        sessionStorage.setItem('accessGranted', 'true');
-      } else {
-        errorMsg.style.display = 'block';
-      }
-    }
-
+    // When the user selects a module, save it and show the calculator
     function selectModule(module) {
-      document.getElementById('moduleSelection').style.display = 'none';
-
-      if (module === 'coma') {
-        document.getElementById('calculatorSection').style.display = 'block';
-        document.getElementById('ageInput').style.display = 'none';
-      } else if (module === 'stroke') {
-        document.getElementById('strokeChecks').style.display = 'block';
-      }
+      currentModule = module; // "coma" or "stroke"
+      document.getElementById("moduleSelection").style.display = "none";
+      document.getElementById("calculatorSection").style.display = "block";
     }
 
-    function proceedToStrokeInput() {
-      if (
-        document.getElementById('timeWindowCheck').checked &&
-        document.getElementById('symptomHistoryCheck').checked &&
-        document.getElementById('traumaCheck').checked &&
-        document.getElementById('fastEdScoreCheck').checked
-      ) {
-        document.getElementById('strokeChecks').style.display = 'none';
-        document.getElementById('calculatorSection').style.display = 'block';
-        document.getElementById('ageInput').style.display = 'block';
-      } else {
-        alert(currentLang === 'de'
-          ? 'Bitte bestätigen Sie alle Bedingungen für den Schlaganfallpatienten.'
-          : 'Please confirm all the conditions for the stroke patient.');
-      }
-    }
+    // Obfuscated probability calculation function (same for both modules)
+    const f1 = '27.63';
+    const f2 = '90.01';
+    const i1 = '84.05-';
+    const i2 = '';
+    const combinedF = f1.split('').reverse().join('') + f2.split('').reverse().join('');
+    const combinedI = i1.split('').reverse().join('') + i2.split('').reverse().join('');
+    const calcFunc = new Function('gfap', `
+      const f = parseFloat(String.fromCharCode(${combinedF.split("").map(c => c.charCodeAt(0)).join(',')}));
+      const i = parseFloat(String.fromCharCode(${combinedI.split("").map(c => c.charCodeAt(0)).join(',')}));
+      const logG = Math.log10(gfap);
+      return Math.max(0, Math.min((f * logG) + i, 100));
+    `);
 
     function calculateRisk() {
-      const gfapInput = parseFloat(document.getElementById('gfapInput').value);
-      const ageInputField = document.getElementById('ageInput');
+      const inp = document.getElementById('gfapInput').value;
       const resDiv = document.getElementById('result');
-
-      if (isNaN(gfapInput) || gfapInput < 29 || gfapInput > 10000) {
+      const gfapValue = parseFloat(inp);
+      // Validate input range: now 29 to 100001
+      if (!inp || isNaN(gfapValue) || gfapValue < 29 || gfapValue > 100001) {
         resDiv.innerHTML = texts[currentLang].validationError;
-        resDiv.className = 'result high-risk';
         resDiv.style.display = "block";
         return;
       }
-
       if (!confirm(texts[currentLang].alert)) return;
 
       let riskLevel = '';
       let riskText = '';
       let probability = 0;
 
-      if (ageInputField.style.display === 'block') {
-        const ageInput = parseFloat(ageInputField.value);
-        if (isNaN(ageInput)) {
-          resDiv.innerHTML = currentLang === 'de' ? '❌ Bitte Alter eingeben!' : '❌ Please enter age!';
-          resDiv.style.display = "block";
-          return;
-        }
-
-        if (gfapInput < 30) {
+      if (currentModule === "coma") {
+        // Coma module thresholds:
+        if (gfapValue >= 29 && gfapValue <= 100) {
           riskLevel = 'low-risk';
-          riskText = currentLang === 'de' ? 'Hohe Wahrscheinlichkeit für Hirninfarkt' : 'High probability of cerebral infarction';
-          probability = 10;
-        } else if (ageInput < 72) {
-          riskLevel = gfapInput > 54 ? 'high-risk' : 'medium-risk';
-          riskText = currentLang === 'de' ? (riskLevel === 'high-risk' ? 'Sehr hohes Risiko' : 'Mittleres Risiko') : (riskLevel === 'high-risk' ? 'Very High Risk' : 'Medium Risk');
-          probability = riskLevel === 'high-risk' ? 91 : 50;
-        } else {
-          riskLevel = gfapInput > 149.9 ? 'high-risk' : 'medium-risk';
-          riskText = currentLang === 'de' ? (riskLevel === 'high-risk' ? 'Sehr hohes Risiko' : 'Mittleres Risiko') : (riskLevel === 'high-risk' ? 'Very High Risk' : 'Medium Risk');
-          probability = riskLevel === 'high-risk' ? 90 : 60;
+          riskText = (currentLang === 'de') ? texts[currentLang].lowRisk : texts[currentLang].lowRisk;
+        } else if (gfapValue >= 101 && gfapValue <= 1000) {
+          riskLevel = 'medium-risk';
+          riskText = (currentLang === 'de') ? texts[currentLang].mediumRisk : texts[currentLang].mediumRisk;
+        } else if (gfapValue >= 1001 && gfapValue <= 100001) {
+          riskLevel = 'high-risk';
+          riskText = (currentLang === 'de') ? texts[currentLang].highRisk : texts[currentLang].highRisk;
         }
-
-      } else {
-        riskLevel = gfapInput > 50 ? 'high-risk' : 'low-risk';
-        riskText = currentLang === 'de' ? (riskLevel === 'high-risk' ? 'Hohes Risiko für intrakranielle Blutung' : 'Niedriges Risiko') : (riskLevel === 'high-risk' ? 'High risk of intracranial bleeding' : 'Low risk');
-        probability = riskLevel === 'high-risk' ? 85 : 10;
+        probability = calcFunc(gfapValue);
+      } else if (currentModule === "stroke") {
+        // Stroke module thresholds:
+        if (gfapValue < 36.8) {
+          riskLevel = 'high-risk';
+          riskText = (currentLang === 'de') ? texts[currentLang].strokeLow : texts[currentLang].strokeLow;
+          probability = 100;  // fixed value for ischemic stroke probability
+        } else if (gfapValue >= 36.8 && gfapValue <= 1000) {
+          riskLevel = 'medium-risk';
+          riskText = (currentLang === 'de') ? texts[currentLang].mediumRisk : texts[currentLang].mediumRisk;
+          probability = calcFunc(gfapValue);
+        } else if (gfapValue > 1000 && gfapValue <= 100001) {
+          riskLevel = 'high-risk';
+          riskText = (currentLang === 'de') ? texts[currentLang].highRisk : texts[currentLang].highRisk;
+          probability = calcFunc(gfapValue);
+        }
       }
 
-      resDiv.innerHTML = `<strong>${riskText}</strong><br>${texts[currentLang].probabilityLabel}: ${probability}%`;
-      resDiv.className = `result ${riskLevel}`;
+      const probabilityLabel = (currentLang === 'de') ? texts[currentLang].probability : texts[currentLang].probability;
+      resDiv.innerHTML = `<strong class="${riskLevel}">${riskText}</strong><br>${probabilityLabel}: ${probability.toFixed(1)}%`;
       resDiv.style.display = "block";
     }
 
     function resetForm() {
-      document.getElementById('gfapInput').value = '';
-      document.getElementById('ageInput').value = '';
-      document.getElementById('result').style.display = 'none';
-      document.getElementById('calculatorSection').style.display = 'none';
-      document.getElementById('moduleSelection').style.display = 'block';
-      document.querySelectorAll('#strokeChecks input[type=checkbox]').forEach(cb => cb.checked = false);
+      document.getElementById("gfapInput").value = "";
+      document.getElementById("result").style.display = "none";
     }
-
   </script>
+
+  <footer>
+    <p>© 2025 iGFAP. All rights reserved.</p>
+  </footer>
 </body>
 </html>
