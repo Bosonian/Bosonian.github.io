@@ -194,6 +194,12 @@
             border-radius: 10px;
             text-align: center;
         }
+        /* Dark mode override for modals */
+        body.dark-mode .modal-content {
+            background-color: #444;
+            color: var(--text-color);
+            border: 1px solid #555;
+        }
         .install-icons {
             display: flex;
             justify-content: center;
@@ -241,11 +247,9 @@
 
     <!-- Module Selection Screen -->
     <section id="moduleSelectionSection" class="container" style="display:none;">
-        <h2 id="moduleSelectionTitle">Select Module</h2>
-        <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">🧠 Probability of Intracranial Hemorrhage in Comatose Patients</button>
-        <p class="module-subtext">COMA (GCS 3-8)</p>
-        <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">🩺 Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms</button>
-        <p class="module-subtext">Stroke</p>
+        <h2 id="moduleSelectionTitle">Check probability for:</h2>
+        <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">for intracranial hemorrhage in comatose patients</button>
+        <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">for intracerebral hemorrhage in patients with stroke symptoms</button>
     </section>
 
     <!-- Coma Module Section -->
@@ -335,9 +339,9 @@
             en: {
                 appTitle: "iGFAP Check",
                 codePrompt: "🔑 Please enter your access code:",
-                moduleSelectionTitle: "Select Module",
-                comaModuleTitle: "Probability of Intracranial Hemorrhage in Comatose Patients",
-                strokeModuleTitle: "Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms",
+                moduleSelectionTitle: "Check probability for:",
+                comaModuleTitle: "for intracranial hemorrhage in comatose patients",
+                strokeModuleTitle: "for intracerebral hemorrhage in patients with stroke symptoms",
                 strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
                 accessError: "Incorrect code. Please try again.",
                 comaRiskTitle: "Probability of Intracranial Hemorrhage in Comatose Patients",
@@ -364,9 +368,9 @@
             de: {
                 appTitle: "iGFAP Check",
                 codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
-                moduleSelectionTitle: "Modul auswählen",
-                comaModuleTitle: "Wahrscheinlichkeit für intrakranielle Blutungen bei komatösen Patienten",
-                strokeModuleTitle: "Wahrscheinlichkeit für intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
+                moduleSelectionTitle: "Wahrscheinlichkeit prüfen bei:",
+                comaModuleTitle: "für intrakranielle Blutungen bei komatösen Patienten",
+                strokeModuleTitle: "für intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
                 strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
                 accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
                 comaRiskTitle: "Wahrscheinlichkeit für intrakranielle Blutungen bei komatösen Patienten",
@@ -481,10 +485,10 @@
             document.getElementById('appTitle').innerText = texts.appTitle;
             document.getElementById('codePrompt').innerText = texts.codePrompt;
             document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-            document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
-            document.getElementById('strokeModuleTitle').innerText = texts.strokeRiskTitle;
+            // Update module buttons with shorter text
+            document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
+            document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
             document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
-            // Update calculate buttons using their specific IDs
             document.getElementById('calculateComaButton').innerText = texts.calculateButton;
             document.getElementById('calculateStrokeButton').innerText = texts.calculateButton;
             document.getElementById('proceedButton').innerText = texts.proceedButton;
@@ -493,8 +497,6 @@
             document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
             document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
             document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
-            document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
-            document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
             document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
             document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
             document.getElementById('ageLabel').innerText = texts.ageLabel;
