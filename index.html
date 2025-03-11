@@ -1,9 +1,10 @@
+Functioning code with both modules working
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iGFAP Check</title>
+    <title>GFAP Bleeding Risk Check</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,7 +13,7 @@
         .container { max-width: 500px; margin: 70px auto 20px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; margin-bottom: 5px; }
-        .input-group input { width: calc(100% - 24px); padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; }
+        .input-group input { width: 100%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; }
         .button-group { margin-top: 20px; }
         button { padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
         .primary { background-color: #007bff; color: white; width: 100%; }
@@ -28,27 +29,25 @@
         .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #007bff; color: white; position: sticky; top: 0; z-index: 999; }
         .header-left h1 { margin: 0; font-size: 20px; }
         .header-right { display: flex; align-items: center; }
-        .language-switcher button { background: none; border: none; color: white; padding: 5px; margin-right: 10px; cursor: pointer; border-radius: 4px; }
-        .language-switcher button img { width: 24px; height: 16px; }
+        .language-switcher button { background: none; border: 1px solid white; color: white; padding: 5px 10px; margin-right: 10px; cursor: pointer; border-radius: 4px; }
+        .language-switcher button:hover { background-color: rgba(255, 255, 255, 0.2); }
         .home-button { background: white; color: #007bff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         .home-button:hover { background-color: #f2f2f2; }
         .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fff; margin: 20% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px; text-align: center; }
         .checkbox-group { margin-bottom: 15px; text-align: left; }
         .checkbox-group input { margin-right: 10px; }
-        .install-icons { display: flex; justify-content: center; margin-top: 20px; }
-        .install-icons img { width: 40px; height: 40px; margin: 0 10px; cursor: pointer; }
     </style>
 </head>
 <body>
     <header class="app-header">
         <div class="header-left">
-            <h1 id="appTitle">iGFAP Check</h1>
+            <h1 id="appTitle">GFAP Risk App</h1>
         </div>
         <div class="header-right">
             <div class="language-switcher">
-                <button onclick="switchLanguage('en')"><img src="https://flagcdn.com/gb.svg" alt="English"></button>
-                <button onclick="switchLanguage('de')"><img src="https://flagcdn.com/de.svg" alt="Deutsch"></button>
+                <button onclick="switchLanguage('en')" id="langEn">EN</button>
+                <button onclick="switchLanguage('de')" id="langDe">DE</button>
             </div>
             <button class="home-button" onclick="restartApp()">🏠 Home</button>
         </div>
@@ -65,8 +64,8 @@
     <!-- Module Selection Screen -->
     <section id="moduleSelectionSection" class="container" style="display:none;">
         <h2 id="moduleSelectionTitle">Select Module</h2>
-        <button class="primary" onclick="startComaModule()" id="comaModuleButton">🧠 Coma / Bleeding Risk (GCS 3-8)</button>
-        <button class="primary" onclick="startStrokeModule()" id="strokeModuleButton">🩺 Stroke Risk Calculator</button>
+        <button class="primary" onclick="startComaModule()">🧠 Coma / Bleeding Risk (GCS 3-8)</button>
+        <button class="primary" onclick="startStrokeModule()">🩺 Stroke Risk Calculator</button>
     </section>
 
     <!-- Coma Module Section -->
@@ -118,13 +117,6 @@
         <div class="result" id="strokeResult"></div>
     </section>
 
-    <!-- Installation Icons -->
-    <div class="install-icons">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android" onclick="installAndroid()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" onclick="installApple()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Windows_logo_-_2012.svg" alt="Windows" onclick="installWindows()">
-    </div>
-
     <footer style="text-align: center; margin-top: 20px;">
         <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
     </footer>
@@ -135,7 +127,7 @@
         // Language translations
         const translations = {
             en: {
-                appTitle: "iGFAP Check",
+                appTitle: "GFAP Risk App",
                 codePrompt: "🔑 Please enter your access code:",
                 moduleSelectionTitle: "Select Module",
                 comaModuleTitle: "🧠 Coma / Bleeding Risk (GCS 3-8)",
@@ -155,11 +147,10 @@
                 prerequisite2: "No neurological deficits in the hours/days before the event",
                 prerequisite3: "No identifiable head trauma (severe fall)",
                 prerequisite4: "FAST ED Score >= 3 points",
-                prerequisiteError: "Please confirm all prerequisites before proceeding.",
-                disclaimer: "The calculations are for research purposes only, do not make clinical decisions based on it."
+                prerequisiteError: "Please confirm all prerequisites before proceeding."
             },
             de: {
-                appTitle: "iGFAP Check",
+                appTitle: "GFAP Risiko App",
                 codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
                 moduleSelectionTitle: "Modul auswählen",
                 comaModuleTitle: "🧠 Koma / Blutungsrisiko (GCS 3-8)",
@@ -179,8 +170,7 @@
                 prerequisite2: "Keine neurologische Defizite in den Stunden / Tagen vor dem Ereignis",
                 prerequisite3: "Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)",
                 prerequisite4: "FAST ED Score >= 3 Punkte",
-                prerequisiteError: "Bitte bestätigen Sie alle Voraussetzungen, um fortzufahren.",
-                disclaimer: "Die Berechnungen dienen nur Forschungszwecken, treffen Sie keine klinischen Entscheidungen basierend darauf."
+                prerequisiteError: "Bitte bestätigen Sie alle Voraussetzungen, um fortzufahren."
             }
         };
 
@@ -202,12 +192,6 @@
             }
         };
 
-        // Show disclaimer dialog
-        function showDisclaimer() {
-            const disclaimerText = translations[currentLang].disclaimer;
-            alert(disclaimerText);
-        }
-
         // Switch language
         function switchLanguage(lang) {
             currentLang = lang;
@@ -227,8 +211,6 @@
             document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
             document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
             document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
-            document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
-            document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
         }
 
         // Restart app (navigate to module selection screen)
@@ -277,13 +259,16 @@
             const prerequisite4 = document.getElementById('prerequisite4').checked;
             const errorElement = document.getElementById('prerequisiteError');
             if (prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4) {
-                document.getElementById('strokePrerequisiteSection').style
-                          result.style.display = 'block';
+                document.getElementById('strokePrerequisiteSection').style.display = 'none';
+                document.getElementById('strokeModuleSection').style.display = 'block';
+                errorElement.style.display = 'none';
+            } else {
+                errorElement.style.display = 'block';
+            }
         }
 
         // Calculate coma risk
         function calculateComaRisk() {
-            showDisclaimer();
             const gfap = parseFloat(document.getElementById('gfapComaInput').value);
             const result = document.getElementById('comaResult');
             if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
@@ -298,14 +283,13 @@
             if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
             else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
             else riskLevel = translations[currentLang].highRisk;
-            result.innerHTML = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
+            result.innerHTML = `<strong>Probability:</strong> ${probability.toFixed(1)}%<br><strong>Risk Level:</strong> ${riskLevel}`;
             result.className = 'result ' + (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk');
             result.style.display = 'block';
         }
 
         // Calculate stroke risk
         function calculateStrokeRisk() {
-            showDisclaimer();
             const age = parseInt(document.getElementById('ageInput').value);
             const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
             const result = document.getElementById('strokeResult');
@@ -334,46 +318,9 @@
                 else if (gfap < 146.5) interpretation = strokeInterpretations[currentLang].intermediate;
                 else interpretation = strokeInterpretations[currentLang].high;
             }
-            result.innerHTML = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
+            result.innerHTML = `<strong>Interpretation:</strong> ${interpretation}`;
             result.className = 'result ' + (interpretation.includes('Low') ? 'low-risk' : interpretation.includes('Intermediate') ? 'medium-risk' : 'high-risk');
             result.style.display = 'block';
-        }
-
-        // Installation functions
-        function installAndroid() {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                alert(translations[currentLang].alreadyInstalled);
-            } else {
-                const deferredPrompt = window.deferredPrompt;
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                }
-            }
-        }
-
-        function installApple() {
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            const modalContent = `
-                <p>${translations[currentLang].installIOS}</p>
-                <ol>
-                    <li>${translations[currentLang].tapShare}</li>
-                    <li>${translations[currentLang].tapHomeScreen}</li>
-                </ol>
-            `;
-            if (isSafari) {
-                document.getElementById('iosInstallModal').innerHTML = modalContent;
-                document.getElementById('iosInstallModal').style.display = 'block';
-            } else {
-                alert(translations[currentLang].useSafari);
-            }
-        }
-
-        function installWindows() {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                alert(translations[currentLang].alreadyInstalled);
-            } else {
-                window.open('https://apps.microsoft.com/store', '_blank');
-            }
         }
 
         // Initialize app
@@ -383,14 +330,5 @@
             switchLanguage('en');
         };
     </script>
-
-    <!-- iOS Install Modal -->
-    <div id="iosInstallModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="document.getElementById('iosInstallModal').style.display = 'none'">&times;</span>
-            <div id="iosInstallContent"></div>
-        </div>
-    </div>
 </body>
 </html>
-              
