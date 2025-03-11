@@ -99,15 +99,9 @@
       display: none;
       text-align: center;
     }
-    .low-risk {
-      color: green;
-    }
-    .medium-risk {
-      color: orange;
-    }
-    .high-risk, .very-high-risk {
-      color: red;
-    }
+    .low-risk { color: green; }
+    .medium-risk { color: orange; }
+    .high-risk, .very-high-risk { color: red; }
     .warning {
       font-size: 12px;
       color: red;
@@ -124,10 +118,7 @@
       top: 0;
       z-index: 999;
     }
-    .header-left h1 {
-      margin: 0;
-      font-size: 20px;
-    }
+    .header-left h1 { margin: 0; font-size: 20px; }
     .header-right {
       display: flex;
       align-items: center;
@@ -165,9 +156,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .home-button:hover {
-      background-color: #f2f2f2;
-    }
+    .home-button:hover { background-color: #f2f2f2; }
     /* Modal styling with transitions and centering */
     .modal {
       display: none;
@@ -184,9 +173,7 @@
       align-items: center;
       justify-content: center;
     }
-    .modal.show {
-      opacity: 1;
-    }
+    .modal.show { opacity: 1; }
     .modal-content {
       background-color: #fff;
       padding: 20px;
@@ -202,7 +189,7 @@
       color: var(--text-color);
       border: 1px solid #555;
     }
-    /* Assign an ID for the confirm button inside the modal for translation */
+    /* Confirm button inside modal */
     #disclaimerConfirmButton {
       margin-top: 15px;
       width: 100%;
@@ -343,7 +330,7 @@
     let deferredPrompt; // For storing the beforeinstallprompt event
     let pendingResult = null; // To store computed result until confirmed
 
-    // Extend translations with a key for the disclaimer confirm button
+    // Extended translations for the disclaimer confirm button
     const extendedTranslations = {
       en: { disclaimerConfirm: "Confirm" },
       de: { disclaimerConfirm: "Bestätigen" }
@@ -432,57 +419,50 @@
     // OS detection function
     function getMobileOperatingSystem() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      if (/windows phone/i.test(userAgent)) {
-        return "Windows";
-      }
-      if (/android/i.test(userAgent)) {
-        return "Android";
-      }
-      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return "iOS";
-      }
+      if (/windows phone/i.test(userAgent)) return "Windows";
+      if (/android/i.test(userAgent)) return "Android";
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
       return "unknown";
     }
 
-    // Show installation icons based on the detected OS
+    // Show installation icons based on detected OS
     function showInstallIcons() {
       const os = getMobileOperatingSystem();
       const installIconsDiv = document.getElementById('installIcons');
-      installIconsDiv.innerHTML = ''; // Clear any previous icons
-
-      if (os === 'Android') {
-        const androidIcon = document.createElement('img');
-        // Use a different reliable source and explicitly set dimensions
-        androidIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg';
-        androidIcon.alt = 'Install on Android';
-        androidIcon.style.cursor = 'pointer';
+      installIconsDiv.innerHTML = ""; // Clear previous icons
+      if (os === "Android") {
+        const androidIcon = document.createElement("img");
+        // Use a reliable source and explicit dimensions
+        androidIcon.src = "https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg";
+        androidIcon.alt = "Install on Android";
+        androidIcon.style.cursor = "pointer";
         androidIcon.style.width = "40px";
         androidIcon.style.height = "40px";
-        androidIcon.addEventListener('click', function() {
+        androidIcon.addEventListener("click", function() {
           if (deferredPrompt) {
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
-              console.log('User response to the install prompt:', choiceResult.outcome);
+              console.log("User response to the install prompt:", choiceResult.outcome);
               deferredPrompt = null;
             });
           }
         });
         installIconsDiv.appendChild(androidIcon);
-      } else if (os === 'iOS') {
-        const appleIcon = document.createElement('img');
-        appleIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg';
-        appleIcon.alt = 'Install on iOS';
-        appleIcon.style.cursor = 'pointer';
-        appleIcon.addEventListener('click', function() {
+      } else if (os === "iOS") {
+        const appleIcon = document.createElement("img");
+        appleIcon.src = "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg";
+        appleIcon.alt = "Install on iOS";
+        appleIcon.style.cursor = "pointer";
+        appleIcon.addEventListener("click", function() {
           alert("Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol und wählen Sie 'Zum Home-Bildschirm hinzufügen'.");
         });
         installIconsDiv.appendChild(appleIcon);
-      } else if (os === 'Windows') {
-        const windowsIcon = document.createElement('img');
-        windowsIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/4/48/Windows_logo_-_2012.svg';
-        windowsIcon.alt = 'Install on Windows';
-        windowsIcon.style.cursor = 'pointer';
-        windowsIcon.addEventListener('click', function() {
+      } else if (os === "Windows") {
+        const windowsIcon = document.createElement("img");
+        windowsIcon.src = "https://upload.wikimedia.org/wikipedia/commons/4/48/Windows_logo_-_2012.svg";
+        windowsIcon.alt = "Install on Windows";
+        windowsIcon.style.cursor = "pointer";
+        windowsIcon.addEventListener("click", function() {
           alert("Um die App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen 'Diese Seite als App installieren'.");
         });
         installIconsDiv.appendChild(windowsIcon);
@@ -490,249 +470,261 @@
     }
 
     // Listen for beforeinstallprompt to capture Android/Chrome install event
-    window.addEventListener('beforeinstallprompt', (e) => {
+    window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
       showInstallIcons();
     });
 
-    // Update UI text based on the selected language
+    // Update UI text based on selected language
     function switchLanguage(lang) {
       currentLang = lang;
       const texts = translations[lang];
-      document.getElementById('appTitle').innerText = texts.appTitle;
-      document.getElementById('codePrompt').innerText = texts.codePrompt;
-      document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-      document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
-      document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
-      document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
-      document.getElementById('calculateComaButton').innerText = texts.calculateButton;
-      document.getElementById('calculateStrokeButton').innerText = texts.calculateButton;
-      document.getElementById('proceedButton').innerText = texts.proceedButton;
-      document.getElementById('accessError').innerText = texts.accessError;
-      document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
-      document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
-      document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
-      document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
-      document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
-      document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
-      document.getElementById('ageLabel').innerText = texts.ageLabel;
-      document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
+      document.getElementById("appTitle").innerText = texts.appTitle;
+      document.getElementById("codePrompt").innerText = texts.codePrompt;
+      document.getElementById("moduleSelectionTitle").innerText = texts.moduleSelectionTitle;
+      document.getElementById("comaModuleButton").innerText = texts.comaModuleTitle;
+      document.getElementById("strokeModuleButton").innerText = texts.strokeModuleTitle;
+      document.getElementById("strokePrerequisiteTitle").innerText = texts.strokePrerequisiteTitle;
+      document.getElementById("calculateComaButton").innerText = texts.calculateButton;
+      document.getElementById("calculateStrokeButton").innerText = texts.calculateButton;
+      document.getElementById("proceedButton").innerText = texts.proceedButton;
+      document.getElementById("accessError").innerText = texts.accessError;
+      document.getElementById("prerequisite1Label").innerText = texts.prerequisite1;
+      document.getElementById("prerequisite2Label").innerText = texts.prerequisite2;
+      document.getElementById("prerequisite3Label").innerText = texts.prerequisite3;
+      document.getElementById("prerequisite4Label").innerText = texts.prerequisite4;
+      document.getElementById("gfapComaLabel").innerText = texts.gfapLabel;
+      document.getElementById("gfapStrokeLabel").innerText = texts.gfapLabel;
+      document.getElementById("ageLabel").innerText = texts.ageLabel;
+      document.getElementById("disclaimerConfirmButton").innerText = extendedTranslations[lang].disclaimerConfirm;
+      console.log("Language switched to:", lang);
     }
 
     // Restart app (navigate to module selection screen)
     function restartApp() {
-      document.getElementById('codeEntrySection').style.display = 'none';
-      document.getElementById('moduleSelectionSection').style.display = 'block';
-      document.getElementById('comaModuleSection').style.display = 'none';
-      document.getElementById('strokeModuleSection').style.display = 'none';
-      document.getElementById('strokePrerequisiteSection').style.display = 'none';
-      document.getElementById('accessCodeInput').value = '';
-      document.getElementById('accessError').style.display = 'none';
+      document.getElementById("codeEntrySection").style.display = "none";
+      document.getElementById("moduleSelectionSection").style.display = "block";
+      document.getElementById("comaModuleSection").style.display = "none";
+      document.getElementById("strokeModuleSection").style.display = "none";
+      document.getElementById("strokePrerequisiteSection").style.display = "none";
+      document.getElementById("accessCodeInput").value = "";
+      document.getElementById("accessError").style.display = "none";
+      console.log("App restarted, showing module selection.");
     }
 
     // Validate access code
     function validateAccessCode() {
-      const accessCode = document.getElementById('accessCodeInput').value.trim();
-      const errorElement = document.getElementById('accessError');
-      const validCodes = ['1234'];
+      const accessCode = document.getElementById("accessCodeInput").value.trim();
+      const errorElement = document.getElementById("accessError");
+      const validCodes = ["1234"];
       if (validCodes.includes(accessCode)) {
-        document.getElementById('codeEntrySection').style.display = 'none';
-        document.getElementById('moduleSelectionSection').style.display = 'block';
-        errorElement.style.display = 'none';
+        document.getElementById("codeEntrySection").style.display = "none";
+        document.getElementById("moduleSelectionSection").style.display = "block";
+        errorElement.style.display = "none";
       } else {
-        // Fix: use translations[currentLang].accessError instead of undefined "texts.accessError"
         errorElement.innerText = translations[currentLang].accessError;
-        errorElement.style.display = 'block';
+        errorElement.style.display = "block";
       }
+      console.log("Access code validated.");
     }
 
     // Show coma module
     function startComaModule() {
-      document.getElementById('moduleSelectionSection').style.display = 'none';
-      document.getElementById('comaModuleSection').style.display = 'block';
+      document.getElementById("moduleSelectionSection").style.display = "none";
+      document.getElementById("comaModuleSection").style.display = "block";
+      console.log("Switched to Coma Module.");
     }
 
     // Show stroke prerequisite screen
     function startStrokeModule() {
-      document.getElementById('moduleSelectionSection').style.display = 'none';
-      document.getElementById('strokePrerequisiteSection').style.display = 'block';
+      document.getElementById("moduleSelectionSection").style.display = "none";
+      document.getElementById("strokePrerequisiteSection").style.display = "block";
+      console.log("Switched to Stroke Prerequisite Screen.");
     }
 
     // Validate prerequisites for stroke module
     function validatePrerequisites() {
-      const prerequisite1 = document.getElementById('prerequisite1').checked;
-      const prerequisite2 = document.getElementById('prerequisite2').checked;
-      const prerequisite3 = document.getElementById('prerequisite3').checked;
-      const prerequisite4 = document.getElementById('prerequisite4').checked;
-      const errorElement = document.getElementById('prerequisiteError');
+      const prerequisite1 = document.getElementById("prerequisite1").checked;
+      const prerequisite2 = document.getElementById("prerequisite2").checked;
+      const prerequisite3 = document.getElementById("prerequisite3").checked;
+      const prerequisite4 = document.getElementById("prerequisite4").checked;
+      const errorElement = document.getElementById("prerequisiteError");
       if (prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4) {
-        document.getElementById('strokePrerequisiteSection').style.display = 'none';
-        document.getElementById('strokeModuleSection').style.display = 'block';
-        errorElement.style.display = 'none';
+        document.getElementById("strokePrerequisiteSection").style.display = "none";
+        document.getElementById("strokeModuleSection").style.display = "block";
+        errorElement.style.display = "none";
       } else {
-        errorElement.style.display = 'block';
+        errorElement.style.display = "block";
       }
+      console.log("Prerequisites validated.");
     }
 
-    // Display disclaimer using the modal with fade-in effect
+    // Display disclaimer using modal (result is hidden until confirm)
     function showDisclaimer() {
-      const modal = document.getElementById('disclaimerModal');
-      document.getElementById('disclaimerText').innerText = translations[currentLang].disclaimer;
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10);
+      const modal = document.getElementById("disclaimerModal");
+      document.getElementById("disclaimerText").innerText = translations[currentLang].disclaimer;
+      modal.style.display = "flex";
+      setTimeout(() => modal.classList.add("show"), 10);
+      console.log("Disclaimer modal shown.");
     }
 
-    // Close disclaimer modal with fade-out effect
+    // Close disclaimer modal
     function closeDisclaimer() {
-      const modal = document.getElementById('disclaimerModal');
-      modal.classList.remove('show');
-      setTimeout(() => { modal.style.display = 'none'; }, 300);
+      const modal = document.getElementById("disclaimerModal");
+      modal.classList.remove("show");
+      setTimeout(() => { modal.style.display = "none"; }, 300);
+      console.log("Disclaimer modal closed.");
     }
 
     // Calculate coma risk – store result until disclaimer confirmation.
     function calculateComaRisk() {
-      const gfap = parseFloat(document.getElementById('gfapComaInput').value);
-      const result = document.getElementById('comaResult');
+      const gfap = parseFloat(document.getElementById("gfapComaInput").value);
+      const result = document.getElementById("comaResult");
       if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
         result.innerText = translations[currentLang].invalidInput;
-        result.className = 'result warning';
-        result.style.display = 'block';
+        result.className = "result warning";
+        result.style.display = "block";
         return;
       }
       const y = 36.72 * Math.log10(gfap) - 50.48;
       const probability = Math.min(Math.max(y, 0), 100);
-      let riskLevel = '';
+      let riskLevel = "";
       if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
       else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
       else riskLevel = translations[currentLang].highRisk;
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
       
-      result.style.display = 'none';
-      pendingResult = { element: result, html: computedResult, riskClass: (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk') };
+      result.style.display = "none";
+      pendingResult = { element: result, html: computedResult, riskClass: (riskLevel === translations[currentLang].lowRisk ? "low-risk" : riskLevel === translations[currentLang].mediumRisk ? "medium-risk" : "high-risk") };
 
       showDisclaimer();
-      document.getElementById('disclaimerConfirmButton').onclick = function() {
+      document.getElementById("disclaimerConfirmButton").onclick = function() {
         closeDisclaimer();
         pendingResult.element.innerHTML = pendingResult.html;
-        pendingResult.element.className = 'result ' + pendingResult.riskClass;
-        pendingResult.element.style.display = 'block';
+        pendingResult.element.className = "result " + pendingResult.riskClass;
+        pendingResult.element.style.display = "block";
         pendingResult = null;
         this.onclick = null;
+        console.log("Coma risk result revealed.");
       };
+      console.log("Coma risk calculated, waiting for confirmation.");
     }
 
     // Calculate stroke risk – same approach.
     function calculateStrokeRisk() {
-      const age = parseInt(document.getElementById('ageInput').value);
-      const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
-      const result = document.getElementById('strokeResult');
+      const age = parseInt(document.getElementById("ageInput").value);
+      const gfap = parseFloat(document.getElementById("gfapStrokeInput").value);
+      const result = document.getElementById("strokeResult");
       if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 0 || gfap > 10001) {
         result.innerText = translations[currentLang].invalidInput;
-        result.className = 'result warning';
-        result.style.display = 'block';
+        result.className = "result warning";
+        result.style.display = "block";
         return;
       }
-      let interpretation = '';
-      let riskClass = '';
-
+      let interpretation = "";
+      let riskClass = "";
       if (age < 72) {
         if (gfap < 29) {
           interpretation = strokeInterpretations[currentLang].veryLow;
-          riskClass = 'low-risk';
+          riskClass = "low-risk";
         } else if (gfap <= 36.8) {
           interpretation = strokeInterpretations[currentLang].low;
-          riskClass = 'low-risk';
+          riskClass = "low-risk";
         } else if (gfap <= 49.2) {
           interpretation = strokeInterpretations[currentLang].intermediate;
-          riskClass = 'medium-risk';
+          riskClass = "medium-risk";
         } else if (gfap <= 54) {
           interpretation = strokeInterpretations[currentLang].high;
-          riskClass = 'high-risk';
+          riskClass = "high-risk";
         } else {
           interpretation = strokeInterpretations[currentLang].veryHigh;
-          riskClass = 'high-risk';
+          riskClass = "high-risk";
         }
       } else if (age <= 83) {
         if (gfap < 29) {
           interpretation = strokeInterpretations[currentLang].veryLow;
-          riskClass = 'low-risk';
+          riskClass = "low-risk";
         } else if (gfap <= 36.8) {
           interpretation = strokeInterpretations[currentLang].low;
-          riskClass = 'low-risk';
+          riskClass = "low-risk";
         } else if (gfap <= 107.3) {
           interpretation = strokeInterpretations[currentLang].intermediate;
-          riskClass = 'medium-risk';
+          riskClass = "medium-risk";
         } else if (gfap <= 149.9) {
           interpretation = strokeInterpretations[currentLang].high;
-          riskClass = 'high-risk';
+          riskClass = "high-risk";
         } else {
           interpretation = strokeInterpretations[currentLang].veryHigh;
-          riskClass = 'high-risk';
+          riskClass = "high-risk";
         }
       } else {
         if (gfap < 29) {
           interpretation = strokeInterpretations[currentLang].veryLow;
-          riskClass = 'low-risk';
+          riskClass = "low-risk";
         } else if (gfap <= 36.8) {
           interpretation = strokeInterpretations[currentLang].low;
-          riskClass = 'low-risk';
+          riskClass = "low-risk";
         } else if (gfap <= 146.5) {
           interpretation = strokeInterpretations[currentLang].intermediate;
-          riskClass = 'medium-risk';
+          riskClass = "medium-risk";
         } else {
           interpretation = strokeInterpretations[currentLang].high;
-          riskClass = 'high-risk';
+          riskClass = "high-risk";
         }
       }
-
       const computedResult = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
-      result.style.display = 'none';
+      result.style.display = "none";
       pendingResult = { element: result, html: computedResult, riskClass: riskClass };
 
       showDisclaimer();
-      document.getElementById('disclaimerConfirmButton').onclick = function() {
+      document.getElementById("disclaimerConfirmButton").onclick = function() {
         closeDisclaimer();
         pendingResult.element.innerHTML = pendingResult.html;
-        pendingResult.element.className = 'result ' + pendingResult.riskClass;
-        pendingResult.element.style.display = 'block';
+        pendingResult.element.className = "result " + pendingResult.riskClass;
+        pendingResult.element.style.display = "block";
         pendingResult = null;
         this.onclick = null;
+        console.log("Stroke risk result revealed.");
       };
+      console.log("Stroke risk calculated, waiting for confirmation.");
     }
 
     // Add event listeners for keyboard accessibility and dark mode toggle
     function addEventListeners() {
-      document.getElementById('accessCodeButton').addEventListener('click', validateAccessCode);
-      document.getElementById('accessCodeInput').addEventListener('keyup', function(e) {
+      console.log("Adding event listeners...");
+      document.getElementById("accessCodeButton").addEventListener("click", validateAccessCode);
+      document.getElementById("accessCodeInput").addEventListener("keyup", function(e) {
         if (e.key === "Enter") validateAccessCode();
       });
-      document.getElementById('comaModuleButton').addEventListener('click', startComaModule);
-      document.getElementById('strokeModuleButton').addEventListener('click', startStrokeModule);
-      document.getElementById('proceedButton').addEventListener('click', validatePrerequisites);
-      document.getElementById('calculateComaButton').addEventListener('click', calculateComaRisk);
-      document.getElementById('gfapComaInput').addEventListener('keyup', function(e) {
+      document.getElementById("comaModuleButton").addEventListener("click", startComaModule);
+      document.getElementById("strokeModuleButton").addEventListener("click", startStrokeModule);
+      document.getElementById("proceedButton").addEventListener("click", validatePrerequisites);
+      document.getElementById("calculateComaButton").addEventListener("click", calculateComaRisk);
+      document.getElementById("gfapComaInput").addEventListener("keyup", function(e) {
         if (e.key === "Enter") calculateComaRisk();
       });
-      document.getElementById('calculateStrokeButton').addEventListener('click', calculateStrokeRisk);
-      document.getElementById('ageInput').addEventListener('keyup', function(e) {
+      document.getElementById("calculateStrokeButton").addEventListener("click", calculateStrokeRisk);
+      document.getElementById("ageInput").addEventListener("keyup", function(e) {
         if (e.key === "Enter") calculateStrokeRisk();
       });
-      document.getElementById('gfapStrokeInput').addEventListener('keyup', function(e) {
+      document.getElementById("gfapStrokeInput").addEventListener("keyup", function(e) {
         if (e.key === "Enter") calculateStrokeRisk();
       });
-      document.getElementById('darkModeToggle').addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
+      document.getElementById("darkModeToggle").addEventListener("click", function() {
+        document.body.classList.toggle("dark-mode");
       });
+      console.log("Event listeners added.");
     }
 
     // Initialize app on window load
     window.onload = function() {
-      document.getElementById('currentYear').innerText = new Date().getFullYear();
+      document.getElementById("currentYear").innerText = new Date().getFullYear();
       restartApp();
-      switchLanguage('en');
+      switchLanguage("en");
       addEventListeners();
       showInstallIcons();
+      console.log("App initialized.");
     };
   </script>
 </body>
