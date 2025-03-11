@@ -1,74 +1,74 @@
-const CACHE_NAME = "gfap-cache-v71"; // Increment version
-const OFFLINE_URL = '/offline.html';
-const urlsToCache = [
+// Service worker for GFAP Risk App
+const CACHE_NAME = 'gfap-risk-app-v2.0';
+const ASSETS = [
   '/',
   '/index.html',
-  '/offline.html', // Ensure offline page is cached
   '/manifest.json',
-  '/icon.png',
-  '/styles.css',
-  '/app.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
 ];
 
-// Install Event - Cache essential files
-self.addEventListener('install', (event) => {
+// Install event - cache assets
+self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+      .then(cache => {
+        console.log('Caching app assets');
+        return cache.addAll(ASSETS);
       })
-      .then(() => self.skipWaiting()) // Activate new SW immediately
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate Event - Delete old caches
-self.addEventListener('activate', (event) => {
+// Activate event - clean old caches
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+        cacheNames.filter(cacheName => {
+          return cacheName !== CACHE_NAME;
+        }).map(cacheName => {
+          return caches.delete(cacheName);
         })
       );
-    }).then(() => self.clients.claim()) // Take control of clients
+    }).then(() => self.clients.claim())
   );
 });
 
-// Fetch Event - Different strategies for different requests
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return; // Skip non-GET requests
-
-  const url = new URL(event.request.url);
-
-  if (urlsToCache.includes(url.pathname)) {
-    // Cache-first strategy for core files
-    event.respondWith(
-      caches.match(event.request)
-        .then((cachedResponse) => {
-          return cachedResponse || fetch(event.request).then((networkResponse) => {
+// Fetch event - serve from cache first, fallback to network
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Return cached response if found
+        if (response) {
+          return response;
+        }
+        
+        // Otherwise fetch from network
+        return fetch(event.request)
+          .then(response => {
+            // Don't cache responses from external domains
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+            
+            // Clone the response
+            const responseToCache = response.clone();
+            
+            // Add to cache for future use
             caches.open(CACHE_NAME)
-              .then((cache) => cache.put(event.request, networkResponse.clone()));
-            return networkResponse;
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+              
+            return response;
+          })
+          .catch(() => {
+            // If both cache and network fail, return a basic offline page
+            if (event.request.headers.get('accept').includes('text/html')) {
+              return caches.match('/index.html');
+            }
           });
-        })
-        .catch(() => caches.match(OFFLINE_URL)) // Fallback to offline page
-    );
-  } else {
-    // Network-first strategy for dynamic content
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          caches.open(CACHE_NAME)
-            .then((cache) => cache.put(event.request, networkResponse.clone()));
-          return networkResponse;
-        })
-        .catch(() => caches.match(event.request).then((cachedResponse) => {
-          return cachedResponse || caches.match(OFFLINE_URL);
-        }))
-    );
-  }
+      })
+  );
 });
