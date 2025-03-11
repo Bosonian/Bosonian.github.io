@@ -115,17 +115,15 @@
         </div>
         <div class="input-group">
             <label for="gfapStrokeInput">GFAP Value (pg/mL)</label>
-            <input type="number" id="gfapStrokeInput" min="29" max="10001">
+            <input type="number" id="gfapStrokeInput" min="0" max="10001"> <!-- Removed lower limit -->
         </div>
         <button class="primary" id="calculateStrokeButton" onclick="calculateStrokeRisk()">Calculate Risk</button>
         <div class="result" id="strokeResult"></div>
     </section>
 
     <!-- Installation Icons -->
-    <div class="install-icons">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android" onclick="installAndroid()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" onclick="installApple()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Windows_logo_-_2012.svg" alt="Windows" onclick="installWindows()">
+    <div class="install-icons" id="installIcons">
+        <!-- Icons will be dynamically added here based on the OS -->
     </div>
 
     <footer style="text-align: center; margin-top: 20px;">
@@ -320,7 +318,7 @@
             const age = parseInt(document.getElementById('ageInput').value);
             const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
             const result = document.getElementById('strokeResult');
-            if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
+            if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 0 || gfap > 10001) { // Removed lower limit for GFAP
                 result.innerText = translations[currentLang].invalidInput;
                 result.className = 'result warning';
                 result.style.display = 'block';
@@ -382,6 +380,34 @@
             result.style.display = 'block';
         }
 
+        // Detect OS and show relevant installation icon
+        function detectOS() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const installIcons = document.getElementById('installIcons');
+
+            // Clear existing icons
+            installIcons.innerHTML = '';
+
+            // Check for Android
+            if (/android/i.test(userAgent)) {
+                installIcons.innerHTML = `
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android" onclick="installAndroid()">
+                `;
+            }
+            // Check for iOS
+            else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                installIcons.innerHTML = `
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" onclick="installApple()">
+                `;
+            }
+            // Check for Windows
+            else if (/windows/i.test(userAgent)) {
+                installIcons.innerHTML = `
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Windows_logo_-_2012.svg" alt="Windows" onclick="installWindows()">
+                `;
+            }
+        }
+
         // Installation functions
         function installAndroid() {
             if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -415,7 +441,8 @@
             if (window.matchMedia('(display-mode: standalone)').matches) {
                 alert(translations[currentLang].alreadyInstalled);
             } else {
-                window.open('https://apps.microsoft.com/store', '_blank');
+                // Trigger PWA installation
+                window.deferredPrompt.prompt();
             }
         }
 
@@ -424,6 +451,7 @@
             document.getElementById('currentYear').innerText = new Date().getFullYear();
             restartApp();
             switchLanguage('en');
+            detectOS(); // Detect OS and show relevant installation icon
         };
     </script>
 
