@@ -159,7 +159,8 @@
                 prerequisiteError: "Please confirm all prerequisites before proceeding.",
                 disclaimer: "The calculations are for research purposes only, do not make clinical decisions based on it.",
                 probability: "Probability",
-                riskLevel: "Risk Level"
+                riskLevel: "Risk Level",
+                interpretation: "Interpretation" // Added translation
             },
             de: {
                 appTitle: "iGFAP Check",
@@ -185,7 +186,8 @@
                 prerequisiteError: "Bitte bestätigen Sie alle Voraussetzungen, um fortzufahren.",
                 disclaimer: "Die Berechnungen dienen nur Forschungszwecken, treffen Sie keine klinischen Entscheidungen basierend darauf.",
                 probability: "Wahrscheinlichkeit",
-                riskLevel: "Risikostufe"
+                riskLevel: "Risikostufe",
+                interpretation: "Interpretation" // Added translation
             }
         };
 
@@ -318,7 +320,7 @@
             const age = parseInt(document.getElementById('ageInput').value);
             const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
             const result = document.getElementById('strokeResult');
-            if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 0 || gfap > 10001) { // Removed lower limit for GFAP
+            if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 0 || gfap > 10001) {
                 result.innerText = translations[currentLang].invalidInput;
                 result.className = 'result warning';
                 result.style.display = 'block';
