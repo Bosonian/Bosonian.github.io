@@ -180,7 +180,6 @@
       background-color: rgba(0, 0, 0, 0.6);
       opacity: 0;
       transition: opacity 0.3s ease;
-      /* Center content using flex */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -190,7 +189,6 @@
     }
     .modal-content {
       background-color: #fff;
-      margin: 0; /* margin no longer needed with flex centering */
       padding: 20px;
       border: 1px solid #888;
       width: 80%;
@@ -258,7 +256,6 @@
   <section id="moduleSelectionSection" class="container" style="display:none;">
     <h2 id="moduleSelectionTitle">Check probability for:</h2>
     <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">for intracranial hemorrhage in comatose patients</button>
-    <!-- Re-add the small subtext below the coma module button -->
     <p class="module-subtext">GCS 3-8</p>
     <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">for intracerebral hemorrhage in patients with stroke symptoms</button>
   </section>
@@ -337,7 +334,6 @@
     <div class="modal-content">
       <span class="close" onclick="closeDisclaimer()" aria-label="Close">&times;</span>
       <p id="disclaimerText"></p>
-      <!-- Added an id for translation and to attach a one-time listener -->
       <button class="primary" id="disclaimerConfirmButton" aria-label="Confirm Disclaimer">Confirm</button>
     </div>
   </div>
@@ -521,7 +517,6 @@
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
-      // Update the disclaimer confirm button text too
       document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
     }
 
@@ -546,6 +541,7 @@
         document.getElementById('moduleSelectionSection').style.display = 'block';
         errorElement.style.display = 'none';
       } else {
+        // Fix: use translations[currentLang].accessError instead of undefined "texts.accessError"
         errorElement.innerText = translations[currentLang].accessError;
         errorElement.style.display = 'block';
       }
@@ -580,7 +576,6 @@
     }
 
     // Display disclaimer using the modal with fade-in effect
-    // We now do not immediately display the computed result.
     function showDisclaimer() {
       const modal = document.getElementById('disclaimerModal');
       document.getElementById('disclaimerText').innerText = translations[currentLang].disclaimer;
@@ -595,7 +590,7 @@
       setTimeout(() => { modal.style.display = 'none'; }, 300);
     }
 
-    // Calculate coma risk – now we compute the result, store it, and only reveal it after the disclaimer is confirmed.
+    // Calculate coma risk – store result until disclaimer confirmation.
     function calculateComaRisk() {
       const gfap = parseFloat(document.getElementById('gfapComaInput').value);
       const result = document.getElementById('comaResult');
@@ -613,23 +608,21 @@
       else riskLevel = translations[currentLang].highRisk;
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
       
-      // Hide result until confirmed
       result.style.display = 'none';
       pendingResult = { element: result, html: computedResult, riskClass: (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk') };
 
       showDisclaimer();
-      // Attach a one-time listener to the disclaimer confirm button
       document.getElementById('disclaimerConfirmButton').onclick = function() {
         closeDisclaimer();
         pendingResult.element.innerHTML = pendingResult.html;
         pendingResult.element.className = 'result ' + pendingResult.riskClass;
         pendingResult.element.style.display = 'block';
-        pendingResult = null; // Clear pending result
-        this.onclick = null;  // Remove this listener
+        pendingResult = null;
+        this.onclick = null;
       };
     }
 
-    // Calculate stroke risk – same approach as above.
+    // Calculate stroke risk – same approach.
     function calculateStrokeRisk() {
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
