@@ -8,34 +8,440 @@
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; }
-        .container { max-width: 500px; margin: 70px auto 20px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; }
-        .input-group input { width: 100%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; }
-        .button-group { margin-top: 20px; }
-        button { padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        .primary { background-color: #007bff; color: white; width: 100%; }
-        .primary:hover { background-color: #0056b3; }
-        .secondary { background-color: #dc3545; color: white; width: 100%; }
-        .secondary:hover { background-color: #b52b3a; }
-        .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; text-align: center; }
-        .low-risk { color: green; }
-        .medium-risk { color: orange; }
-        .high-risk { color: red; }
-        .very-high-risk { color: red; }
-        .warning { font-size: 12px; color: red; margin-top: 10px; }
-        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #007bff; color: white; position: sticky; top: 0; z-index: 999; }
-        .header-left h1 { margin: 0; font-size: 20px; }
-        .header-right { display: flex; align-items: center; }
-        .language-switcher button { background: none; border: 1px solid white; color: white; padding: 5px 10px; margin-right: 10px; cursor: pointer; border-radius: 4px; }
-        .language-switcher button:hover { background-color: rgba(255, 255, 255, 0.2); }
-        .home-button { background: white; color: #007bff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .home-button:hover { background-color: #f2f2f2; }
-        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 20% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px; text-align: center; }
-        .checkbox-group { margin-bottom: 15px; text-align: left; }
-        .checkbox-group input { margin-right: 10px; }
+        :root {
+            --primary-color: #007bff;
+            --primary-dark: #0056b3;
+            --secondary-color: #dc3545;
+            --secondary-dark: #b52b3a;
+            --light-color: #f8f9fa;
+            --text-color: #333;
+            --danger-color: #ff0000;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 70px auto 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+        }
+
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .secondary {
+            background-color: var(--secondary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .secondary:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .result-details {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        .low-risk {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .medium-risk {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning-color);
+            color: #d97706;
+        }
+
+        .high-risk {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .very-high-risk {
+            background-color: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .warning {
+            font-size: 12px;
+            color: var(--danger-color);
+            margin-top: 10px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .language-switcher button {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .language-switcher button.active {
+            background-color: white;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .language-switcher button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .home-button {
+            background: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 0;
+        }
+
+        .home-button:hover {
+            background-color: #f2f2f2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 20% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .checkbox-group {
+            margin-bottom: 15px;
+            text-align: left;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .risk-gauge {
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to right, green, yellow, orange, red);
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .risk-marker {
+            position: absolute;
+            top: -10px;
+            width: 10px;
+            height: 40px;
+            background-color: #333;
+            transform: translateX(-50%);
+        }
+
+        .risk-label {
+            position: absolute;
+            top: 25px;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            width: auto;
+            padding: 8px 15px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            margin-left: 5px;
+            color: var(--primary-color);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(0, 123, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Additional field for GFAP value method */
+        .method-selector {
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+
+        .method-selector label {
+            display: inline-block;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                margin-top: 60px;
+                width: 95%;
+                padding: 15px;
+            }
+
+            .app-header {
+                padding: 5px 10px;
+            }
+
+            .header-left h1 {
+                font-size: 16px;
+            }
+
+            .language-switcher button {
+                padding: 3px 8px;
+                font-size: 12px;
+            }
+
+            .home-button {
+                padding: 3px 8px;
+                font-size: 12px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --light-color: #222;
+                --text-color: #f8f9fa;
+            }
+
+            body {
+                background-color: #222;
+            }
+
+            .container {
+                background-color: #333;
+                color: #f8f9fa;
+            }
+
+            .input-group input {
+                background-color: #444;
+                color: #f8f9fa;
+                border-color: #007bff;
+            }
+
+            .checkbox-group {
+                background-color: #444;
+                border-color: #666;
+            }
+
+            .info-text {
+                color: #ccc;
+            }
+        }
     </style>
 </head>
 <body>
@@ -45,98 +451,170 @@
         </div>
         <div class="header-right">
             <div class="language-switcher">
-                <button onclick="switchLanguage('en')" id="langEn">EN</button>
+                <button onclick="switchLanguage('en')" id="langEn" class="active">EN</button>
                 <button onclick="switchLanguage('de')" id="langDe">DE</button>
             </div>
-            <button class="home-button" onclick="restartApp()">🏠 Home</button>
+            <button class="home-button" onclick="restartApp()"><i class="fas fa-home"></i> <span id="homeText">Home</span></button>
         </div>
     </header>
 
     <!-- Access Code Screen -->
     <section id="codeEntrySection" class="container">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 33%;"></div>
+        </div>
+        <h2 id="codePromptTitle">Access Required</h2>
         <p id="codePrompt">🔑 Please enter your access code:</p>
-        <input type="password" id="accessCodeInput" placeholder="Enter code">
-        <button class="primary" onclick="validateAccessCode()">Submit</button>
+        <div class="input-group">
+            <input type="password" id="accessCodeInput" placeholder="Enter code">
+        </div>
+        <p class="info-text" id="accessInfo">This application is for healthcare professionals only.</p>
+        <button class="primary" onclick="validateAccessCode()"><i class="fas fa-sign-in-alt"></i> <span id="submitText">Submit</span></button>
         <p id="accessError" class="warning" style="display: none;">Incorrect code. Please try again.</p>
     </section>
 
     <!-- Module Selection Screen -->
     <section id="moduleSelectionSection" class="container" style="display:none;">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 66%;"></div>
+        </div>
         <h2 id="moduleSelectionTitle">Select Module</h2>
-        <button class="primary" onclick="startComaModule()">🧠 Coma / Bleeding Risk (GCS 3-8)</button>
-        <button class="primary" onclick="startStrokeModule()">🩺 Stroke Risk Calculator</button>
+        <p class="info-text" id="moduleSelectionInfo">Please select the appropriate module based on the patient's condition:</p>
+        <button class="primary" onclick="startComaModule()"><i class="fas fa-brain"></i> <span id="comaButtonText">Coma / Bleeding Risk (GCS 3-8)</span></button>
+        <button class="primary" onclick="startStrokeModule()"><i class="fas fa-heartbeat"></i> <span id="strokeButtonText">Stroke Risk Calculator</span></button>
+        <p class="info-text" id="disclaimerText">This tool is designed to assist clinical decision-making and should not replace professional medical judgment.</p>
     </section>
 
     <!-- Coma Module Section -->
     <section id="comaModuleSection" class="container" style="display:none;">
-        <h2 id="comaModuleTitle">Coma / Bleeding Risk Calculator</h2>
-        <div class="input-group">
-            <label for="gfapComaInput">GFAP Value (pg/mL)</label>
-            <input type="number" id="gfapComaInput" min="29" max="10001">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 100%;"></div>
         </div>
-        <button class="primary" onclick="calculateComaRisk()">Calculate Risk</button>
+        <button class="back-button" onclick="goBack('coma')"><i class="fas fa-arrow-left"></i> <span id="backText">Back</span></button>
+        <h2 id="comaModuleTitle">Coma / Bleeding Risk Calculator</h2>
+        <p class="info-text" id="comaInfo">Enter the GFAP value to calculate the bleeding risk for a comatose patient (GCS 3-8).</p>
+        
+        <div class="method-selector">
+            <input type="radio" id="method-manual" name="gfapMethod" value="manual" checked>
+            <label for="method-manual" id="methodManualLabel">Manual Entry</label>
+            <input type="radio" id="method-i-stat" name="gfapMethod" value="i-stat">
+            <label for="method-i-stat" id="methodIStatLabel">i-STAT</label>
+        </div>
+        
+        <div class="input-group">
+            <label for="gfapComaInput">GFAP Value (pg/mL) <span class="tooltip"><i class="fas fa-info-circle info-icon"></i><span class="tooltiptext" id="gfapTooltip">GFAP (Glial Fibrillary Acidic Protein) is a biomarker for brain injury.</span></span></label>
+            <input type="number" id="gfapComaInput" min="29" max="10001" placeholder="Enter value between 29-10000">
+        </div>
+        <button class="primary" onclick="calculateComaRisk()"><i class="fas fa-calculator"></i> <span id="calculateComaText">Calculate Risk</span></button>
+        <div class="spinner" id="comaSpinner"></div>
         <div class="result" id="comaResult"></div>
     </section>
 
     <!-- Stroke Prerequisite Screen -->
     <section id="strokePrerequisiteSection" class="container" style="display:none;">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 80%;"></div>
+        </div>
+        <button class="back-button" onclick="goBack('prereq')"><i class="fas fa-arrow-left"></i> <span id="backPrereqText">Back</span></button>
         <h2 id="strokePrerequisiteTitle">Prerequisites for Stroke Risk Calculation</h2>
+        <p class="info-text" id="prerequisiteInfo">Please confirm that all of the following criteria are met:</p>
+        
         <div class="checkbox-group">
             <input type="checkbox" id="prerequisite1">
-            <label for="prerequisite1" id="prerequisite1Label">Gesichertes Zeitfenster < 6 Stunden</label>
+            <label for="prerequisite1" id="prerequisite1Label">Confirmed time window < 6 hours</label>
         </div>
         <div class="checkbox-group">
             <input type="checkbox" id="prerequisite2">
-            <label for="prerequisite2" id="prerequisite2Label">Keine neurologische Defizite in den Stunden / Tagen vor dem Ereignis</label>
+            <label for="prerequisite2" id="prerequisite2Label">No neurological deficits in the hours/days before the event</label>
         </div>
         <div class="checkbox-group">
             <input type="checkbox" id="prerequisite3">
-            <label for="prerequisite3" id="prerequisite3Label">Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)</label>
+            <label for="prerequisite3" id="prerequisite3Label">No identifiable head trauma (severe fall)</label>
         </div>
         <div class="checkbox-group">
             <input type="checkbox" id="prerequisite4">
-            <label for="prerequisite4" id="prerequisite4Label">FAST ED Score >= 3 Punkte</label>
+            <label for="prerequisite4" id="prerequisite4Label">FAST ED Score >= 3 points</label>
+            <div class="tooltip" style="display: block; margin-top: 5px; margin-left: 25px;">
+                <i class="fas fa-info-circle info-icon"></i>
+                <span class="tooltiptext" id="fastEdTooltip">FAST ED: Face drooping (0-1), Arm weakness (0-2), Speech changes (0-2), Time (documentation), Eye deviation (0-2), Denial/neglect (0-2)</span>
+            </div>
         </div>
-        <button class="primary" id="proceedButton" onclick="validatePrerequisites()">Proceed to Calculation</button>
+        <button class="primary" id="proceedButton" onclick="validatePrerequisites()"><i class="fas fa-arrow-right"></i> <span id="proceedText">Proceed to Calculation</span></button>
         <p id="prerequisiteError" class="warning" style="display: none;">Please confirm all prerequisites before proceeding.</p>
     </section>
 
     <!-- Stroke Module Section -->
     <section id="strokeModuleSection" class="container" style="display:none;">
+        <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 100%;"></div>
+        </div>
+        <button class="back-button" onclick="goBack('stroke')"><i class="fas fa-arrow-left"></i> <span id="backStrokeText">Back</span></button>
         <h2 id="strokeModuleTitle">Stroke Risk Calculator</h2>
+        <p class="info-text" id="strokeInfo">Enter the patient's age and GFAP value to calculate stroke risk.</p>
+        
         <div class="input-group">
             <label for="ageInput">Patient Age (Years)</label>
-            <input type="number" id="ageInput" min="1" max="120">
+            <input type="number" id="ageInput" min="18" max="120" placeholder="Enter age between 18-120">
         </div>
+        
+        <div class="method-selector">
+            <input type="radio" id="stroke-method-manual" name="strokeGfapMethod" value="manual" checked>
+            <label for="stroke-method-manual" id="strokeMethodManualLabel">Manual Entry</label>
+            <input type="radio" id="stroke-method-i-stat" name="strokeGfapMethod" value="i-stat">
+            <label for="stroke-method-i-stat" id="strokeMethodIStatLabel">i-STAT</label>
+        </div>
+        
         <div class="input-group">
-            <label for="gfapStrokeInput">GFAP Value (pg/mL)</label>
-            <input type="number" id="gfapStrokeInput" min="29" max="10001">
+            <label for="gfapStrokeInput">GFAP Value (pg/mL) <span class="tooltip"><i class="fas fa-info-circle info-icon"></i><span class="tooltiptext" id="strokeGfapTooltip">GFAP (Glial Fibrillary Acidic Protein) is a biomarker for brain injury.</span></span></label>
+            <input type="number" id="gfapStrokeInput" min="29" max="10001" placeholder="Enter value between 29-10000">
         </div>
-        <button class="primary" id="calculateStrokeButton" onclick="calculateStrokeRisk()">Calculate Risk</button>
+        <button class="primary" id="calculateStrokeButton" onclick="calculateStrokeRisk()"><i class="fas fa-calculator"></i> <span id="calculateStrokeText">Calculate Risk</span></button>
+        <div class="spinner" id="strokeSpinner"></div>
         <div class="result" id="strokeResult"></div>
     </section>
 
-    <footer style="text-align: center; margin-top: 20px;">
-        <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Information</h3>
+            <p id="modalContent"></p>
+            <button class="primary" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© <span id="currentYear"></span> iGFAP. <span id="rightsText">All rights reserved.</span></p>
+        <p id="versionText">Version 2.0 | <a href="mailto:support@igfap.eu" id="supportLink">Support</a></p>
     </footer>
 
     <script>
         let currentLang = 'en';
+        let currentSection = 'codeEntry';
 
         // Language translations
         const translations = {
             en: {
                 appTitle: "GFAP Risk App",
+                codePromptTitle: "Access Required",
                 codePrompt: "🔑 Please enter your access code:",
+                accessInfo: "This application is for healthcare professionals only.",
+                submitText: "Submit",
                 moduleSelectionTitle: "Select Module",
-                comaModuleTitle: "🧠 Coma / Bleeding Risk (GCS 3-8)",
-                strokeModuleTitle: "🩺 Stroke Risk Calculator",
+                moduleSelectionInfo: "Please select the appropriate module based on the patient's condition:",
+                comaButtonText: "Coma / Bleeding Risk (GCS 3-8)",
+                strokeButtonText: "Stroke Risk Calculator",
+                disclaimerText: "This tool is designed to assist clinical decision-making and should not replace professional medical judgment.",
                 strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
+                prerequisiteInfo: "Please confirm that all of the following criteria are met:",
                 accessError: "Incorrect code. Please try again.",
                 comaRiskTitle: "Coma / Bleeding Risk Calculator",
+                comaInfo: "Enter the GFAP value to calculate the bleeding risk for a comatose patient (GCS 3-8).",
                 strokeRiskTitle: "Stroke Risk Calculator",
+                strokeInfo: "Enter the patient's age and GFAP value to calculate stroke risk.",
                 calculateButton: "Calculate Risk",
-                proceedButton: "Proceed to Calculation",
+                calculateComaText: "Calculate Risk",
+                calculateStrokeText: "Calculate Risk",
+                proceedText: "Proceed to Calculation",
                 invalidInput: "Please enter a valid value!",
                 lowRisk: "Low Risk",
                 mediumRisk: "Medium Risk",
@@ -146,20 +624,49 @@
                 prerequisite2: "No neurological deficits in the hours/days before the event",
                 prerequisite3: "No identifiable head trauma (severe fall)",
                 prerequisite4: "FAST ED Score >= 3 points",
-                prerequisiteError: "Please confirm all prerequisites before proceeding."
+                prerequisiteError: "Please confirm all prerequisites before proceeding.",
+                backText: "Back",
+                backPrereqText: "Back",
+                backStrokeText: "Back",
+                homeText: "Home",
+                methodManualLabel: "Manual Entry",
+                methodIStatLabel: "i-STAT Device",
+                strokeMethodManualLabel: "Manual Entry",
+                strokeMethodIStatLabel: "i-STAT Device",
+                gfapTooltip: "GFAP (Glial Fibrillary Acidic Protein) is a biomarker for brain injury.",
+                strokeGfapTooltip: "GFAP (Glial Fibrillary Acidic Protein) is a biomarker for brain injury.",
+                fastEdTooltip: "FAST ED: Face drooping (0-1), Arm weakness (0-2), Speech changes (0-2), Time (documentation), Eye deviation (0-2), Denial/neglect (0-2)",
+                rightsText: "All rights reserved.",
+                versionText: "Version 2.0",
+                supportLink: "Support",
+                detailsText: "Show Details",
+                hideDetailsText: "Hide Details",
+                recommendation: "Recommendation",
+                probabilityText: "Probability",
+                riskLevelText: "Risk Level"
             },
             de: {
                 appTitle: "GFAP Risiko App",
+                codePromptTitle: "Zugang erforderlich",
                 codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
+                accessInfo: "Diese Anwendung ist nur für medizinisches Fachpersonal bestimmt.",
+                submitText: "Bestätigen",
                 moduleSelectionTitle: "Modul auswählen",
-                comaModuleTitle: "🧠 Koma / Blutungsrisiko (GCS 3-8)",
-                strokeModuleTitle: "🩺 Schlaganfallrisikorechner",
+                moduleSelectionInfo: "Bitte wählen Sie das entsprechende Modul basierend auf dem Zustand des Patienten:",
+                comaButtonText: "Koma / Blutungsrisiko (GCS 3-8)",
+                strokeButtonText: "Schlaganfallrisikorechner",
+                disclaimerText: "Dieses Tool soll die klinische Entscheidungsfindung unterstützen und ersetzt nicht die professionelle medizinische Beurteilung.",
                 strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
+                prerequisiteInfo: "Bitte bestätigen Sie, dass alle folgenden Kriterien erfüllt sind:",
                 accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
                 comaRiskTitle: "Koma / Blutungsrisiko Rechner",
+                comaInfo: "Geben Sie den GFAP-Wert ein, um das Blutungsrisiko für einen komatösen Patienten (GCS 3-8) zu berechnen.",
                 strokeRiskTitle: "Schlaganfallrisiko Rechner",
+                strokeInfo: "Geben Sie das Alter des Patienten und den GFAP-Wert ein, um das Schlaganfallrisiko zu berechnen.",
                 calculateButton: "Risiko berechnen",
-                proceedButton: "Zur Berechnung fortfahren",
+                calculateComaText: "Risiko berechnen",
+                calculateStrokeText: "Risiko berechnen",
+                proceedText: "Zur Berechnung fortfahren",
                 invalidInput: "Bitte geben Sie einen gültigen Wert ein!",
                 lowRisk: "Geringes Risiko",
                 mediumRisk: "Mittleres Risiko",
@@ -169,11 +676,30 @@
                 prerequisite2: "Keine neurologische Defizite in den Stunden / Tagen vor dem Ereignis",
                 prerequisite3: "Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)",
                 prerequisite4: "FAST ED Score >= 3 Punkte",
-                prerequisiteError: "Bitte bestätigen Sie alle Voraussetzungen, um fortzufahren."
+                prerequisiteError: "Bitte bestätigen Sie alle Voraussetzungen, um fortzufahren.",
+                backText: "Zurück",
+                backPrereqText: "Zurück",
+                backStrokeText: "Zurück",
+                homeText: "Start",
+                methodManualLabel: "Manuelle Eingabe",
+                methodIStatLabel: "i-STAT Gerät",
+                strokeMethodManualLabel: "Manuelle Eingabe",
+                strokeMethodIStatLabel: "i-STAT Gerät",
+                gfapTooltip: "GFAP (Gliales fibrilläres saures Protein) ist ein Biomarker für Hirnverletzungen.",
+                strokeGfapTooltip: "GFAP (Gliales fibrilläres saures Protein) ist ein Biomarker für Hirnverletzungen.",
+                fastEdTooltip: "FAST ED: Gesichtslähmung (0-1), Armschwäche (0-2), Sprachstörungen (0-2), Zeit (Dokumentation), Augenabweichung (0-2), Neglect (0-2)",
+                rightsText: "Alle Rechte vorbehalten.",
+                versionText: "Version 2.0",
+                supportLink: "Support",
+                detailsText: "Details anzeigen",
+                hideDetailsText: "Details ausblenden",
+                recommendation: "Empfehlung",
+                probabilityText: "Wahrscheinlichkeit",
+                riskLevelText: "Risikolevel"
             }
         };
 
-        // Stroke risk interpretations (from the uploaded document)
+        // Stroke risk interpretations
         const strokeInterpretations = {
             en: {
                 veryLow: "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO).",
@@ -185,69 +711,188 @@
             de: {
                 veryLow: "Hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4, hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO).",
                 low: "Ischämischer Schlaganfall sehr wahrscheinlich.",
-                intermediate: "Intermediär ICH Risiko.",
+                intermediate: "Intermediäres ICH Risiko.",
                 high: "ICH Risiko hoch ~ 85%.",
-                veryHigh: "ICH Risiko sehr hoch ~ 91%."
+                veryHigh: "ICH veryHigh: "ICH Risiko sehr hoch ~ 91%."
             }
         };
 
-        // Switch language
+        // Recommendations based on risk level
+        const recommendations = {
+            en: {
+                lowRisk: "Continue with standard stroke protocol. Consider transport to primary stroke center if symptoms support ischemic stroke diagnosis.",
+                mediumRisk: "Consider early neurosurgical consultation. Transport to comprehensive stroke center if available within reasonable distance.",
+                highRisk: "Urgent neurosurgical consultation recommended. Prioritize transport to comprehensive stroke center with neurosurgical capabilities.",
+                veryHighRisk: "Immediate neurosurgical consultation required. Transport directly to nearest comprehensive stroke center with neurosurgical capabilities."
+            },
+            de: {
+                lowRisk: "Fahren Sie mit dem Standardschlaganfallprotokoll fort. Erwägen Sie den Transport zu einem primären Schlaganfallzentrum, wenn die Symptome die Diagnose eines ischämischen Schlaganfalls stützen.",
+                mediumRisk: "Erwägen Sie eine frühzeitige neurochirurgische Konsultation. Transport zu einem umfassenden Schlaganfallzentrum, wenn innerhalb angemessener Entfernung verfügbar.",
+                highRisk: "Dringende neurochirurgische Konsultation empfohlen. Priorisieren Sie den Transport zu einem umfassenden Schlaganfallzentrum mit neurochirurgischen Kapazitäten.",
+                veryHighRisk: "Sofortige neurochirurgische Konsultation erforderlich. Transport direkt zum nächsten umfassenden Schlaganfallzentrum mit neurochirurgischen Kapazitäten."
+            }
+        };
+
+        // Switch language function with UI update
         function switchLanguage(lang) {
             currentLang = lang;
+            
+            // Update active language button
+            document.getElementById('langEn').classList.remove('active');
+            document.getElementById('langDe').classList.remove('active');
+            document.getElementById('lang' + lang.charAt(0).toUpperCase() + lang.slice(1)).classList.add('active');
+            
             const texts = translations[lang];
+            
+            // Update UI text elements
             document.getElementById('appTitle').innerText = texts.appTitle;
+            document.getElementById('codePromptTitle').innerText = texts.codePromptTitle;
             document.getElementById('codePrompt').innerText = texts.codePrompt;
+            document.getElementById('accessInfo').innerText = texts.accessInfo;
+            document.getElementById('submitText').innerText = texts.submitText;
             document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-            document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
-            document.getElementById('strokeModuleTitle').innerText = texts.strokeRiskTitle;
+            document.getElementById('moduleSelectionInfo').innerText = texts.moduleSelectionInfo;
+            document.getElementById('comaButtonText').innerText = texts.comaButtonText;
+            document.getElementById('strokeButtonText').innerText = texts.strokeButtonText;
+            document.getElementById('disclaimerText').innerText = texts.disclaimerText;
             document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
-            document.querySelector('#comaModuleSection button').innerText = texts.calculateButton;
-            document.querySelector('#strokeModuleSection button').innerText = texts.calculateButton;
-            document.getElementById('proceedButton').innerText = texts.proceedButton;
+            document.getElementById('prerequisiteInfo').innerText = texts.prerequisiteInfo;
+            document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
+            document.getElementById('comaInfo').innerText = texts.comaInfo;
+            document.getElementById('strokeModuleTitle').innerText = texts.strokeRiskTitle;
+            document.getElementById('strokeInfo').innerText = texts.strokeInfo;
+            document.getElementById('calculateComaText').innerText = texts.calculateButton;
+            document.getElementById('calculateStrokeText').innerText = texts.calculateButton;
+            document.getElementById('proceedText').innerText = texts.proceedText;
             document.getElementById('accessError').innerText = texts.accessError;
             document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
             document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
             document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
             document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
             document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
+            document.getElementById('backText').innerText = texts.backText;
+            document.getElementById('backPrereqText').innerText = texts.backPrereqText;
+            document.getElementById('backStrokeText').innerText = texts.backStrokeText;
+            document.getElementById('homeText').innerText = texts.homeText;
+            document.getElementById('methodManualLabel').innerText = texts.methodManualLabel;
+            document.getElementById('methodIStatLabel').innerText = texts.methodIStatLabel;
+            document.getElementById('strokeMethodManualLabel').innerText = texts.strokeMethodManualLabel;
+            document.getElementById('strokeMethodIStatLabel').innerText = texts.strokeMethodIStatLabel;
+            document.getElementById('gfapTooltip').innerText = texts.gfapTooltip;
+            document.getElementById('strokeGfapTooltip').innerText = texts.strokeGfapTooltip;
+            document.getElementById('fastEdTooltip').innerText = texts.fastEdTooltip;
+            document.getElementById('rightsText').innerText = texts.rightsText;
+            document.getElementById('versionText').innerText = texts.versionText;
+            document.getElementById('supportLink').innerText = texts.supportLink;
+            
+            // Update any visible results
+            updateVisibleResults();
         }
 
-        // Restart app (navigate to module selection screen)
+        // Update visible results when language changes
+        function updateVisibleResults() {
+            if (document.getElementById('comaResult').style.display === 'block') {
+                calculateComaRisk(true);
+            }
+            if (document.getElementById('strokeResult').style.display === 'block') {
+                calculateStrokeRisk(true);
+            }
+        }
+
+        // Navigation functions
         function restartApp() {
-            document.getElementById('codeEntrySection').style.display = 'none';
+            hideAllSections();
             document.getElementById('moduleSelectionSection').style.display = 'block';
+            currentSection = 'moduleSelection';
+            resetFormInputs();
+        }
+
+        function goBack(module) {
+            if (module === 'coma') {
+                hideAllSections();
+                document.getElementById('moduleSelectionSection').style.display = 'block';
+                currentSection = 'moduleSelection';
+            } else if (module === 'prereq') {
+                hideAllSections();
+                document.getElementById('moduleSelectionSection').style.display = 'block';
+                currentSection = 'moduleSelection';
+            } else if (module === 'stroke') {
+                hideAllSections();
+                document.getElementById('strokePrerequisiteSection').style.display = 'block';
+                currentSection = 'strokePrerequisite';
+            }
+        }
+
+        function hideAllSections() {
+            document.getElementById('codeEntrySection').style.display = 'none';
+            document.getElementById('moduleSelectionSection').style.display = 'none';
             document.getElementById('comaModuleSection').style.display = 'none';
-            document.getElementById('strokeModuleSection').style.display = 'none';
             document.getElementById('strokePrerequisiteSection').style.display = 'none';
+            document.getElementById('strokeModuleSection').style.display = 'none';
+        }
+
+        function resetFormInputs() {
+            // Reset all input fields
             document.getElementById('accessCodeInput').value = '';
+            document.getElementById('gfapComaInput').value = '';
+            document.getElementById('ageInput').value = '';
+            document.getElementById('gfapStrokeInput').value = '';
+            
+            // Reset checkboxes
+            document.getElementById('prerequisite1').checked = false;
+            document.getElementById('prerequisite2').checked = false;
+            document.getElementById('prerequisite3').checked = false;
+            document.getElementById('prerequisite4').checked = false;
+            
+            // Reset radio buttons
+            document.getElementById('method-manual').checked = true;
+            document.getElementById('stroke-method-manual').checked = true;
+            
+            // Hide any error messages
             document.getElementById('accessError').style.display = 'none';
+            document.getElementById('prerequisiteError').style.display = 'none';
+            
+            // Hide results
+            document.getElementById('comaResult').style.display = 'none';
+            document.getElementById('strokeResult').style.display = 'none';
         }
 
         // Validate access code
         function validateAccessCode() {
             const accessCode = document.getElementById('accessCodeInput').value.trim();
             const errorElement = document.getElementById('accessError');
-            const validCodes = ['1234'];
-            if (validCodes.includes(accessCode)) {
-                document.getElementById('codeEntrySection').style.display = 'none';
-                document.getElementById('moduleSelectionSection').style.display = 'block';
-                errorElement.style.display = 'none';
-            } else {
-                errorElement.innerText = translations[currentLang].accessError;
-                errorElement.style.display = 'block';
-            }
+            const validCodes = ['1234', 'stroke2025', 'medic'];
+            
+            // Show spinner
+            document.getElementById('accessCodeInput').disabled = true;
+            simulateLoading(function() {
+                document.getElementById('accessCodeInput').disabled = false;
+                
+                if (validCodes.includes(accessCode)) {
+                    hideAllSections();
+                    document.getElementById('moduleSelectionSection').style.display = 'block';
+                    currentSection = 'moduleSelection';
+                    errorElement.style.display = 'none';
+                } else {
+                    errorElement.style.display = 'block';
+                    document.getElementById('accessCodeInput').focus();
+                }
+            });
         }
 
         // Show coma module
         function startComaModule() {
-            document.getElementById('moduleSelectionSection').style.display = 'none';
+            hideAllSections();
             document.getElementById('comaModuleSection').style.display = 'block';
+            currentSection = 'comaModule';
+            document.getElementById('gfapComaInput').focus();
         }
 
         // Show stroke prerequisite screen
         function startStrokeModule() {
-            document.getElementById('moduleSelectionSection').style.display = 'none';
+            hideAllSections();
             document.getElementById('strokePrerequisiteSection').style.display = 'block';
+            currentSection = 'strokePrerequisite';
         }
 
         // Validate prerequisites
@@ -257,77 +902,296 @@
             const prerequisite3 = document.getElementById('prerequisite3').checked;
             const prerequisite4 = document.getElementById('prerequisite4').checked;
             const errorElement = document.getElementById('prerequisiteError');
+            
             if (prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4) {
-                document.getElementById('strokePrerequisiteSection').style.display = 'none';
+                hideAllSections();
                 document.getElementById('strokeModuleSection').style.display = 'block';
+                currentSection = 'strokeModule';
+                document.getElementById('ageInput').focus();
                 errorElement.style.display = 'none';
             } else {
                 errorElement.style.display = 'block';
+                
+                // Highlight unchecked boxes
+                document.querySelectorAll('.checkbox-group').forEach(group => {
+                    const checkbox = group.querySelector('input[type="checkbox"]');
+                    if (!checkbox.checked) {
+                        group.style.borderColor = 'var(--danger-color)';
+                        setTimeout(() => {
+                            group.style.borderColor = '#ddd';
+                        }, 2000);
+                    }
+                });
             }
         }
 
-        // Calculate coma risk
-        function calculateComaRisk() {
-            const gfap = parseFloat(document.getElementById('gfapComaInput').value);
-            const result = document.getElementById('comaResult');
-            if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
-                result.innerText = translations[currentLang].invalidInput;
-                result.className = 'result warning';
-                result.style.display = 'block';
-                return;
+         // Calculate coma risk
+        function calculateComaRisk(skipAnimation) {
+            if (!skipAnimation) {
+                // Get values
+                const gfap = parseFloat(document.getElementById('gfapComaInput').value);
+                const result = document.getElementById('comaResult');
+                const spinner = document.getElementById('comaSpinner');
+                
+                // Validate input
+                if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
+                    result.innerText = translations[currentLang].invalidInput;
+                    result.className = 'result warning';
+                    result.style.display = 'block';
+                    return;
+                }
+                
+                // Show spinner and disable input during calculation
+                spinner.style.display = 'block';
+                document.getElementById('gfapComaInput').disabled = true;
+                document.querySelector('#comaModuleSection button').disabled = true;
+                
+                // Simulate loading delay
+                setTimeout(() => {
+                    // Hide spinner and enable inputs
+                    spinner.style.display = 'none';
+                    document.getElementById('gfapComaInput').disabled = false;
+                    document.querySelector('#comaModuleSection button').disabled = false;
+                    
+                    // Calculate risk
+                    displayComaRiskResult(gfap);
+                }, 800);
+            } else {
+                // Skip animation and just update result display for language change
+                const gfap = parseFloat(document.getElementById('gfapComaInput').value);
+                if (!isNaN(gfap) && gfap >= 29 && gfap <= 10001) {
+                    displayComaRiskResult(gfap);
+                }
             }
+        }
+
+        // Display coma risk result
+        function displayComaRiskResult(gfap) {
+            const result = document.getElementById('comaResult');
+            
+            // Calculate probability using the formula
             const y = 36.72 * Math.log10(gfap) - 50.48;
             const probability = Math.min(Math.max(y, 0), 100);
-            let riskLevel = '';
-            if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
-            else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
-            else riskLevel = translations[currentLang].highRisk;
-            result.innerHTML = `<strong>Probability:</strong> ${probability.toFixed(1)}%<br><strong>Risk Level:</strong> ${riskLevel}`;
-            result.className = 'result ' + (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk');
+            
+            // Determine risk level
+            let riskLevel, riskClass, recommendation;
+            
+            if (gfap <= 100) {
+                riskLevel = translations[currentLang].lowRisk;
+                riskClass = 'low-risk';
+                recommendation = recommendations[currentLang].lowRisk;
+            } else if (gfap <= 1000) {
+                riskLevel = translations[currentLang].mediumRisk;
+                riskClass = 'medium-risk';
+                recommendation = recommendations[currentLang].mediumRisk;
+            } else {
+                riskLevel = translations[currentLang].highRisk;
+                riskClass = 'high-risk';
+                recommendation = recommendations[currentLang].highRisk;
+            }
+            
+            // Create risk gauge position (0-100%)
+            const gaugePosition = Math.min(probability, 100);
+            
+            // Create result HTML with gauge and detailed information
+            result.innerHTML = `
+                <div>${riskLevel}</div>
+                <div class="risk-gauge">
+                    <div class="risk-marker" style="left: ${gaugePosition}%;"></div>
+                </div>
+                <div class="result-details">
+                    <p><strong>${translations[currentLang].probabilityText}:</strong> ${probability.toFixed(1)}%</p>
+                    <p><strong>${translations[currentLang].recommendation}:</strong> ${recommendation}</p>
+                    <p><em>GFAP Value: ${gfap} pg/mL</em></p>
+                </div>
+            `;
+            
+            result.className = 'result ' + riskClass;
             result.style.display = 'block';
         }
 
         // Calculate stroke risk
-        function calculateStrokeRisk() {
-            const age = parseInt(document.getElementById('ageInput').value);
-            const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
-            const result = document.getElementById('strokeResult');
-            if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
-                result.innerText = translations[currentLang].invalidInput;
-                result.className = 'result warning';
-                result.style.display = 'block';
-                return;
-            }
-            let interpretation = '';
-            if (age < 72) {
-                if (gfap < 30) interpretation = strokeInterpretations[currentLang].veryLow;
-                else if (gfap <= 36.8) interpretation = strokeInterpretations[currentLang].low;
-                else if (gfap < 49.2) interpretation = strokeInterpretations[currentLang].intermediate;
-                else if (gfap < 54) interpretation = strokeInterpretations[currentLang].high;
-                else interpretation = strokeInterpretations[currentLang].veryHigh;
-            } else if (age <= 83) {
-                if (gfap < 30) interpretation = strokeInterpretations[currentLang].veryLow;
-                else if (gfap <= 36.8) interpretation = strokeInterpretations[currentLang].low;
-                else if (gfap < 107) interpretation = strokeInterpretations[currentLang].intermediate;
-                else if (gfap < 149.9) interpretation = strokeInterpretations[currentLang].high;
-                else interpretation = strokeInterpretations[currentLang].veryHigh;
+        function calculateStrokeRisk(skipAnimation) {
+            if (!skipAnimation) {
+                // Get values
+                const age = parseInt(document.getElementById('ageInput').value);
+                const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
+                const result = document.getElementById('strokeResult');
+                const spinner = document.getElementById('strokeSpinner');
+                
+                // Validate input
+                if (isNaN(age) || isNaN(gfap) || age < 18 || age > 120 || gfap < 29 || gfap > 10001) {
+                    result.innerText = translations[currentLang].invalidInput;
+                    result.className = 'result warning';
+                    result.style.display = 'block';
+                    return;
+                }
+                
+                // Show spinner and disable inputs during calculation
+                spinner.style.display = 'block';
+                document.getElementById('ageInput').disabled = true;
+                document.getElementById('gfapStrokeInput').disabled = true;
+                document.querySelector('#strokeModuleSection button').disabled = true;
+                
+                // Simulate loading delay
+                setTimeout(() => {
+                    // Hide spinner and enable inputs
+                    spinner.style.display = 'none';
+                    document.getElementById('ageInput').disabled = false;
+                    document.getElementById('gfapStrokeInput').disabled = false;
+                    document.querySelector('#strokeModuleSection button').disabled = false;
+                    
+                    // Calculate risk
+                    displayStrokeRiskResult(age, gfap);
+                }, 800);
             } else {
-                if (gfap < 30) interpretation = strokeInterpretations[currentLang].veryLow;
-                else if (gfap <= 36.8) interpretation = strokeInterpretations[currentLang].low;
-                else if (gfap < 146.5) interpretation = strokeInterpretations[currentLang].intermediate;
-                else interpretation = strokeInterpretations[currentLang].high;
+                // Skip animation and just update result display for language change
+                const age = parseInt(document.getElementById('ageInput').value);
+                const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
+                if (!isNaN(age) && !isNaN(gfap) && age >= 18 && age <= 120 && gfap >= 29 && gfap <= 10001) {
+                    displayStrokeRiskResult(age, gfap);
+                }
             }
-            result.innerHTML = `<strong>Interpretation:</strong> ${interpretation}`;
-            result.className = 'result ' + (interpretation.includes('Low') ? 'low-risk' : interpretation.includes('Intermediate') ? 'medium-risk' : 'high-risk');
+        }
+
+        // Display stroke risk result
+        function displayStrokeRiskResult(age, gfap) {
+            const result = document.getElementById('strokeResult');
+            
+            // Determine risk category based on age and GFAP value
+            let interpretation, riskClass, recommendation;
+            
+            if (age < 72) {
+                if (gfap < 30) {
+                    interpretation = strokeInterpretations[currentLang].veryLow;
+                    riskClass = 'low-risk';
+                    recommendation = recommendations[currentLang].lowRisk;
+                } else if (gfap <= 36.8) {
+                    interpretation = strokeInterpretations[currentLang].low;
+                    riskClass = 'low-risk';
+                    recommendation = recommendations[currentLang].lowRisk;
+                } else if (gfap < 49.2) {
+                    interpretation = strokeInterpretations[currentLang].intermediate;
+                    riskClass = 'medium-risk';
+                    recommendation = recommendations[currentLang].mediumRisk;
+                } else if (gfap < 54) {
+                    interpretation = strokeInterpretations[currentLang].high;
+                    riskClass = 'high-risk';
+                    recommendation = recommendations[currentLang].highRisk;
+                } else {
+                    interpretation = strokeInterpretations[currentLang].veryHigh;
+                    riskClass = 'very-high-risk';
+                    recommendation = recommendations[currentLang].veryHighRisk;
+                }
+            } else if (age <= 83) {
+                if (gfap < 30) {
+                    interpretation = strokeInterpretations[currentLang].veryLow;
+                    riskClass = 'low-risk';
+                    recommendation = recommendations[currentLang].lowRisk;
+                } else if (gfap <= 36.8) {
+                    interpretation = strokeInterpretations[currentLang].low;
+                    riskClass = 'low-risk';
+                    recommendation = recommendations[currentLang].lowRisk;
+                } else if (gfap < 107) {
+                    interpretation = strokeInterpretations[currentLang].intermediate;
+                    riskClass = 'medium-risk';
+                    recommendation = recommendations[currentLang].mediumRisk;
+                } else if (gfap < 149.9) {
+                    interpretation = strokeInterpretations[currentLang].high;
+                    riskClass = 'high-risk';
+                    recommendation = recommendations[currentLang].highRisk;
+                } else {
+                    interpretation = strokeInterpretations[currentLang].veryHigh;
+                    riskClass = 'very-high-risk';
+                    recommendation = recommendations[currentLang].veryHighRisk;
+                }
+            } else {
+                if (gfap < 30) {
+                    interpretation = strokeInterpretations[currentLang].veryLow;
+                    riskClass = 'low-risk';
+                    recommendation = recommendations[currentLang].lowRisk;
+                } else if (gfap <= 36.8) {
+                    interpretation = strokeInterpretations[currentLang].low;
+                    riskClass = 'low-risk';
+                    recommendation = recommendations[currentLang].lowRisk;
+                } else if (gfap < 146.5) {
+                    interpretation = strokeInterpretations[currentLang].intermediate;
+                    riskClass = 'medium-risk';
+                    recommendation = recommendations[currentLang].mediumRisk;
+                } else {
+                    interpretation = strokeInterpretations[currentLang].high;
+                    riskClass = 'high-risk';
+                    recommendation = recommendations[currentLang].highRisk;
+                }
+            }
+            
+            // Create result HTML with detailed information
+            result.innerHTML = `
+                <div>${interpretation}</div>
+                <div class="result-details">
+                    <p><strong>${translations[currentLang].recommendation}:</strong> ${recommendation}</p>
+                    <p><em>Patient Age: ${age}, GFAP Value: ${gfap} pg/mL</em></p>
+                </div>
+            `;
+            
+            result.className = 'result ' + riskClass;
             result.style.display = 'block';
         }
+
+        // Show modal with information
+        function showModal(title, content) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalContent').innerText = content;
+            document.getElementById('infoModal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        // Simulate loading for better UX
+        function simulateLoading(callback) {
+            setTimeout(() => {
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
+            }, 600);
+        }
+
+        // Handle Enter key press
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (currentSection === 'codeEntry') {
+                    validateAccessCode();
+                } else if (currentSection === 'comaModule') {
+                    calculateComaRisk();
+                } else if (currentSection === 'strokeModule') {
+                    calculateStrokeRisk();
+                }
+            }
+        });
 
         // Initialize app
         window.onload = function() {
             document.getElementById('currentYear').innerText = new Date().getFullYear();
-            restartApp();
+            
+            // Set up access screen
+            hideAllSections();
+            document.getElementById('codeEntrySection').style.display = 'block';
+            
+            // Set default language
             switchLanguage('en');
+            
+            // Focus on input field
+            document.getElementById('accessCodeInput').focus();
         };
-    </script>
-</body>
-</html>
+
+        // Add service worker for PWA support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed: ', err));
+            });
+        }
