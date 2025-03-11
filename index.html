@@ -55,7 +55,7 @@
     .checkbox-group label {
       margin-bottom: 5px;
     }
-    /* For checkboxes, display them inline with their labels */
+    /* Display checkboxes and labels inline */
     .checkbox-group {
       display: flex;
       align-items: center;
@@ -171,9 +171,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .home-button:hover {
-      background-color: #f2f2f2;
-    }
+    .home-button:hover { background-color: #f2f2f2; }
     /* Modal styling with transitions */
     .modal {
       display: none;
@@ -187,9 +185,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    .modal.show {
-      opacity: 1;
-    }
+    .modal.show { opacity: 1; }
     .modal-content {
       background-color: #fff;
       margin: 20% auto;
@@ -341,8 +337,9 @@
   <script>
     let currentLang = 'en';
     let deferredPrompt; // For storing the beforeinstallprompt event
+    let pendingResult = null; // To store computed result until confirmation
 
-    // Extended translations for the confirm button
+    // Extended translations for confirm button
     const extendedTranslations = {
       en: { disclaimerConfirm: "Confirm" },
       de: { disclaimerConfirm: "Einverstanden" }
@@ -507,7 +504,7 @@
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
-      // Update the prerequisite error message text
+      // Update prerequisite error message text
       document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
       // Also update module screen headings if they exist:
       if (document.getElementById('comaModuleTitle')) {
@@ -596,7 +593,7 @@
       console.log("Disclaimer modal closed.");
     }
 
-    // Calculate coma risk
+    // Calculate coma risk (uses disclaimer modal; result revealed on confirm)
     function calculateComaRisk() {
       showDisclaimer();
       const gfap = parseFloat(document.getElementById('gfapComaInput').value);
@@ -613,13 +610,21 @@
       if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
       else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
       else riskLevel = translations[currentLang].highRisk;
-      result.innerHTML = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
-      result.className = 'result ' + (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk');
-      result.style.display = 'block';
-      console.log("Coma risk result displayed.");
+      const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
+      result.style.display = 'none';
+      pendingResult = { element: result, html: computedResult, riskClass: (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk') };
+      document.getElementById('disclaimerConfirmButton').onclick = function() {
+        closeDisclaimer();
+        pendingResult.element.innerHTML = pendingResult.html;
+        pendingResult.element.className = 'result ' + pendingResult.riskClass;
+        pendingResult.element.style.display = 'block';
+        pendingResult = null;
+        this.onclick = null;
+        console.log("Coma risk result revealed.");
+      };
     }
 
-    // Calculate stroke risk
+    // Calculate stroke risk (modified to wait for confirmation via the disclaimer modal)
     function calculateStrokeRisk() {
       showDisclaimer();
       const age = parseInt(document.getElementById('ageInput').value);
@@ -633,7 +638,6 @@
       }
       let interpretation = '';
       let riskClass = '';
-
       if (age < 72) {
         if (gfap < 29) {
           interpretation = strokeInterpretations[currentLang].veryLow;
@@ -683,10 +687,19 @@
           riskClass = 'high-risk';
         }
       }
-      result.innerHTML = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
-      result.className = `result ${riskClass}`;
-      result.style.display = 'block';
-      console.log("Stroke risk result displayed.");
+      const computedResult = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
+      result.style.display = 'none';
+      pendingResult = { element: result, html: computedResult, riskClass: riskClass };
+      document.getElementById('disclaimerConfirmButton').onclick = function() {
+        closeDisclaimer();
+        pendingResult.element.innerHTML = pendingResult.html;
+        pendingResult.element.className = 'result ' + pendingResult.riskClass;
+        pendingResult.element.style.display = 'block';
+        pendingResult = null;
+        this.onclick = null;
+        console.log("Stroke risk result revealed.");
+      };
+      console.log("Stroke risk calculated, waiting for confirmation.");
     }
 
     // Add event listeners for keyboard accessibility and dark mode toggle
