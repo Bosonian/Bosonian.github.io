@@ -9,12 +9,32 @@
     <meta name="theme-color" content="#007bff">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* CSS Variables for theme colors */
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --secondary-color: #dc3545;
+            --secondary-hover: #b52b3a;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+        }
+        /* Dark mode overrides */
+        body.dark-mode {
+            --primary-color: #3399ff;
+            --primary-hover: #287ac7;
+            --secondary-color: #e06666;
+            --secondary-hover: #cc5252;
+            --background-color: #333;
+            --text-color: #f8f9fa;
+        }
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa;
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
+        /* Container style with dark mode adjustment */
         .container {
             max-width: 500px;
             margin: 70px auto 20px auto;
@@ -22,6 +42,10 @@
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode .container {
+            background-color: #444;
+            color: var(--text-color);
         }
         .input-group, .checkbox-group {
             margin-bottom: 15px;
@@ -35,7 +59,7 @@
             width: calc(100% - 24px);
             padding: 12px;
             font-size: 18px;
-            border: 2px solid #007bff;
+            border: 2px solid var(--primary-color);
             border-radius: 5px;
         }
         .button-group {
@@ -48,22 +72,23 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s ease;
         }
         .primary {
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
             width: 100%;
         }
         .primary:hover {
-            background-color: #0056b3;
+            background-color: var(--primary-hover);
         }
         .secondary {
-            background-color: #dc3545;
+            background-color: var(--secondary-color);
             color: white;
             width: 100%;
         }
         .secondary:hover {
-            background-color: #b52b3a;
+            background-color: var(--secondary-hover);
         }
         .result {
             margin-top: 1.5rem;
@@ -80,10 +105,7 @@
         .medium-risk {
             color: orange;
         }
-        .high-risk {
-            color: red;
-        }
-        .very-high-risk {
+        .high-risk, .very-high-risk {
             color: red;
         }
         .warning {
@@ -96,7 +118,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
             position: sticky;
             top: 0;
@@ -127,9 +149,17 @@
             border: 1px solid #ccc;
             border-radius: 3px;
         }
+        /* Dark Mode Toggle button styling */
+        #darkModeToggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: white;
+        }
         .home-button {
             background: white;
-            color: #007bff;
+            color: var(--primary-color);
             border: none;
             padding: 5px 10px;
             border-radius: 4px;
@@ -138,6 +168,7 @@
         .home-button:hover {
             background-color: #f2f2f2;
         }
+        /* Modal styling with transitions */
         .modal {
             display: none;
             position: fixed;
@@ -147,6 +178,11 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            opacity: 1;
         }
         .modal-content {
             background-color: #fff;
@@ -183,31 +219,32 @@
         </div>
         <div class="header-right">
             <div class="language-switcher">
-                <button onclick="switchLanguage('en')">
-                    <img src="https://flagcdn.com/gb.svg" alt="English" aria-label="Switch to English">
+                <button onclick="switchLanguage('en')" aria-label="Switch to English">
+                    <img src="https://flagcdn.com/gb.svg" alt="English">
                 </button>
-                <button onclick="switchLanguage('de')">
-                    <img src="https://flagcdn.com/de.svg" alt="Deutsch" aria-label="Auf Deutsch umstellen">
+                <button onclick="switchLanguage('de')" aria-label="Auf Deutsch umstellen">
+                    <img src="https://flagcdn.com/de.svg" alt="Deutsch">
                 </button>
             </div>
-            <button class="home-button" onclick="restartApp()">🏠 Home</button>
+            <button id="darkModeToggle" aria-label="Toggle Dark Mode">🌙</button>
+            <button class="home-button" onclick="restartApp()" aria-label="Home">🏠 Home</button>
         </div>
     </header>
 
     <!-- Access Code Screen -->
     <section id="codeEntrySection" class="container">
         <p id="codePrompt">🔑 Please enter your access code:</p>
-        <input type="password" id="accessCodeInput" placeholder="Enter code">
-        <button class="primary" id="accessCodeButton">Submit</button>
+        <input type="password" id="accessCodeInput" placeholder="Enter code" aria-label="Access Code">
+        <button class="primary" id="accessCodeButton" aria-label="Submit Access Code">Submit</button>
         <p id="accessError" class="warning" style="display: none;">Incorrect code. Please try again.</p>
     </section>
 
     <!-- Module Selection Screen -->
     <section id="moduleSelectionSection" class="container" style="display:none;">
         <h2 id="moduleSelectionTitle">Select Module</h2>
-        <button class="primary" id="comaModuleButton">🧠 Probability of Intracranial Hemorrhage in Comatose Patients</button>
+        <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">🧠 Probability of Intracranial Hemorrhage in Comatose Patients</button>
         <p class="module-subtext">COMA (GCS 3-8)</p>
-        <button class="primary" id="strokeModuleButton">🩺 Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms</button>
+        <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">🩺 Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms</button>
         <p class="module-subtext">Stroke</p>
     </section>
 
@@ -216,10 +253,10 @@
         <h2 id="comaModuleTitle">Probability of Intracranial Hemorrhage in Comatose Patients</h2>
         <div class="input-group">
             <label for="gfapComaInput" id="gfapComaLabel">GFAP Value (pg/mL)</label>
-            <input type="number" id="gfapComaInput" min="29" max="10001">
+            <input type="number" id="gfapComaInput" min="29" max="10001" aria-label="GFAP Value for Coma">
         </div>
-        <button class="primary" id="calculateComaButton">Calculate Probability</button>
-        <button class="secondary" onclick="restartApp()">⬅️ Back</button>
+        <button class="primary" id="calculateComaButton" aria-label="Calculate Coma Risk">Calculate Probability</button>
+        <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
         <div class="result" id="comaResult"></div>
     </section>
 
@@ -227,23 +264,23 @@
     <section id="strokePrerequisiteSection" class="container" style="display:none;">
         <h2 id="strokePrerequisiteTitle">Prerequisites for Stroke Risk Calculation</h2>
         <div class="checkbox-group">
-            <input type="checkbox" id="prerequisite1">
-            <label for="prerequisite1" id="prerequisite1Label">Gesichertes Zeitfenster < 6 Stunden</label>
+            <input type="checkbox" id="prerequisite1" aria-label="Confirmed time window less than 6 hours">
+            <label for="prerequisite1" id="prerequisite1Label">Gesichertes Zeitfenster &lt; 6 Stunden</label>
         </div>
         <div class="checkbox-group">
-            <input type="checkbox" id="prerequisite2">
+            <input type="checkbox" id="prerequisite2" aria-label="No neurological deficits before the event">
             <label for="prerequisite2" id="prerequisite2Label">Keine neurologische Defizite in den Stunden / Tagen vor dem Ereignis</label>
         </div>
         <div class="checkbox-group">
-            <input type="checkbox" id="prerequisite3">
+            <input type="checkbox" id="prerequisite3" aria-label="No identifiable head trauma">
             <label for="prerequisite3" id="prerequisite3Label">Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)</label>
         </div>
         <div class="checkbox-group">
-            <input type="checkbox" id="prerequisite4">
+            <input type="checkbox" id="prerequisite4" aria-label="FAST ED Score greater or equal to 3">
             <label for="prerequisite4" id="prerequisite4Label">FAST ED Score >= 3 Punkte</label>
         </div>
-        <button class="primary" id="proceedButton">Proceed to Calculation</button>
-        <button class="secondary" onclick="restartApp()">⬅️ Back</button>
+        <button class="primary" id="proceedButton" aria-label="Proceed to Stroke Calculation">Proceed to Calculation</button>
+        <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
         <p id="prerequisiteError" class="warning" style="display: none;">Please confirm all prerequisites before proceeding.</p>
     </section>
 
@@ -252,45 +289,46 @@
         <h2 id="strokeModuleTitle">Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms</h2>
         <div class="input-group">
             <label for="ageInput" id="ageLabel">Patient Age (Years)</label>
-            <input type="number" id="ageInput" min="1" max="120">
+            <input type="number" id="ageInput" min="1" max="120" aria-label="Patient Age">
         </div>
         <div class="input-group">
             <label for="gfapStrokeInput" id="gfapStrokeLabel">GFAP Value (pg/mL)</label>
-            <input type="number" id="gfapStrokeInput" min="0" max="10001">
+            <input type="number" id="gfapStrokeInput" min="0" max="10001" aria-label="GFAP Value for Stroke">
         </div>
-        <button class="primary" id="calculateStrokeButton">Calculate Probability</button>
-        <button class="secondary" onclick="restartApp()">⬅️ Back</button>
+        <button class="primary" id="calculateStrokeButton" aria-label="Calculate Stroke Risk">Calculate Probability</button>
+        <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
         <div class="result" id="strokeResult"></div>
     </section>
 
     <!-- Installation Icons -->
     <div class="install-icons" id="installIcons">
-        <!-- Icons will be dynamically added here based on the OS -->
+        <!-- Installation icons will be added here based on OS detection -->
     </div>
 
     <footer style="text-align: center; margin-top: 20px;">
         <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
     </footer>
 
-    <!-- iOS Install Modal -->
-    <div id="iosInstallModal" class="modal">
+    <!-- iOS Install Modal (for future customization) -->
+    <div id="iosInstallModal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content">
-            <span class="close" onclick="document.getElementById('iosInstallModal').style.display = 'none'">&times;</span>
+            <span class="close" onclick="document.getElementById('iosInstallModal').style.display = 'none'" aria-label="Close">&times;</span>
             <div id="iosInstallContent"></div>
         </div>
     </div>
 
     <!-- Disclaimer Modal -->
-    <div id="disclaimerModal" class="modal">
+    <div id="disclaimerModal" class="modal" role="dialog" aria-modal="true">
         <div class="modal-content">
-            <span class="close" onclick="closeDisclaimer()">&times;</span>
+            <span class="close" onclick="closeDisclaimer()" aria-label="Close">&times;</span>
             <p id="disclaimerText"></p>
-            <button class="primary" onclick="closeDisclaimer()">Confirm</button>
+            <button class="primary" onclick="closeDisclaimer()" aria-label="Confirm Disclaimer">Confirm</button>
         </div>
     </div>
 
     <script>
         let currentLang = 'en';
+        let deferredPrompt; // For storing the beforeinstallprompt event
 
         // Language translations
         const translations = {
@@ -372,7 +410,71 @@
             }
         };
 
-        // Update text elements based on current language
+        // OS detection function
+        function getMobileOperatingSystem() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/windows phone/i.test(userAgent)) {
+                return "Windows";
+            }
+            if (/android/i.test(userAgent)) {
+                return "Android";
+            }
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return "iOS";
+            }
+            return "unknown";
+        }
+
+        // Show installation icons based on the detected OS
+        function showInstallIcons() {
+            const os = getMobileOperatingSystem();
+            const installIconsDiv = document.getElementById('installIcons');
+            installIconsDiv.innerHTML = ''; // Clear any previous icons
+
+            if (os === 'Android') {
+                const androidIcon = document.createElement('img');
+                androidIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/3/31/Android_robot.svg';
+                androidIcon.alt = 'Install on Android';
+                androidIcon.style.cursor = 'pointer';
+                androidIcon.addEventListener('click', function() {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            console.log('User response to the install prompt:', choiceResult.outcome);
+                            deferredPrompt = null;
+                        });
+                    }
+                });
+                installIconsDiv.appendChild(androidIcon);
+            } else if (os === 'iOS') {
+                const appleIcon = document.createElement('img');
+                appleIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg';
+                appleIcon.alt = 'Install on iOS';
+                appleIcon.style.cursor = 'pointer';
+                appleIcon.addEventListener('click', function() {
+                    alert("Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol und wählen Sie 'Zum Home-Bildschirm hinzufügen'.");
+                });
+                installIconsDiv.appendChild(appleIcon);
+            } else if (os === 'Windows') {
+                const windowsIcon = document.createElement('img');
+                windowsIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/4/48/Windows_logo_-_2012.svg';
+                windowsIcon.alt = 'Install on Windows';
+                windowsIcon.style.cursor = 'pointer';
+                windowsIcon.addEventListener('click', function() {
+                    alert("Um die App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen 'Diese Seite als App installieren'.");
+                });
+                installIconsDiv.appendChild(windowsIcon);
+            }
+        }
+
+        // Listen for beforeinstallprompt to capture Android/Chrome install event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallIcons();
+        });
+
+        // Update UI text based on the selected language
         function switchLanguage(lang) {
             currentLang = lang;
             const texts = translations[lang];
@@ -382,15 +484,15 @@
             document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
             document.getElementById('strokeModuleTitle').innerText = texts.strokeRiskTitle;
             document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
-            document.querySelector('#comaModuleSection button').innerText = texts.calculateButton;
-            document.querySelector('#strokeModuleSection button').innerText = texts.calculateButton;
+            // Update calculate buttons using their specific IDs
+            document.getElementById('calculateComaButton').innerText = texts.calculateButton;
+            document.getElementById('calculateStrokeButton').innerText = texts.calculateButton;
             document.getElementById('proceedButton').innerText = texts.proceedButton;
             document.getElementById('accessError').innerText = texts.accessError;
             document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
             document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
             document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
             document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
-            document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
             document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
             document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
             document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
@@ -452,16 +554,19 @@
             }
         }
 
-        // Display disclaimer using the modal
+        // Display disclaimer using the modal with fade-in effect
         function showDisclaimer() {
             const modal = document.getElementById('disclaimerModal');
             document.getElementById('disclaimerText').innerText = translations[currentLang].disclaimer;
             modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
         }
 
-        // Close disclaimer modal
+        // Close disclaimer modal with fade-out effect
         function closeDisclaimer() {
-            document.getElementById('disclaimerModal').style.display = 'none';
+            const modal = document.getElementById('disclaimerModal');
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 300);
         }
 
         // Calculate coma risk
@@ -557,7 +662,7 @@
             result.style.display = 'block';
         }
 
-        // Add event listeners for keyboard accessibility
+        // Add event listeners for keyboard accessibility and dark mode toggle
         function addEventListeners() {
             document.getElementById('accessCodeButton').addEventListener('click', validateAccessCode);
             document.getElementById('accessCodeInput').addEventListener('keyup', function(e) {
@@ -571,12 +676,14 @@
                 if (e.key === "Enter") calculateComaRisk();
             });
             document.getElementById('calculateStrokeButton').addEventListener('click', calculateStrokeRisk);
-            // Allow Enter key in age and GFAP fields of stroke module to trigger calculation
             document.getElementById('ageInput').addEventListener('keyup', function(e) {
                 if (e.key === "Enter") calculateStrokeRisk();
             });
             document.getElementById('gfapStrokeInput').addEventListener('keyup', function(e) {
                 if (e.key === "Enter") calculateStrokeRisk();
+            });
+            document.getElementById('darkModeToggle').addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
             });
         }
 
@@ -586,6 +693,7 @@
             restartApp();
             switchLanguage('en');
             addEventListeners();
+            showInstallIcons();
         };
     </script>
 </body>
