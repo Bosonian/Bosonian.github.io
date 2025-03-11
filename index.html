@@ -1,295 +1,294 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GFAP Risk Calculator</title>
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#007bff" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    input, button {
-      width: 90%;
-      padding: 12px;
-      margin: 8px auto;
-      border-radius: 5px;
-      font-size: 16px;
-      display: block;
-    }
-    button.primary {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button.primary:hover {
-      background-color: #0056b3;
-    }
-    button.secondary {
-      background-color: #6c757d;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button.secondary:hover {
-      background-color: #545b62;
-    }
-    .result {
-      padding: 15px;
-      margin: 20px auto;
-      border-radius: 8px;
-      display: none;
-      width: 90%;
-    }
-    .low-risk { background-color: #d4edda; color: #155724; }
-    .medium-risk { background-color: #fff3cd; color: #856404; }
-    .high-risk { background-color: #f8d7da; color: #721c24; }
-    .stroke-warning { background-color: #e2e3e5; color: #383d41; border: 2px solid #007bff; }
-    .hidden { display: none; }
-    .age-group { margin: 15px 0; }
-    .checkbox-group {
-      text-align: left;
-      margin: 15px 10%;
-    }
-    .checkbox-group label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    .fas { margin-right: 8px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFAP Bleeding Risk Check</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* (Your existing CSS - no changes needed) */
+        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #ffffff; color: #2c3e50; margin: 0; padding: 0; }
+        .container { max-width: 500px; margin: 50px auto; padding: 20px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .input-group input { width: 90%; padding: 12px; font-size: 18px; border: 2px solid #007bff; border-radius: 5px; outline: none; text-align: center; }
+        .button-group button { width: 90%; padding: 12px; margin-top: 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .primary { background-color: #007bff; color: white; }
+        .primary:hover { background-color: #0056b3; }
+        .secondary { background-color: #dc3545; color: white; }
+        .secondary:hover { background-color: #b52b3a; }
+        .result { margin-top: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 18px; font-weight: bold; display: none; }
+        .warning { font-size: 12px; color: red; margin-top: 10px; }
+        /* Color Coding */
+        .low-risk { color: green; }
+        .medium-risk { color: orange; }
+        .high-risk { color: red; }
+
+        /* Install Icon Styles */
+        .install-icons {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .install-icons i {
+            font-size: 24px; /* Adjust as needed */
+            margin: 0 10px;
+            cursor: pointer;
+            color: #007bff; /* Or any color you prefer */
+        }
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .title-line {
+           display: flex;
+           flex-direction: column; /* Stack elements vertically */
+           align-items: center; /* Center horizontally */
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Language Selector -->
-    <div style="margin-bottom: 20px;">
-      <button onclick="switchLanguage('de')" class="secondary">🇩🇪 Deutsch</button>
-      <button onclick="switchLanguage('en')" class="secondary">🇬🇧 English</button>
+    <header>
+        <div class="title-line">
+           <h1 id="mainTitle">🧠 GFAP Blutungsrisiko-Check</h1>
+            <h2 id= "mainTitleGCS">für Koma GCS (3-8)</h2>  </div>
+
+        <div class="language-switcher">
+            <button onclick="switchLanguage('en')" id="langEn">English</button>
+            <button onclick="switchLanguage('de')" id="langDe">Deutsch</button>
+        </div>
+    </header>
+
+    <section id="codeEntrySection" class="container">
+        <p id="codePrompt">🔑 Please enter your access code:</p>
+        <input type="password" id="accessCodeInput" placeholder="Enter code" >
+        <button class="primary" onclick="validateAccessCode()">Submit</button>
+        <p id="accessError" class="warning" style="display: none;">Incorrect code. Please try again.</p>
+    </section>
+
+    <section id="calculatorSection" class="container" style="display: none;">
+        <p id="description">Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:</p>
+        <div class="input-group">
+             <label for="gfapInput" id="gfapInputLabel">Enter GFAP value</label>
+            <input type="number" id="gfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10000" aria-labelledby="gfapInputLabel">
+        </div>
+        <div class="warning" id="validationError" style="display: none;"></div>
+        <div class="button-group">
+            <button class="primary" id="calculateButton" onclick="calculateRisk()" role="button">Calculate</button>
+            <button class="secondary" onclick="resetForm()">Reset</button>
+        </div>
+        <div class="result" id="result"></div>
+        <p class="alert" id="alertMessage">⚠️ This calculation is for research purposes only. Do not use for clinical decisions!</p>
+    </section>
+
+     <div id="strokeChecklistSection" class="container" style="display: none;">
+      <p id="checklistIntro">Please confirm the following criteria:</p>
+        <ul style="list-style-type: none; padding: 0;">
+            <li>
+                <input type="checkbox" id="timeWindow" name="timeWindow">
+                <label for="timeWindow" id="timeWindowLabel">Confirmed time window &lt; 6 hours</label>
+            </li>
+            <li>
+                <input type="checkbox" id="noPriorSymptoms" name="noPriorSymptoms">
+                <label for="noPriorSymptoms" id="noPriorSymptomsLabel">No symptoms in the hours/days before the event</label>
+            </li>
+            <li>
+                <input type="checkbox" id="noTrauma" name="noTrauma">
+                <label for="noTrauma" id="noTraumaLabel">No recognizable traumatic brain injury (severe fall)</label>
+            </li>
+            <li>
+                <label for="fastEDInput" id="fastEDLabel">FAST-ED Score (≥ 3):</label>
+                <input type="number" id="fastEDInput" name="fastEDInput" min="3" max="10" inputmode="numeric" >
+            </li>
+        </ul>
+        <button class="primary" id="proceedToCalcButton" onclick="checkStrokeChecklist()" disabled>Calculate Stroke Risk</button>
+        <div class="warning" id="checklistError" style="display: none;"></div>
     </div>
 
-    <!-- Access Section -->
-    <div id="accessSection">
-      <h2><i class="fas fa-lock"></i><span id="title">GFAP Risk Calculator</span></h2>
-      <input type="password" id="accessCode" placeholder="Enter access code">
-      <button class="primary" onclick="validateAccess()"><i class="fas fa-check"></i> Continue</button>
-      <p id="accessError" class="hidden" style="color: red;"></p>
+    <div id="strokeInputSection" class="container" style="display: none;">
+        <p id="strokeDescription">Enter the measured GFAP value (pg/mL) and the patient's age:</p>
+        <div class="input-group">
+            <label for="strokeGfapInput" id="strokeGfapLabel">GFAP Value (pg/mL):</label>
+            <input type="number" id="strokeGfapInput" placeholder="Enter GFAP value" inputmode="numeric" min="29" max="10000">
+        </div>
+        <div class="input-group">
+            <label for="ageInput" id="ageInputLabel">Age (Years):</label>
+            <input type="number" id="ageInput" placeholder="Enter age" inputmode="numeric">
+        </div>
+         <div class="button-group">
+            <button class="primary" id="strokeCalculateButton" onclick="calculateStrokeRisk()">Calculate</button>
+            <button class="secondary" id="strokeResetButton" onclick="resetStrokeForm()">Reset</button>
+        </div>
+        <div class="result" id="strokeResult"></div>
     </div>
 
-    <!-- Module Selection -->
-    <div id="moduleSection" class="hidden">
-      <h3><span id="moduleTitle">Select Analysis Module</span></h3>
-      <button class="primary" onclick="selectModule('coma')">
-        <i class="fas fa-bed"></i> Coma Analysis
-      </button>
-      <button class="primary" onclick="selectModule('stroke')">
-        <i class="fas fa-brain"></i> Stroke Analysis
-      </button>
+    <div class="install-icons">
+        <i id="iosInstallIcon" class="fab fa-apple" onclick="showInstallInstructions('ios')" style="display: none;"></i>
+        <i id="androidInstallIcon" class="fab fa-android" onclick="showInstallInstructions('android')" style="display: none;"></i>
+        <i id="windowsInstallIcon" class="fab fa-windows" onclick="showInstallInstructions('windows')"></i>
     </div>
 
-    <!-- Coma Module -->
-    <div id="comaSection" class="hidden">
-      <input type="number" id="comaGFAP" placeholder="GFAP value (pg/mL)" min="29" max="100001">
-      <button class="primary" onclick="calculateComa()">
-        <i class="fas fa-calculator"></i> Calculate
-      </button>
-    </div>
-
-    <!-- Stroke Module Checklist -->
-    <div id="strokeChecklist" class="hidden">
-      <p>Please confirm the following for the stroke patient:</p>
-      <div class="checkbox-group">
-        <label><input type="checkbox" id="timeWindowCheck"> Stroke occurred within 6 hours</label>
-        <label><input type="checkbox" id="symptomHistoryCheck"> No stroke-like symptoms in the days prior</label>
-        <label><input type="checkbox" id="traumaCheck"> No significant head trauma</label>
-        <label><input type="checkbox" id="fastEdCheck"> FAST-ED score ≥ 3</label>
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modalText"></p>
       </div>
-      <button class="primary" onclick="proceedToStrokeInput()">Proceed</button>
     </div>
 
-    <!-- Stroke Module Input Fields -->
-    <div id="strokeInputFields" class="hidden">
-      <div class="age-group">
-        <input type="number" id="patientAge" placeholder="Patient age (1-101)" min="1" max="101">
+    <div id="windowsModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="windowsModalText"></p>
       </div>
-      <input type="number" id="strokeGFAP" placeholder="GFAP value (pg/mL)" min="0" max="100001">
-      <input type="number" id="fastEdScore" placeholder="FAST-ED Score (0-6)" min="0" max="6">
-      <button class="primary" onclick="calculateStroke()">
-        <i class="fas fa-calculator"></i> Calculate
-      </button>
     </div>
 
-    <!-- Results Display -->
-    <div id="resultSection" class="result hidden">
-      <h4><i class="fas fa-poll"></i><span id="resultTitle">Analysis Result</span></h4>
-      <div id="resultContent"></div>
-    </div>
-  </div>
 
-  <script>
-    // Constants and initial settings
-    const ACCESS_CODES = ["0P9MYVVA", "U68M94MV", "J8RKB4Z5", "SKZUSTQ1", "F5IJOOVY", "VVXTWAKB"];
-    let currentLang = 'en';
-    let currentModule = '';
+    <footer>
+        <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
+    </footer>
 
-    const translations = {
-      en: {
-        accessError: "Invalid access code!",
-        moduleSelect: "Select Analysis Module",
-        comaModule: "Coma Analysis",
-        strokeModule: "Stroke Analysis",
-        comaResult: (p) => `Coma Risk: ${p}% probability of intracranial bleeding`,
-        strokeResults: {
-          low: "High probability of ischemic stroke",
-          lvo: "If FAST-ED ≥4: High probability of LVO"
-        },
-        resultTitle: "Analysis Result",
-        checklistPrompt: "Please confirm the following for the stroke patient:",
-        confirmChecklist: "Please confirm all the conditions!"
-      },
-      de: {
-        accessError: "Ungültiger Zugangscode!",
-        moduleSelect: "Modul auswählen",
-        comaModule: "Koma-Analyse",
-        strokeModule: "Schlaganfall-Analyse",
-        comaResult: (p) => `Koma-Risiko: ${p}% Wahrscheinlichkeit für intrakranielle Blutung`,
-        strokeResults: {
-          low: "Hohe Wahrscheinlichkeit für Hirninfarkt",
-          lvo: "Bei FAST-ED ≥4: Hohe Wahrscheinlichkeit für LVO"
-        },
-        resultTitle: "Analyse Ergebnis",
-        checklistPrompt: "Bitte bestätigen Sie folgendes für den Schlaganfallpatienten:",
-        confirmChecklist: "Bitte alle Bedingungen bestätigen!"
-      }
-    };
+    <script>
+        let deferredPrompt;
+        let isIOS = false;
+        let currentLang = 'en'; // Default language
 
-    // Obfuscated formula (same as coma module)
-    const f1 = '27.63';
-    const f2 = '90.01';
-    const i1 = '84.05-';
-    const i2 = '';
-    const combinedF = f1.split('').reverse().join('') + f2.split('').reverse().join('');
-    const combinedI = i1.split('').reverse().join('') + i2.split('').reverse().join('');
-    const calcFunc = new Function('gfap', `
-      const f = parseFloat(String.fromCharCode(${combinedF.split("").map(c => c.charCodeAt(0)).join(',')}));
-      const i = parseFloat(String.fromCharCode(${combinedI.split("").map(c => c.charCodeAt(0)).join(',')}));
-      const logG = Math.log10(gfap);
-      return Math.max(0, Math.min((f * logG) + i, 100));
-    `);
+         window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the default browser prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Show the install button *only* for Android (not iOS)
+            if (!isIOS) {
+                document.getElementById('androidInstallIcon').style.display = 'inline-block';
+            }
+        });
 
-    // Access validation
-    function validateAccess() {
-      const code = document.getElementById('accessCode').value.trim().toUpperCase();
-      if (ACCESS_CODES.includes(code)) {
-        document.getElementById('accessSection').classList.add('hidden');
-        document.getElementById('moduleSection').classList.remove('hidden');
-        document.getElementById('moduleTitle').innerText = translations[currentLang].moduleSelect;
-      } else {
-        showError('accessError', translations[currentLang].accessError);
-      }
-    }
+       // Define texts *outside* of switchLanguage - making it global
+        const texts = {
+            iosInstructions: "To install this app on your iPhone, tap the 'Share' icon and then 'Add to Home Screen'.",
+            androidInstructions: "To install this app, tap the menu button (three dots) and then 'Add to Home screen' or 'Install'.",
+            windowsInstructions: "To install this app on Windows, open it in Chrome, Edge, or Firefox, and then click the install button in the address bar (it may look like a '+' or a computer with an arrow). Follow the prompts.",
+            de: {
+                title: "🧠 GFAP Blutungsrisiko-Check",
+                titleGCS: "für Koma GCS (3-8)",
+                codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
+                description: "Geben Sie den gemessenen GFAP-Wert (pg/mL) ein, um das Risiko einer intrakraniellen Blutung zu berechnen:",
+                calculate: "Berechnen",
+                reset: "Zurücksetzen",
+                lowRisk: "Niedriges Risiko",
+                mediumRisk: "Mittleres Risiko",
+                highRisk: "Hohes Risiko",
+                probability: "Wahrscheinlichkeit",
+                alert: "⚠️ Diese Berechnung dient nur zu Forschungszwecken. Nicht für klinische Entscheidungen verwenden!",
+                validationError: "Bitte geben Sie einen gültigen GFAP-Wert ein (29-10000)!",
+                installButton: "App installieren",
+                checklistIntro: "Bitte bestätigen Sie die folgenden Kriterien:",
+                timeWindowLabel: "Gesichertes Zeitfenster < 6 Stunden",
+                noPriorSymptomsLabel: "Keine Symptome in den Stunden / Tagen vor dem Ereignis",
+                noTraumaLabel: "Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)",
+                fastEDLabel: "FAST-ED Score (≥ 3 Punkte):",
+                proceedToCalcButton: "Schlaganfallrisiko berechnen",
+                strokeDescription: "Geben Sie den gemessenen GFAP-Wert (pg/mL) und das Alter des Patienten ein:",
+                strokeGfapLabel: "GFAP-Wert (pg/mL):",
+                ageInputLabel: "Alter (Jahre):",
+                strokeResultHeader: "Ergebnisse der Schlaganfallbewertung:",
+                highInfarctionRisk: "Hohe Wahrscheinlichkeit für Hirninfarkt",
+                highLVORisk: "Bei FAST-ED ≥ 4 hohe Wahrscheinlichkeit für 'large vessel occlusion' (LVO)",
+                veryLowRisk : "sehr niedrig",
+                intermediateRisk: "mittel",
+                veryHighRisk: "sehr hoch",
+                checklistError: "Bitte bestätigen Sie alle Kriterien und geben Sie einen gültigen FAST-ED Score ein (≥ 3).",
+                ischaemischerSchlaganfallSehrWahrscheinlich: "Ischämiescher Schlaganfall sehr wahrscheinlich",
+                windowsInstructions: "Um diese App unter Windows zu installieren, öffnen Sie sie in Chrome, Edge oder Firefox und klicken Sie dann auf die Installationsschaltfläche in der Adressleiste (sie kann wie ein '+' oder ein Computer mit einem Pfeil aussehen). Folgen Sie den Anweisungen." // German translation
 
-    function showError(id, msg) {
-      const el = document.getElementById(id);
-      el.innerText = msg;
-      el.classList.remove('hidden');
-    }
+            },
+            en: {
+                title: "🧠 GFAP Bleeding Risk Check",
+                titleGCS: "for Coma GCS (3-8)",
+                codePrompt: "🔑 Please enter your access code:",
+                description: "Enter the measured GFAP value (pg/mL) to calculate the risk of intracranial bleeding:",
+                calculate: "Calculate",
+                reset: "Reset",
+                lowRisk: "Low Risk",
+                mediumRisk: "Medium Risk",
+                highRisk: "High Risk",
+                probability: "Probability",
+                alert: "⚠️ This calculation is for research purposes only. Do not use for clinical decisions!",
+                validationError: "Please enter a valid GFAP value (29-10000)!",
+                installButton: "Install App",
+                checklistIntro: "Please confirm the following criteria:",
+                timeWindowLabel: "Confirmed time window < 6 hours",
+                noPriorSymptomsLabel: "No symptoms in the hours/days before the event",
+                noTraumaLabel: "No recognizable traumatic brain injury (severe fall)",
+                fastEDLabel: "FAST-ED Score (≥ 3):",
+                proceedToCalcButton: "Calculate Stroke Risk",
+                strokeDescription: "Enter the measured GFAP value (pg/mL) and the patient's age:",
+                strokeGfapLabel: "GFAP Value (pg/mL):",
+                ageInputLabel: "Age (Years):",
+                strokeResultHeader: "Stroke Assessment Results:",
+                highInfarctionRisk: "High probability of brain infarction",
+                highLVORisk: "With FAST-ED ≥ 4, high probability of large vessel occlusion (LVO)",
+                veryLowRisk : "very low",
+                intermediateRisk: "intermediate",
+                veryHighRisk: "very high",
+                checklistError: "Please confirm all criteria and enter a valid FAST-ED score (≥ 3).",
+                ischemicStrokeLikely: "Ischemic stroke very likely",
+                 windowsInstructions: "To install this app on Windows, open it in Chrome, Edge, or Firefox, and then click the install button in the address bar (it may look like a '+' or a computer with an arrow). Follow the prompts."
 
-    // Module selection
-    function selectModule(module) {
-      currentModule = module;
-      document.getElementById('moduleSection').classList.add('hidden');
-      if (module === 'coma') {
-        document.getElementById('comaSection').classList.remove('hidden');
-      } else if (module === 'stroke') {
-        document.getElementById('strokeChecklist').classList.remove('hidden');
-      }
-    }
+            }
+        };
 
-    // Stroke checklist: require all checkboxes to be checked before showing input fields
-    function proceedToStrokeInput() {
-      if (document.getElementById('timeWindowCheck').checked &&
-          document.getElementById('symptomHistoryCheck').checked &&
-          document.getElementById('traumaCheck').checked &&
-          document.getElementById('fastEdCheck').checked) {
-        document.getElementById('strokeChecklist').classList.add('hidden');
-        document.getElementById('strokeInputFields').classList.remove('hidden');
-      } else {
-        alert(translations[currentLang].confirmChecklist);
-      }
-    }
+        window.onload = function() {
+            // Detect iOS
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+                isIOS = true;
+            }
+            // Get user's preferred language
+            let userLang = navigator.language || navigator.userLanguage;
+            currentLang = userLang.startsWith('de') ? 'de' : 'en';
+            checkAccess();
+            switchLanguage(currentLang); // Now texts is guaranteed to be defined
+              document.getElementById("currentYear").textContent = new Date().getFullYear();
 
-    // Coma calculation
-    function calculateComa() {
-      const gfap = parseFloat(document.getElementById('comaGFAP').value);
-      if (isNaN(gfap) || gfap < 29 || gfap > 100001) {
-        showResult("Please enter a valid GFAP value (29-100001)", "high-risk");
-        return;
-      }
-      const probability = calcFunc(gfap);
-      // Thresholds: 29-100: Low, 101-1000: Medium, 1001-100001: High
-      let riskClass = (gfap <= 100) ? 'low-risk' : (gfap <= 1000 ? 'medium-risk' : 'high-risk');
-      showResult(translations[currentLang].comaResult(probability.toFixed(1)), riskClass);
-    }
+        };
 
-    // Stroke calculation
-    function calculateStroke() {
-      const age = parseInt(document.getElementById('patientAge').value);
-      const gfap = parseFloat(document.getElementById('strokeGFAP').value);
-      const fastEd = parseInt(document.getElementById('fastEdScore').value) || 0;
-      if (isNaN(gfap) || gfap < 0 || gfap > 100001) {
-        showResult("Please enter a valid GFAP value", "high-risk");
-        return;
-      }
-      let resultText = '';
-      // If GFAP < 36.8, fixed message for ischemic stroke
-      if (gfap < 36.8) {
-        resultText = translations[currentLang].strokeResults.low;
-        if (fastEd >= 4) resultText += `<br>${translations[currentLang].strokeResults.lvo}`;
-        showResult(resultText, 'stroke-warning');
-        return;
-      }
-      const probability = calcFunc(gfap);
-      resultText = `Stroke Risk: ${probability.toFixed(1)}% probability`;
-      showResult(resultText, getRiskClass(probability));
-    }
+        function showInstallInstructions(platform) {
+            let modal;
+            let modalContent;
 
-    function getRiskClass(value) {
-      if (value < 33) return 'low-risk';
-      if (value < 66) return 'medium-risk';
-      return 'high-risk';
-    }
-
-    function showResult(text, cssClass) {
-      const resultDiv = document.getElementById('resultSection');
-      resultDiv.className = `result ${cssClass}`;
-      document.getElementById('resultContent').innerHTML = text;
-      resultDiv.classList.remove('hidden');
-    }
-
-    // Language switching
-    function switchLanguage(lang) {
-      currentLang = lang;
-      document.getElementById('title').innerText = (lang === 'de') ? "GFAP Risiko Rechner" : "GFAP Risk Calculator";
-      document.getElementById('moduleTitle').innerText = translations[lang].moduleSelect;
-      document.getElementById('resultTitle').innerText = translations[lang].resultTitle;
-    }
-
-    // Set initial focus
-    document.getElementById('accessCode').focus();
-  </script>
-</body>
-</html>
+            if (platform === 'ios') {
+                modal = document.getElementById("myModal");
+                modalContent = document.getElementById("modalText");
+                modal
