@@ -249,10 +249,11 @@
     <section id="moduleSelectionSection" class="container" style="display:none;">
         <h2 id="moduleSelectionTitle">Check probability for:</h2>
         <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">for intracranial hemorrhage in comatose patients</button>
+        <p class="module-subtext">GCS 3-8</p>
         <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">for intracerebral hemorrhage in patients with stroke symptoms</button>
     </section>
 
-    <!-- Coma Module Section -->
+    <!-- Coma Module Screen -->
     <section id="comaModuleSection" class="container" style="display:none;">
         <h2 id="comaModuleTitle">Probability of Intracranial Hemorrhage in Comatose Patients</h2>
         <div class="input-group">
@@ -288,7 +289,7 @@
         <p id="prerequisiteError" class="warning" style="display: none;">Please confirm all prerequisites before proceeding.</p>
     </section>
 
-    <!-- Stroke Module Section -->
+    <!-- Stroke Module Screen -->
     <section id="strokeModuleSection" class="container" style="display:none;">
         <h2 id="strokeModuleTitle">Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms</h2>
         <div class="input-group">
@@ -326,7 +327,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeDisclaimer()" aria-label="Close">&times;</span>
             <p id="disclaimerText"></p>
-            <button class="primary" onclick="closeDisclaimer()" aria-label="Confirm Disclaimer">Confirm</button>
+            <button class="primary" id="disclaimerConfirmButton" aria-label="Confirm Disclaimer">Confirm</button>
         </div>
     </div>
 
@@ -471,13 +472,6 @@
             }
         }
 
-        // Listen for beforeinstallprompt to capture Android/Chrome install event
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            showInstallIcons();
-        });
-
         // Update UI text based on the selected language
         function switchLanguage(lang) {
             currentLang = lang;
@@ -485,7 +479,7 @@
             document.getElementById('appTitle').innerText = texts.appTitle;
             document.getElementById('codePrompt').innerText = texts.codePrompt;
             document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-            // Update module buttons with shorter text
+            // These update the module selection buttons...
             document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
             document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
             document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -500,6 +494,14 @@
             document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
             document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
             document.getElementById('ageLabel').innerText = texts.ageLabel;
+            // Also update the module screen headings if they exist:
+            if (document.getElementById('comaModuleTitle')) {
+                document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
+            }
+            if (document.getElementById('strokeModuleTitle')) {
+                document.getElementById('strokeModuleTitle').innerText = texts.strokeRiskTitle;
+            }
+            console.log("Language switched to:", lang);
         }
 
         // Restart app (navigate to module selection screen)
@@ -523,21 +525,24 @@
                 document.getElementById('moduleSelectionSection').style.display = 'block';
                 errorElement.style.display = 'none';
             } else {
-                errorElement.innerText = translations[currentLang].accessError;
+                errorElement.innerText = texts ? texts.accessError : translations[currentLang].accessError;
                 errorElement.style.display = 'block';
             }
+            console.log("Access code validated.");
         }
 
         // Show coma module
         function startComaModule() {
             document.getElementById('moduleSelectionSection').style.display = 'none';
             document.getElementById('comaModuleSection').style.display = 'block';
+            console.log("Switched to Coma Module.");
         }
 
         // Show stroke prerequisite screen
         function startStrokeModule() {
             document.getElementById('moduleSelectionSection').style.display = 'none';
             document.getElementById('strokePrerequisiteSection').style.display = 'block';
+            console.log("Switched to Stroke Prerequisite Screen.");
         }
 
         // Validate prerequisites for stroke module
@@ -554,6 +559,7 @@
             } else {
                 errorElement.style.display = 'block';
             }
+            console.log("Prerequisites validated.");
         }
 
         // Display disclaimer using the modal with fade-in effect
@@ -562,6 +568,7 @@
             document.getElementById('disclaimerText').innerText = translations[currentLang].disclaimer;
             modal.style.display = 'block';
             setTimeout(() => modal.classList.add('show'), 10);
+            console.log("Disclaimer modal shown.");
         }
 
         // Close disclaimer modal with fade-out effect
@@ -569,6 +576,7 @@
             const modal = document.getElementById('disclaimerModal');
             modal.classList.remove('show');
             setTimeout(() => { modal.style.display = 'none'; }, 300);
+            console.log("Disclaimer modal closed.");
         }
 
         // Calculate coma risk
@@ -605,7 +613,6 @@
                 result.style.display = 'block';
                 return;
             }
-
             let interpretation = '';
             let riskClass = '';
 
@@ -658,7 +665,6 @@
                     riskClass = 'high-risk';
                 }
             }
-
             result.innerHTML = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
             result.className = `result ${riskClass}`;
             result.style.display = 'block';
