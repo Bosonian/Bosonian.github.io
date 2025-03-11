@@ -248,9 +248,8 @@
     <!-- Module Selection Screen -->
     <section id="moduleSelectionSection" class="container" style="display:none;">
         <h2 id="moduleSelectionTitle">Check probability for:</h2>
-        <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">for intracranial hemorrhage in comatose patients</button>
-        <p class="module-subtext">GCS 3-8</p>
-        <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">for intracerebral hemorrhage in patients with stroke symptoms</button>
+        <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">intracranial hemorrhage in comatose patients</button>
+        <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">intracerebral hemorrhage in patients with stroke symptoms</button>
     </section>
 
     <!-- Coma Module Screen -->
@@ -341,8 +340,8 @@
                 appTitle: "iGFAP Check",
                 codePrompt: "🔑 Please enter your access code:",
                 moduleSelectionTitle: "Check probability for:",
-                comaModuleTitle: "for intracranial hemorrhage in comatose patients",
-                strokeModuleTitle: "for intracerebral hemorrhage in patients with stroke symptoms",
+                comaModuleTitle: "intracranial hemorrhage in comatose patients",
+                strokeModuleTitle: "intracerebral hemorrhage in patients with stroke symptoms",
                 strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
                 accessError: "Incorrect code. Please try again.",
                 comaRiskTitle: "Probability of Intracranial Hemorrhage in Comatose Patients",
@@ -370,8 +369,8 @@
                 appTitle: "iGFAP Check",
                 codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
                 moduleSelectionTitle: "Wahrscheinlichkeit prüfen bei:",
-                comaModuleTitle: "für intrakranielle Blutungen bei komatösen Patienten",
-                strokeModuleTitle: "für intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
+                comaModuleTitle: "intrakranielle Blutungen bei komatösen Patienten",
+                strokeModuleTitle: "intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
                 strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
                 accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
                 comaRiskTitle: "Wahrscheinlichkeit für intrakranielle Blutungen bei komatösen Patienten",
@@ -479,7 +478,7 @@
             document.getElementById('appTitle').innerText = texts.appTitle;
             document.getElementById('codePrompt').innerText = texts.codePrompt;
             document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-            // These update the module selection buttons...
+            // Update module selection buttons without "for" or "für"
             document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
             document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
             document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -494,7 +493,7 @@
             document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
             document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
             document.getElementById('ageLabel').innerText = texts.ageLabel;
-            // Also update the module screen headings if they exist:
+            // Also update module screen headings if they exist:
             if (document.getElementById('comaModuleTitle')) {
                 document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
             }
@@ -525,7 +524,7 @@
                 document.getElementById('moduleSelectionSection').style.display = 'block';
                 errorElement.style.display = 'none';
             } else {
-                errorElement.innerText = texts ? texts.accessError : translations[currentLang].accessError;
+                errorElement.innerText = translations[currentLang].accessError;
                 errorElement.style.display = 'block';
             }
             console.log("Access code validated.");
