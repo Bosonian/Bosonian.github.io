@@ -108,7 +108,7 @@
     /* For three-level risk, medium-risk is yellow and high-risk is red */
     .medium-risk { color: yellow; }
     .high-risk { color: red; }
-    /* For four-level risk, we expect to use: low-risk (green), medium-risk (yellow), high-risk (orange), very-high-risk (red) */
+    /* For four-level risk, we expect: low-risk (green), medium-risk (yellow), high-risk (orange), very-high-risk (red) */
     .very-high-risk { color: red; }
     .app-header {
       display: flex;
@@ -182,6 +182,13 @@
     #installButton:hover {
       background-color: var(--secondary-hover);
     }
+    /* Prerequisite error styling */
+    #prerequisiteError {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -251,7 +258,7 @@
     </div>
     <button class="primary" id="proceedButton" aria-label="Proceed to Stroke Calculation">Proceed to Calculation</button>
     <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
-    <p id="prerequisiteError" class="warning" style="display:none;"></p>
+    <p id="prerequisiteError"></p>
   </section>
 
   <!-- Stroke Module Screen -->
@@ -482,6 +489,9 @@
       document.getElementById('strokePrerequisiteSection').style.display = 'none';
       document.getElementById('accessCodeInput').value = '';
       document.getElementById('accessError').style.display = 'none';
+      // Clear prerequisite error message
+      document.getElementById('prerequisiteError').style.display = 'none';
+      document.getElementById('prerequisiteError').innerText = "";
     }
 
     // Validate access code
@@ -511,26 +521,23 @@
       console.log("Switched to Stroke Prerequisite Screen.");
     }
 
-    // Validate stroke prerequisites and alert if not all are fulfilled
+    // Validate stroke prerequisites and show inline error if not all are fulfilled
     function validatePrerequisites() {
       const prerequisite1 = document.getElementById('prerequisite1').checked;
       const prerequisite2 = document.getElementById('prerequisite2').checked;
       const prerequisite3 = document.getElementById('prerequisite3').checked;
       const prerequisite4 = document.getElementById('prerequisite4').checked;
       if (!(prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4)) {
-        // Alert user that all prerequisites must be fulfilled
-        alert(currentLang === 'de' 
-          ? "Alle Voraussetzungen müssen erfüllt sein, damit die Berechnung gültig ist." 
-          : "All prerequisites must be fulfilled for the calculation to be valid.");
-        document.getElementById('prerequisiteError').innerText = currentLang === 'de' 
-          ? "Alle Voraussetzungen müssen erfüllt sein." 
-          : "All prerequisites must be fulfilled.";
+        // Display inline error message in red at the bottom of the prerequisites screen
+        document.getElementById('prerequisiteError').innerText = currentLang === 'de'
+          ? "Alle Voraussetzungen müssen erfüllt sein, damit die Berechnung gültig ist."
+          : "All prerequisites must be fulfilled for the calculation to be valid.";
         document.getElementById('prerequisiteError').style.display = 'block';
         return;
       }
+      document.getElementById('prerequisiteError').style.display = 'none';
       document.getElementById('strokePrerequisiteSection').style.display = 'none';
       document.getElementById('strokeModuleSection').style.display = 'block';
-      document.getElementById('prerequisiteError').style.display = 'none';
       console.log("Prerequisites validated.");
     }
 
