@@ -281,7 +281,7 @@
     <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
   </footer>
 
-  <!-- Disclaimer Modal (only Confirm button) -->
+  <!-- Disclaimer Modal -->
   <div id="disclaimerModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal-content">
       <p id="disclaimerText"></p>
@@ -289,24 +289,19 @@
     </div>
   </div>
 
-  <!-- Fixed Install App Button at bottom center -->
+  <!-- Fixed Install App Button -->
   <button id="installButton" aria-label="Install App">Install App</button>
 
+  <!-- Inline JavaScript -->
   <script>
     let currentLang = 'en';
     let deferredPrompt = null;
     let pendingResult = null; // To store computed result until confirmation
 
-    // Extended translations for confirm button, alreadyInstalled message, and range error
+    // Extended translations for confirm button, alreadyInstalled message, etc.
     const extendedTranslations = {
-      en: {
-        disclaimerConfirm: "Confirm",
-        alreadyInstalled: "App already installed."
-      },
-      de: {
-        disclaimerConfirm: "Einverstanden",
-        alreadyInstalled: "App bereits installiert."
-      }
+      en: { disclaimerConfirm: "Confirm", alreadyInstalled: "App already installed." },
+      de: { disclaimerConfirm: "Einverstanden", alreadyInstalled: "App bereits installiert." }
     };
 
     // Language translations
@@ -319,21 +314,14 @@
         strokeModuleTitle: "intracerebral hemorrhage in patients with stroke symptoms",
         strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
         accessError: "Incorrect code. Please try again.",
-        comaRiskTitle: "Probability of Intracranial Hemorrhage in Comatose Patients",
-        strokeRiskTitle: "Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms",
         calculateButton: "Calculate Probability",
         proceedButton: "Proceed to Calculation",
-        invalidInput: "Please enter a valid value!",
         rangeError: "Please enter a value between 29 and 10001 pg/mL.",
+        invalidInput: "Please enter a valid value!",
         lowRisk: "Low Risk",
         mediumRisk: "Medium Risk",
         highRisk: "High Risk",
         veryHighRisk: "Very High Risk",
-        prerequisite1: "Confirmed time window < 6 hours",
-        prerequisite2: "No neurological deficits in the hours/days before the event",
-        prerequisite3: "No identifiable head trauma (severe fall)",
-        prerequisite4: "FAST ED Score >= 3 points",
-        prerequisiteError: "Please confirm all prerequisites before proceeding.",
         disclaimer: "The calculations are for research purposes only, do not make clinical decisions based on it.",
         probability: "Probability",
         riskLevel: "Risk Level",
@@ -349,21 +337,14 @@
         strokeModuleTitle: "intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
         strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
         accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
-        comaRiskTitle: "Wahrscheinlichkeit für intrakranielle Blutungen bei komatösen Patienten",
-        strokeRiskTitle: "Wahrscheinlichkeit für intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
         calculateButton: "Wahrscheinlichkeit berechnen",
         proceedButton: "Zur Berechnung fortfahren",
-        invalidInput: "Bitte geben Sie einen gültigen Wert ein!",
         rangeError: "Bitte geben Sie einen Wert zwischen 29 und 10001 pg/mL ein.",
+        invalidInput: "Bitte geben Sie einen gültigen Wert ein!",
         lowRisk: "Geringes Risiko",
         mediumRisk: "Mittleres Risiko",
         highRisk: "Hohes Risiko",
         veryHighRisk: "Sehr hohes Risiko",
-        prerequisite1: "Gesichertes Zeitfenster < 6 Stunden",
-        prerequisite2: "Keine neurologische Defizite in den Stunden / Tagen vor dem Ereignis",
-        prerequisite3: "Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)",
-        prerequisite4: "FAST ED Score >= 3 Punkte",
-        prerequisiteError: "Bitte bestätigen Sie alle Voraussetzungen, um fortzufahren.",
         disclaimer: "Die Berechnungen dienen nur Forschungszwecken, treffen Sie keine klinischen Entscheidungen basierend darauf.",
         probability: "Wahrscheinlichkeit",
         riskLevel: "Risikostufe",
@@ -373,8 +354,6 @@
       }
     };
 
-    // Stroke risk interpretations for each age group are handled inline in calculateStrokeRisk()
-
     // Capture beforeinstallprompt event for PWA installation
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -382,7 +361,7 @@
       console.log("beforeinstallprompt event captured.");
     });
 
-    // Helper: Detect mobile operating system
+    // Helper: Get mobile OS for install instructions
     function getMobileOperatingSystem() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       if (/windows phone/i.test(userAgent)) return "Windows";
@@ -417,7 +396,18 @@
       }
     });
 
-    // Helper: Attach a one-time click handler to the disclaimer confirm button
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          console.log('ServiceWorker registration successful with scope:', registration.scope);
+        }, function(err) {
+          console.log('ServiceWorker registration failed:', err);
+        });
+      });
+    }
+
+    // Helper: Attach one-time click handler for disclaimer confirm
     function attachDisclaimerConfirmHandler(callback) {
       const btn = document.getElementById('disclaimerConfirmButton');
       function handler() {
@@ -441,19 +431,15 @@
       document.getElementById('calculateStrokeButton').innerText = texts.calculateButton;
       document.getElementById('proceedButton').innerText = texts.proceedButton;
       document.getElementById('accessError').innerText = texts.accessError;
-      document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
-      document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
-      document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
-      document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
+      // If any prerequisite labels need to be updated, add here
+      document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
-      document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
-      document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
       console.log("Language switched to:", lang);
     }
 
-    // Restart app (navigate to module selection)
+    // Restart app (navigate back to module selection)
     function restartApp() {
       document.getElementById('codeEntrySection').style.display = 'none';
       document.getElementById('moduleSelectionSection').style.display = 'block';
@@ -467,51 +453,47 @@
     // Validate access code
     function validateAccessCode() {
       const accessCode = document.getElementById('accessCodeInput').value.trim();
-      const errorElement = document.getElementById('accessError');
-      const validCodes = ['1234'];
-      if (validCodes.includes(accessCode)) {
+      if (['1234'].includes(accessCode)) {
         document.getElementById('codeEntrySection').style.display = 'none';
         document.getElementById('moduleSelectionSection').style.display = 'block';
-        errorElement.style.display = 'none';
       } else {
-        errorElement.innerText = translations[currentLang].accessError;
-        errorElement.style.display = 'block';
+        document.getElementById('accessError').innerText = translations[currentLang].accessError;
+        document.getElementById('accessError').style.display = 'block';
       }
       console.log("Access code validated.");
     }
 
-    // Show coma module
+    // Show Coma Module
     function startComaModule() {
       document.getElementById('moduleSelectionSection').style.display = 'none';
       document.getElementById('comaModuleSection').style.display = 'block';
       console.log("Switched to Coma Module.");
     }
 
-    // Show stroke prerequisite screen
+    // Show Stroke Module (via prerequisite screen)
     function startStrokeModule() {
       document.getElementById('moduleSelectionSection').style.display = 'none';
       document.getElementById('strokePrerequisiteSection').style.display = 'block';
       console.log("Switched to Stroke Prerequisite Screen.");
     }
 
-    // Validate prerequisites for stroke module
+    // Validate stroke prerequisites (if needed)
     function validatePrerequisites() {
       const prerequisite1 = document.getElementById('prerequisite1').checked;
       const prerequisite2 = document.getElementById('prerequisite2').checked;
       const prerequisite3 = document.getElementById('prerequisite3').checked;
       const prerequisite4 = document.getElementById('prerequisite4').checked;
-      const errorElement = document.getElementById('prerequisiteError');
       if (prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4) {
         document.getElementById('strokePrerequisiteSection').style.display = 'none';
         document.getElementById('strokeModuleSection').style.display = 'block';
-        errorElement.style.display = 'none';
+        document.getElementById('prerequisiteError').style.display = 'none';
       } else {
-        errorElement.style.display = 'block';
+        document.getElementById('prerequisiteError').style.display = 'block';
       }
       console.log("Prerequisites validated.");
     }
 
-    // Display disclaimer using modal with fade-in effect
+    // Show disclaimer modal
     function showDisclaimer() {
       const modal = document.getElementById('disclaimerModal');
       document.getElementById('disclaimerText').innerText = translations[currentLang].disclaimer;
@@ -520,7 +502,7 @@
       console.log("Disclaimer modal shown.");
     }
 
-    // Close disclaimer modal with fade-out effect
+    // Close disclaimer modal
     function closeDisclaimer() {
       const modal = document.getElementById('disclaimerModal');
       modal.classList.remove('show');
@@ -528,7 +510,7 @@
       console.log("Disclaimer modal closed.");
     }
 
-    // Calculate coma risk (validate input first)
+    // Calculate Coma Risk
     function calculateComaRisk() {
       const gfap = parseFloat(document.getElementById('gfapComaInput').value);
       const result = document.getElementById('comaResult');
@@ -558,26 +540,23 @@
       });
     }
 
-    // Calculate stroke risk with updated interpretation rules
+    // Calculate Stroke Risk
     function calculateStrokeRisk() {
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
       const result = document.getElementById('strokeResult');
 
-      // Validate inputs before proceeding
       if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
         result.innerText = (gfap < 29 || gfap > 10001) ? translations[currentLang].rangeError : translations[currentLang].invalidInput;
         result.className = 'result warning';
         result.style.display = 'block';
-        return; // Exit early if inputs are invalid
+        return;
       }
 
-      // Show disclaimer only if inputs are valid
       showDisclaimer();
 
       let interpretation = '';
       let riskClass = '';
-      // For patients aged < 72 years (4 categories)
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -600,9 +579,7 @@
             : "Very high risk of ICH (91%)";
           riskClass = 'very-high-risk';
         }
-      }
-      // For patients aged 72–83 years (4 categories)
-      else if (age <= 83) {
+      } else if (age <= 83) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
@@ -624,9 +601,7 @@
             : "Very high risk of ICH (90%)";
           riskClass = 'very-high-risk';
         }
-      }
-      // For patients aged > 83 years (3 categories)
-      else {
+      } else {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
@@ -658,7 +633,7 @@
       console.log("Stroke risk calculated, waiting for confirmation.");
     }
 
-    // Add event listeners for keyboard accessibility and dark mode toggle
+    // Attach event listeners
     function addEventListeners() {
       document.getElementById('accessCodeButton').addEventListener('click', validateAccessCode);
       document.getElementById('accessCodeInput').addEventListener('keyup', function(e) {
@@ -689,7 +664,6 @@
       restartApp();
       switchLanguage('en');
       addEventListeners();
-      // Install App button remains fixed at the bottom.
     };
   </script>
 </body>
