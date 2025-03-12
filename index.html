@@ -168,12 +168,11 @@
       color: var(--text-color);
       border: 1px solid #555;
     }
-    /* Fixed Install App button at bottom center */
+    /* Install Button styling (positioned bottom-right and hidden by default) */
     #installButton {
       position: fixed;
       bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 20px;
       background-color: var(--secondary-color);
       color: white;
       padding: 8px 12px;
@@ -181,6 +180,7 @@
       font-size: 14px;
       z-index: 1000;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      display: none; /* Hidden by default */
     }
     #installButton:hover {
       background-color: var(--secondary-hover);
@@ -289,7 +289,7 @@
     </div>
   </div>
 
-  <!-- Fixed Install App Button -->
+  <!-- Fixed Install App Button (hidden by default) -->
   <button id="installButton" aria-label="Install App">Install App</button>
 
   <!-- Inline JavaScript -->
@@ -354,11 +354,17 @@
       }
     };
 
-    // Capture beforeinstallprompt event for PWA installation
+    // Hide the install button by default
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('installButton').style.display = 'none';
+    });
+
+    // Capture beforeinstallprompt event for PWA installation and show the install button
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       console.log("beforeinstallprompt event captured.");
+      document.getElementById('installButton').style.display = 'block';
     });
 
     // Helper: Get mobile OS for install instructions
@@ -383,6 +389,7 @@
               console.log("User dismissed the install prompt.");
             }
             deferredPrompt = null;
+            document.getElementById('installButton').style.display = 'none';
           });
         } else {
           alert(extendedTranslations[currentLang].alreadyInstalled);
@@ -431,7 +438,6 @@
       document.getElementById('calculateStrokeButton').innerText = texts.calculateButton;
       document.getElementById('proceedButton').innerText = texts.proceedButton;
       document.getElementById('accessError').innerText = texts.accessError;
-      // If any prerequisite labels need to be updated, add here
       document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
@@ -477,7 +483,7 @@
       console.log("Switched to Stroke Prerequisite Screen.");
     }
 
-    // Validate stroke prerequisites (if needed)
+    // Validate stroke prerequisites
     function validatePrerequisites() {
       const prerequisite1 = document.getElementById('prerequisite1').checked;
       const prerequisite2 = document.getElementById('prerequisite2').checked;
