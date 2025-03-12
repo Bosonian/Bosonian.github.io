@@ -33,7 +33,6 @@
       background-color: var(--background-color);
       color: var(--text-color);
     }
-    /* Container style */
     .container {
       max-width: 500px;
       margin: 70px auto 20px auto;
@@ -104,9 +103,9 @@
       display: none;
       text-align: center;
     }
-    /* Risk styling: for 4-category (green, yellow, orange, red) and 3-category (green, yellow, red) */
+    /* Risk styling */
     .low-risk { color: green; }
-    .medium-risk { color: goldenrod; }  /* yellow-ish */
+    .medium-risk { color: goldenrod; }
     .high-risk { color: orange; }
     .very-high-risk { color: red; }
     .warning {
@@ -374,28 +373,13 @@
       }
     };
 
-    // Stroke risk interpretations with updated intermediate text:
-    const strokeInterpretations = {
-      en: {
-        low: "Ischemic stroke very likely.",
-        intermediate: "Test not conclusive",
-        high: "High risk of ICH (85%)",
-        veryHigh: "Very high risk of ICH (91%)"
-      },
-      de: {
-        low: "Ischämischer Schlaganfall sehr wahrscheinlich.",
-        intermediate: "Test nicht aussagekräftig",
-        high: "Hohe Wahrscheinlichkeit für ICH (83%)",
-        veryHigh: "Sehr hohe Wahrscheinlichkeit für ICH (90%)"
-      }
-    };
+    // Stroke risk interpretations for each age group are handled inline in calculateStrokeRisk()
 
     // Capture beforeinstallprompt event for PWA installation
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       console.log("beforeinstallprompt event captured.");
-      // The Install App button is already fixed at the bottom.
     });
 
     // Helper: Detect mobile operating system
@@ -574,7 +558,7 @@
       });
     }
 
-    // Calculate stroke risk with updated interpretation values and rules
+    // Calculate stroke risk with updated interpretation rules
     function calculateStrokeRisk() {
       showDisclaimer();
       const age = parseInt(document.getElementById('ageInput').value);
@@ -588,26 +572,31 @@
       }
       let interpretation = '';
       let riskClass = '';
-      // For patients aged < 72 (4 categories)
+      // For patients aged < 72 years (4 categories)
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
-          // Use the specified text for 29-36.8
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
             : "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO)";
           riskClass = 'low-risk';
         } else if (gfap <= 49.2) {
-          interpretation = strokeInterpretations[currentLang].intermediate;
+          interpretation = currentLang === 'de'
+            ? "Test nicht aussagekräftig"
+            : "Test not conclusive";
           riskClass = 'medium-risk';
         } else if (gfap <= 54) {
-          interpretation = strokeInterpretations[currentLang].high;
+          interpretation = currentLang === 'de'
+            ? "Hohe Wahrscheinlichkeit für ICH (85%)"
+            : "High risk of ICH (85%)";
           riskClass = 'high-risk';
         } else {
-          interpretation = strokeInterpretations[currentLang].veryHigh;
+          interpretation = currentLang === 'de'
+            ? "Sehr hohe Wahrscheinlichkeit für ICH (91%)"
+            : "Very high risk of ICH (91%)";
           riskClass = 'very-high-risk';
         }
       }
-      // For patients aged 72–83 (4 categories)
+      // For patients aged 72–83 years (4 categories)
       else if (age <= 83) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -615,17 +604,23 @@
             : "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO)";
           riskClass = 'low-risk';
         } else if (gfap <= 107.3) {
-          interpretation = strokeInterpretations[currentLang].intermediate;
+          interpretation = currentLang === 'de'
+            ? "Test nicht aussagekräftig"
+            : "Test not conclusive";
           riskClass = 'medium-risk';
         } else if (gfap <= 149.9) {
-          interpretation = strokeInterpretations[currentLang].high;
+          interpretation = currentLang === 'de'
+            ? "Hohe Wahrscheinlichkeit für ICH (83%)"
+            : "High risk of ICH (83%)";
           riskClass = 'high-risk';
         } else {
-          interpretation = strokeInterpretations[currentLang].veryHigh;
+          interpretation = currentLang === 'de'
+            ? "Sehr hohe Wahrscheinlichkeit für ICH (90%)"
+            : "Very high risk of ICH (90%)";
           riskClass = 'very-high-risk';
         }
       }
-      // For patients aged > 83 (3 categories)
+      // For patients aged > 83 years (3 categories)
       else {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -633,10 +628,14 @@
             : "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO)";
           riskClass = 'low-risk';
         } else if (gfap <= 146.5) {
-          interpretation = strokeInterpretations[currentLang].intermediate;
+          interpretation = currentLang === 'de'
+            ? "Test nicht aussagekräftig"
+            : "Test not conclusive";
           riskClass = 'medium-risk';
         } else {
-          interpretation = strokeInterpretations[currentLang].high;  // Using the high-risk interpretation (83%)
+          interpretation = currentLang === 'de'
+            ? "Hohe Wahrscheinlichkeit für ICH (83%)"
+            : "High risk of ICH (83%)";
           riskClass = 'high-risk';
         }
       }
@@ -685,7 +684,7 @@
       restartApp();
       switchLanguage('en');
       addEventListeners();
-      // The Install App button is fixed at the bottom; no further action required.
+      // Install App button remains fixed at the bottom.
     };
   </script>
 </body>
