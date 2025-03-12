@@ -373,7 +373,21 @@
       }
     };
 
-    // Stroke risk interpretations for each age group are handled inline in calculateStrokeRisk()
+    // Stroke risk interpretations based on the guide:
+    // For patients aged < 72 years (4 categories):
+    //   29–36.8: "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)" (green)
+    //   >36.8–49.2: "Test not conclusive" / "Test nicht aussagekräftig" (yellow)
+    //   >49.2–54: "High risk of ICH (85%)" / "Hohe Wahrscheinlichkeit für ICH (85%)" (orange)
+    //   >54: "Very high risk of ICH (91%)" / "Sehr hohe Wahrscheinlichkeit für ICH (91%)" (red)
+    // For patients aged 72–83 years (4 categories):
+    //   29–36.8: same as above (green)
+    //   >36.8–107.3: "Test not conclusive" / "Test nicht aussagekräftig" (yellow)
+    //   >107.3–149.9: "High risk of ICH (83%)" / "Hohe Wahrscheinlichkeit für ICH (83%)" (orange)
+    //   >149.9: "Very high risk of ICH (90%)" / "Sehr hohe Wahrscheinlichkeit für ICH (90%)" (red)
+    // For patients aged > 83 years (3 categories):
+    //   29–36.8: same as above (green)
+    //   >36.8–146.5: "Test not conclusive" / "Test nicht aussagekräftig" (yellow)
+    //   >146.5: "High risk of ICH (83%)" / "Hohe Wahrscheinlichkeit für ICH (83%)" (red)
 
     // Capture beforeinstallprompt event for PWA installation
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -474,7 +488,7 @@
         document.getElementById('moduleSelectionSection').style.display = 'block';
         errorElement.style.display = 'none';
       } else {
-        errorElement.innerText = translations[currentLang].accessError;
+        errorElement.innerText = texts.accessError || translations[currentLang].accessError;
         errorElement.style.display = 'block';
       }
       console.log("Access code validated.");
@@ -558,20 +572,23 @@
       });
     }
 
-    // Calculate stroke risk with updated interpretation rules
+    // Calculate stroke risk with updated interpretation rules and validation BEFORE showing the modal
     function calculateStrokeRisk() {
-      showDisclaimer();
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
       const result = document.getElementById('strokeResult');
+
+      // Validate input first; if invalid, show error and exit without showing modal
       if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
         result.innerText = (gfap < 29 || gfap > 10001) ? translations[currentLang].rangeError : translations[currentLang].invalidInput;
         result.className = 'result warning';
         result.style.display = 'block';
         return;
       }
+
       let interpretation = '';
       let riskClass = '';
+
       // For patients aged < 72 years (4 categories)
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
@@ -639,6 +656,7 @@
           riskClass = 'high-risk';
         }
       }
+
       const computedResult = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
       result.style.display = 'none';
       pendingResult = { element: result, html: computedResult, riskClass: riskClass };
@@ -684,7 +702,7 @@
       restartApp();
       switchLanguage('en');
       addEventListeners();
-      // Install App button remains fixed at the bottom.
+      // The fixed Install App button remains at the bottom.
     };
   </script>
 </body>
