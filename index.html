@@ -103,13 +103,23 @@
       display: none;
       text-align: center;
     }
-    /* Risk Colour Coding */
-    .low-risk { color: green; }
-    /* For three-level risk, medium-risk is yellow and high-risk is red */
-    .medium-risk { color: yellow; }
-    .high-risk { color: red; }
-    /* For four-level risk, we expect: low-risk (green), medium-risk (yellow), high-risk (orange), very-high-risk (red) */
-    .very-high-risk { color: red; }
+    /* Four-level risk color coding */
+    .low-risk { 
+      color: #28a745; 
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    .medium-risk { 
+      color: #daa520; 
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    .high-risk { 
+      color: #fd7e14; 
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    .very-high-risk { 
+      color: #dc3545; 
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
     .app-header {
       display: flex;
       justify-content: space-between;
@@ -528,7 +538,6 @@
       const prerequisite3 = document.getElementById('prerequisite3').checked;
       const prerequisite4 = document.getElementById('prerequisite4').checked;
       if (!(prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4)) {
-        // Display inline error message in red at the bottom of the prerequisites screen
         document.getElementById('prerequisiteError').innerText = currentLang === 'de'
           ? "Alle Voraussetzungen müssen erfüllt sein, damit die Berechnung gültig ist."
           : "All prerequisites must be fulfilled for the calculation to be valid.";
