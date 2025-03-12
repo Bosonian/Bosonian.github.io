@@ -15,7 +15,7 @@ self.addEventListener('install', event => {
         console.log('Caching app assets');
         return cache.addAll(ASSETS);
       })
-      .then(() => self.skipWaiting())
+      .then(() => self.skipWaiting()) // Activate the new service worker immediately
   );
 });
 
@@ -24,13 +24,11 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.filter(cacheName => {
-          return cacheName !== CACHE_NAME;
-        }).map(cacheName => {
-          return caches.delete(cacheName);
-        })
+        cacheNames
+          .filter(cacheName => cacheName !== CACHE_NAME) // Filter out the current cache
+          .map(cacheName => caches.delete(cacheName)) // Delete old caches
       );
-    }).then(() => self.clients.claim())
+    }).then(() => self.clients.claim()) // Take control of all clients
   );
 });
 
@@ -43,28 +41,25 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
-        
+
         // Otherwise fetch from network
         return fetch(event.request)
           .then(response => {
-            // Don't cache responses from external domains
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+            // Check if the response is valid and from the same origin
+            const isSameOrigin = new URL(event.request.url).origin === self.location.origin;
+            const isCacheable = response && response.status === 200 && isSameOrigin;
+
+            // Cache the response if it's valid and from the same origin
+            if (isCacheable) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => cache.put(event.request, responseToCache));
             }
-            
-            // Clone the response
-            const responseToCache = response.clone();
-            
-            // Add to cache for future use
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-              
+
             return response;
           })
           .catch(() => {
-            // If both cache and network fail, return a basic offline page
+            // If both cache and network fail, return the offline fallback
             if (event.request.headers.get('accept').includes('text/html')) {
               return caches.match('/index.html');
             }
