@@ -103,7 +103,7 @@
       display: none;
       text-align: center;
     }
-    /* Risk styling: green, yellow, orange, red */
+    /* Risk styling */
     .low-risk { color: green; }
     .medium-risk { color: goldenrod; }
     .high-risk { color: orange; }
@@ -373,6 +373,8 @@
       }
     };
 
+    // Stroke risk interpretations for each age group are handled inline in calculateStrokeRisk()
+
     // Capture beforeinstallprompt event for PWA installation
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -556,23 +558,20 @@
       });
     }
 
-    // Calculate stroke risk with updated interpretation rules and input validation BEFORE showing modal
+    // Calculate stroke risk with updated interpretation rules
     function calculateStrokeRisk() {
+      showDisclaimer();
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
       const result = document.getElementById('strokeResult');
-
-      // Validate input first. If invalid, show error and do not show disclaimer modal.
       if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
         result.innerText = (gfap < 29 || gfap > 10001) ? translations[currentLang].rangeError : translations[currentLang].invalidInput;
         result.className = 'result warning';
         result.style.display = 'block';
         return;
       }
-
       let interpretation = '';
       let riskClass = '';
-
       // For patients aged < 72 years (4 categories)
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
@@ -640,7 +639,6 @@
           riskClass = 'high-risk';
         }
       }
-
       const computedResult = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
       result.style.display = 'none';
       pendingResult = { element: result, html: computedResult, riskClass: riskClass };
@@ -686,7 +684,7 @@
       restartApp();
       switchLanguage('en');
       addEventListeners();
-      // The fixed Install App button remains at the bottom.
+      // Install App button remains fixed at the bottom.
     };
   </script>
 </body>
