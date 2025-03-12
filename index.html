@@ -33,14 +33,14 @@
       background-color: var(--background-color);
       color: var(--text-color);
     }
-    /* Container style with dark mode adjustment */
+    /* Container style */
     .container {
       max-width: 500px;
       margin: 70px auto 20px auto;
       padding: 20px;
       background-color: white;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     body.dark-mode .container {
       background-color: #444;
@@ -50,11 +50,9 @@
       margin-bottom: 15px;
       text-align: left;
     }
-    .input-group label,
-    .checkbox-group label {
+    .input-group label, .checkbox-group label {
       margin-bottom: 5px;
     }
-    /* Display checkboxes and labels inline */
     .checkbox-group {
       display: flex;
       align-items: center;
@@ -73,9 +71,6 @@
       border: 2px solid var(--primary-color);
       border-radius: 5px;
     }
-    .button-group {
-      margin-top: 20px;
-    }
     button {
       padding: 12px;
       margin-top: 15px;
@@ -84,11 +79,11 @@
       cursor: pointer;
       font-size: 16px;
       transition: background-color 0.3s ease;
+      width: 100%;
     }
     .primary {
       background-color: var(--primary-color);
       color: white;
-      width: 100%;
     }
     .primary:hover {
       background-color: var(--primary-hover);
@@ -96,7 +91,6 @@
     .secondary {
       background-color: var(--secondary-color);
       color: white;
-      width: 100%;
     }
     .secondary:hover {
       background-color: var(--secondary-hover);
@@ -110,9 +104,11 @@
       display: none;
       text-align: center;
     }
+    /* Risk styling: for 4-category (green, yellow, orange, red) and 3-category (green, yellow, red) */
     .low-risk { color: green; }
-    .medium-risk { color: orange; }
-    .high-risk, .very-high-risk { color: red; }
+    .medium-risk { color: goldenrod; }  /* yellow-ish */
+    .high-risk { color: orange; }
+    .very-high-risk { color: red; }
     .warning {
       font-size: 12px;
       color: red;
@@ -129,38 +125,12 @@
       top: 0;
       z-index: 999;
     }
-    .header-left h1 {
-      margin: 0;
-      font-size: 20px;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .language-switcher {
-      display: flex;
-      gap: 5px;
-    }
-    .language-switcher button {
-      background: none;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-    }
-    .language-switcher button img {
-      width: 24px;
-      height: 16px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-    #darkModeToggle {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: white;
-    }
+    .header-left h1 { margin: 0; font-size: 20px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .language-switcher { display: flex; gap: 5px; }
+    .language-switcher button { background: none; border: none; padding: 0; cursor: pointer; }
+    .language-switcher button img { width: 24px; height: 16px; border: 1px solid #ccc; border-radius: 3px; }
+    #darkModeToggle { background: none; border: none; font-size: 20px; cursor: pointer; color: white; }
     .home-button {
       background: white;
       color: var(--primary-color);
@@ -170,7 +140,7 @@
       cursor: pointer;
     }
     .home-button:hover { background-color: #f2f2f2; }
-    /* Modal styling with transitions */
+    /* Modal styling */
     .modal {
       display: none;
       position: fixed;
@@ -179,7 +149,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(0,0,0,0.6);
       opacity: 0;
       transition: opacity 0.3s ease;
     }
@@ -199,7 +169,7 @@
       color: var(--text-color);
       border: 1px solid #555;
     }
-    /* Install button styling (fixed at bottom center, non-intrusive) */
+    /* Fixed Install App button at bottom center */
     #installButton {
       position: fixed;
       bottom: 20px;
@@ -242,7 +212,7 @@
     <p id="codePrompt">🔑 Please enter your access code:</p>
     <input type="password" id="accessCodeInput" placeholder="Enter code" aria-label="Access Code">
     <button class="primary" id="accessCodeButton" aria-label="Submit Access Code">Submit</button>
-    <p id="accessError" class="warning" style="display: none;">Incorrect code. Please try again.</p>
+    <p id="accessError" class="warning" style="display:none;">Incorrect code. Please try again.</p>
   </section>
 
   <!-- Module Selection Screen -->
@@ -289,7 +259,7 @@
     </div>
     <button class="primary" id="proceedButton" aria-label="Proceed to Stroke Calculation">Proceed to Calculation</button>
     <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
-    <p id="prerequisiteError" class="warning" style="display: none;"></p>
+    <p id="prerequisiteError" class="warning" style="display:none;"></p>
   </section>
 
   <!-- Stroke Module Screen -->
@@ -301,16 +271,14 @@
     </div>
     <div class="input-group">
       <label for="gfapStrokeInput" id="gfapStrokeLabel">GFAP Value (pg/mL)</label>
-      <input type="number" id="gfapStrokeInput" min="0" max="10001" aria-label="GFAP Value for Stroke">
+      <input type="number" id="gfapStrokeInput" min="29" max="10001" aria-label="GFAP Value for Stroke">
     </div>
     <button class="primary" id="calculateStrokeButton" aria-label="Calculate Stroke Risk">Calculate Probability</button>
     <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
     <div class="result" id="strokeResult"></div>
   </section>
 
-  <!-- Installation Icons Container is removed; instead, a fixed Install App button is added below -->
-
-  <footer style="text-align: center; margin-top: 20px;">
+  <footer style="text-align:center; margin-top:20px;">
     <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
   </footer>
 
@@ -322,7 +290,7 @@
     </div>
   </div>
 
-  <!-- Fixed Install App Button at the bottom center -->
+  <!-- Fixed Install App Button at bottom center -->
   <button id="installButton" aria-label="Install App">Install App</button>
 
   <script>
@@ -334,11 +302,11 @@
     const extendedTranslations = {
       en: {
         disclaimerConfirm: "Confirm",
-        alreadyInstalled: "App already installed.",
+        alreadyInstalled: "App already installed."
       },
       de: {
         disclaimerConfirm: "Einverstanden",
-        alreadyInstalled: "App bereits installiert.",
+        alreadyInstalled: "App bereits installiert."
       }
     };
 
@@ -411,14 +379,14 @@
       en: {
         low: "Ischemic stroke very likely.",
         intermediate: "Test not conclusive",
-        high: "ICH risk high ~ 85%.",
-        veryHigh: "ICH risk very high ~ 91%."
+        high: "High risk of ICH (85%)",
+        veryHigh: "Very high risk of ICH (91%)"
       },
       de: {
         low: "Ischämischer Schlaganfall sehr wahrscheinlich.",
         intermediate: "Test nicht aussagekräftig",
-        high: "ICH Risiko hoch ~ 85%.",
-        veryHigh: "ICH Risiko sehr hoch ~ 91%."
+        high: "Hohe Wahrscheinlichkeit für ICH (83%)",
+        veryHigh: "Sehr hohe Wahrscheinlichkeit für ICH (90%)"
       }
     };
 
@@ -427,7 +395,7 @@
       e.preventDefault();
       deferredPrompt = e;
       console.log("beforeinstallprompt event captured.");
-      // Make sure the install button is visible (it's fixed at bottom)
+      // The Install App button is already fixed at the bottom.
     });
 
     // Helper: Detect mobile operating system
@@ -454,12 +422,12 @@
             deferredPrompt = null;
           });
         } else {
-          alert(translations[currentLang].alreadyInstalled);
+          alert(extendedTranslations[currentLang].alreadyInstalled);
         }
       } else if (os === 'iOS') {
         alert("Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol und wählen Sie 'Zum Home-Bildschirm hinzufügen'.");
       } else if (os === 'Windows') {
-        alert("Um die App als Web App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen 'Diese Seite als App installieren'.");
+        alert("Um die App als Web App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen Sie 'Diese Seite als App installieren'.");
       } else {
         alert("Installation not supported on this platform.");
       }
@@ -497,7 +465,6 @@
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
       document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
-      // Update modal confirm button text
       document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
       console.log("Language switched to:", lang);
     }
@@ -607,26 +574,27 @@
       });
     }
 
-    // Calculate stroke risk with updated interpretation values (result revealed on confirm)
+    // Calculate stroke risk with updated interpretation values and rules
     function calculateStrokeRisk() {
       showDisclaimer();
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
       const result = document.getElementById('strokeResult');
-      if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 0 || gfap > 10001) {
-        result.innerText = translations[currentLang].invalidInput;
+      if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
+        result.innerText = (gfap < 29 || gfap > 10001) ? translations[currentLang].rangeError : translations[currentLang].invalidInput;
         result.className = 'result warning';
         result.style.display = 'block';
         return;
       }
       let interpretation = '';
       let riskClass = '';
+      // For patients aged < 72 (4 categories)
       if (age < 72) {
-        if (gfap < 29) {
-          interpretation = translations[currentLang].lowRisk;
-          riskClass = 'low-risk';
-        } else if (gfap <= 36.8) {
-          interpretation = translations[currentLang].lowRisk;
+        if (gfap >= 29 && gfap <= 36.8) {
+          // Use the specified text for 29-36.8
+          interpretation = currentLang === 'de'
+            ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
+            : "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO)";
           riskClass = 'low-risk';
         } else if (gfap <= 49.2) {
           interpretation = strokeInterpretations[currentLang].intermediate;
@@ -636,14 +604,15 @@
           riskClass = 'high-risk';
         } else {
           interpretation = strokeInterpretations[currentLang].veryHigh;
-          riskClass = 'high-risk';
+          riskClass = 'very-high-risk';
         }
-      } else if (age <= 83) {
-        if (gfap < 29) {
-          interpretation = translations[currentLang].lowRisk;
-          riskClass = 'low-risk';
-        } else if (gfap <= 36.8) {
-          interpretation = translations[currentLang].lowRisk;
+      }
+      // For patients aged 72–83 (4 categories)
+      else if (age <= 83) {
+        if (gfap >= 29 && gfap <= 36.8) {
+          interpretation = currentLang === 'de'
+            ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
+            : "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO)";
           riskClass = 'low-risk';
         } else if (gfap <= 107.3) {
           interpretation = strokeInterpretations[currentLang].intermediate;
@@ -653,20 +622,21 @@
           riskClass = 'high-risk';
         } else {
           interpretation = strokeInterpretations[currentLang].veryHigh;
-          riskClass = 'high-risk';
+          riskClass = 'very-high-risk';
         }
-      } else {
-        if (gfap < 29) {
-          interpretation = translations[currentLang].lowRisk;
-          riskClass = 'low-risk';
-        } else if (gfap <= 36.8) {
-          interpretation = translations[currentLang].lowRisk;
+      }
+      // For patients aged > 83 (3 categories)
+      else {
+        if (gfap >= 29 && gfap <= 36.8) {
+          interpretation = currentLang === 'de'
+            ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
+            : "High probability of cerebral infarction. If FAST ED ≥ 4, high probability of Large Vessel Occlusion (LVO)";
           riskClass = 'low-risk';
         } else if (gfap <= 146.5) {
           interpretation = strokeInterpretations[currentLang].intermediate;
           riskClass = 'medium-risk';
         } else {
-          interpretation = strokeInterpretations[currentLang].high;
+          interpretation = strokeInterpretations[currentLang].high;  // Using the high-risk interpretation (83%)
           riskClass = 'high-risk';
         }
       }
@@ -715,7 +685,7 @@
       restartApp();
       switchLanguage('en');
       addEventListeners();
-      showInstallIcons();
+      // The Install App button is fixed at the bottom; no further action required.
     };
   </script>
 </body>
