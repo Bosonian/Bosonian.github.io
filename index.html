@@ -202,8 +202,9 @@
       color: var(--text-color);
       border: 1px solid #555;
     }
+    /* Installation icons section */
     .install-icons {
-      display: none; /* Initially hidden; will be shown on beforeinstallprompt event */
+      display: none; /* initially hidden */
       justify-content: center;
       margin-top: 20px;
     }
@@ -429,16 +430,16 @@
       }
     };
 
-    // Capture the beforeinstallprompt event
+    // Capture the beforeinstallprompt event for PWA install
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       console.log("BeforeInstallPrompt event captured.");
-      // Show the install icons
+      // Show the install icons container
       document.getElementById('installIcons').style.display = 'flex';
     });
 
-    // New function to install Android version
+    // Function to install the app on Android
     function installAndroid() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -466,7 +467,6 @@
         androidIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/3/31/Android_robot.svg';
         androidIcon.alt = 'Install on Android';
         androidIcon.style.cursor = 'pointer';
-        // Use the new installAndroid() function
         androidIcon.addEventListener('click', installAndroid);
         installIconsDiv.appendChild(androidIcon);
       } else if (os === 'iOS') {
@@ -500,6 +500,21 @@
       btn.addEventListener('click', handler);
     }
 
+    // OS detection function
+    function getMobileOperatingSystem() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      if (/windows phone/i.test(userAgent)) {
+        return "Windows";
+      }
+      if (/android/i.test(userAgent)) {
+        return "Android";
+      }
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+      }
+      return "unknown";
+    }
+
     // Update UI text based on the selected language
     function switchLanguage(lang) {
       currentLang = lang;
@@ -507,7 +522,7 @@
       document.getElementById('appTitle').innerText = texts.appTitle;
       document.getElementById('codePrompt').innerText = texts.codePrompt;
       document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-      // Update module selection buttons without "for"/"für"
+      // Update module selection buttons
       document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
       document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -524,7 +539,7 @@
       document.getElementById('ageLabel').innerText = texts.ageLabel;
       // Update prerequisite error message text
       document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
-      // Also update module screen headings if they exist:
+      // Update module screen headings if they exist:
       if (document.getElementById('comaModuleTitle')) {
         document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
       }
