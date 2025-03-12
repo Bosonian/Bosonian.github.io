@@ -482,6 +482,16 @@
       }
     }
 
+    // Helper: Attach a one-time click handler to the confirm button
+    function attachDisclaimerConfirmHandler(callback) {
+      const btn = document.getElementById('disclaimerConfirmButton');
+      function handler() {
+        callback();
+        btn.removeEventListener('click', handler);
+      }
+      btn.addEventListener('click', handler);
+    }
+
     // Update UI text based on the selected language
     function switchLanguage(lang) {
       currentLang = lang;
@@ -613,15 +623,14 @@
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
       result.style.display = 'none';
       pendingResult = { element: result, html: computedResult, riskClass: (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk') };
-      document.getElementById('disclaimerConfirmButton').onclick = function() {
+      attachDisclaimerConfirmHandler(() => {
         closeDisclaimer();
         pendingResult.element.innerHTML = pendingResult.html;
         pendingResult.element.className = 'result ' + pendingResult.riskClass;
         pendingResult.element.style.display = 'block';
         pendingResult = null;
-        this.onclick = null;
         console.log("Coma risk result revealed.");
-      };
+      });
     }
 
     // Calculate stroke risk (modified to wait for confirmation via the disclaimer modal)
@@ -690,15 +699,14 @@
       const computedResult = `<strong>${translations[currentLang].interpretation}:</strong> ${interpretation}`;
       result.style.display = 'none';
       pendingResult = { element: result, html: computedResult, riskClass: riskClass };
-      document.getElementById('disclaimerConfirmButton').onclick = function() {
+      attachDisclaimerConfirmHandler(() => {
         closeDisclaimer();
         pendingResult.element.innerHTML = pendingResult.html;
         pendingResult.element.className = 'result ' + pendingResult.riskClass;
         pendingResult.element.style.display = 'block';
         pendingResult = null;
-        this.onclick = null;
         console.log("Stroke risk result revealed.");
-      };
+      });
       console.log("Stroke risk calculated, waiting for confirmation.");
     }
 
