@@ -103,16 +103,15 @@
       display: none;
       text-align: center;
     }
-    /* Risk styling */
+    /* Risk Colour Coding */
     .low-risk { color: green; }
-    .medium-risk { color: goldenrod; }
-    .high-risk { color: orange; }
+    /* For three-level risk, medium-risk is yellow and high-risk is red */
+    .medium-risk { color: yellow; }
+    .high-risk { color: red; }
+    /* For four-level risk, high-risk will be orange and very-high-risk red */
     .very-high-risk { color: red; }
-    .warning {
-      font-size: 12px;
-      color: red;
-      margin-top: 10px;
-    }
+    /* (In four-level cases, we’ll assign classes accordingly in the stroke risk calculation) */
+
     .app-header {
       display: flex;
       justify-content: space-between;
@@ -180,7 +179,7 @@
       font-size: 14px;
       z-index: 1000;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      display: none; /* Hidden by default */
+      display: none;
     }
     #installButton:hover {
       background-color: var(--secondary-hover);
@@ -217,17 +216,13 @@
   <!-- Module Selection Screen -->
   <section id="moduleSelectionSection" class="container" style="display:none;">
     <h2 id="moduleSelectionTitle">Check probability for:</h2>
-    <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">
-      Intracranial Hemorrhage in Comatose Patients (GCS 3-8)
-    </button>
-    <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">
-      Intracerebral Hemorrhage in Patients with Stroke Symptoms
-    </button>
+    <button class="primary" id="comaModuleButton" aria-label="Select Coma Module"></button>
+    <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module"></button>
   </section>
 
   <!-- Coma Module Screen -->
   <section id="comaModuleSection" class="container" style="display:none;">
-    <h2 id="comaModuleTitle">Intracranial Hemorrhage in Comatose Patients (GCS 3-8)</h2>
+    <h2 id="comaModuleTitle">Intracranial hemorrhage in comatose patients (GCS 3-8)</h2>
     <div class="input-group">
       <label for="gfapComaInput" id="gfapComaLabel">GFAP Value (pg/mL)</label>
       <input type="number" id="gfapComaInput" min="29" max="10001" placeholder="GFAP Value (pg/mL)" aria-label="GFAP Value for Coma">
@@ -263,7 +258,7 @@
 
   <!-- Stroke Module Screen -->
   <section id="strokeModuleSection" class="container" style="display:none;">
-    <h2 id="strokeModuleTitle">Intracerebral Hemorrhage in Patients with Stroke Symptoms</h2>
+    <h2 id="strokeModuleTitle">Intracerebral hemorrhage in patients with stroke symptoms</h2>
     <div class="input-group">
       <label for="ageInput" id="ageLabel">Patient Age (Years)</label>
       <input type="number" id="ageInput" min="1" max="120" placeholder="Patient Age (Years)" aria-label="Patient Age">
@@ -304,14 +299,14 @@
       de: { disclaimerConfirm: "Einverstanden", alreadyInstalled: "App bereits installiert." }
     };
 
-    // Language translations (including prerequisites keys)
+    // Language translations (including module texts and prerequisites)
     const translations = {
       en: {
         appTitle: "iGFAP Check",
         codePrompt: "🔑 Please enter your access code:",
         moduleSelectionTitle: "Check probability for:",
-        comaModuleTitle: "Probability of Intracranial Hemorrhage in Comatose Patients (GCS 3-8)",
-        strokeModuleTitle: "Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms",
+        comaModuleTitle: "Intracranial hemorrhage in comatose patients (GCS 3-8)",
+        strokeModuleTitle: "Intracerebral hemorrhage in patients with stroke symptoms",
         strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
         accessError: "Incorrect code. Please try again.",
         calculateButton: "Calculate Probability",
@@ -337,8 +332,8 @@
         appTitle: "iGFAP Check",
         codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
         moduleSelectionTitle: "Wahrscheinlichkeit prüfen für:",
-        comaModuleTitle: "Wahrscheinlichkeit für intrakranielle Blutungen bei komatösen Patienten (GCS 3-8)",
-        strokeModuleTitle: "Wahrscheinlichkeit für intracerebrale Blutungen bei Schlaganfallsymptomen",
+        comaModuleTitle: "Intrakranielle Blutungen bei komatösen Patienten (GCS 3-8)",
+        strokeModuleTitle: "Intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
         strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
         accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
         calculateButton: "Wahrscheinlichkeit berechnen",
@@ -356,11 +351,25 @@
         gfapLabel: "GFAP-Wert (pg/mL)",
         ageLabel: "Patientenalter (Jahre)",
         prerequisite1: "Gesichertes Zeitfenster < 6 Stunden",
-        prerequisite2: "Keine neurologische Defizite in den Stunden/Dagen vor dem Ereignis",
+        prerequisite2: "Keine neurologischen Defizite vor dem Ereignis",
         prerequisite3: "Kein erkennbares Schädel-Hirn-Trauma (schwerer Sturz)",
         prerequisite4: "FAST ED Score >= 3 Punkte"
       }
     };
+
+    // Auto-detect system language and dark mode preference on load
+    window.addEventListener('load', function() {
+      // Detect dark mode preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+      }
+      // Auto-detect language; if system language starts with 'de', switch to German
+      if (navigator.language && navigator.language.toLowerCase().startsWith('de')) {
+        switchLanguage('de');
+      } else {
+        switchLanguage('en');
+      }
+    });
 
     // Hide the install button by default
     document.addEventListener('DOMContentLoaded', function() {
@@ -432,13 +441,14 @@
       btn.addEventListener('click', handler);
     }
 
-    // Update UI text based on selected language (including headings, input placeholders, and prerequisites)
+    // Update UI text based on selected language (including headings, input placeholders, prerequisites, and button texts)
     function switchLanguage(lang) {
       currentLang = lang;
       const texts = translations[lang];
       document.getElementById('appTitle').innerText = texts.appTitle;
       document.getElementById('codePrompt').innerText = texts.codePrompt;
       document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
+      // Set button texts for module selection
       document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
       document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -536,7 +546,7 @@
       console.log("Disclaimer modal closed.");
     }
 
-    // Calculate Coma Risk
+    // Calculate Coma Risk (three-level risk: green, yellow, red)
     function calculateComaRisk() {
       const gfap = parseFloat(document.getElementById('gfapComaInput').value);
       const result = document.getElementById('comaResult');
@@ -553,9 +563,12 @@
       if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
       else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
       else riskLevel = translations[currentLang].highRisk;
+      // For three-level risk: assign low-risk (green), medium-risk (yellow), high-risk (red)
+      let riskClass = (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : 
+                       riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk');
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
       result.style.display = 'none';
-      pendingResult = { element: result, html: computedResult, riskClass: (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk') };
+      pendingResult = { element: result, html: computedResult, riskClass: riskClass };
       attachDisclaimerConfirmHandler(() => {
         closeDisclaimer();
         pendingResult.element.innerHTML = pendingResult.html;
@@ -566,7 +579,7 @@
       });
     }
 
-    // Calculate Stroke Risk
+    // Calculate Stroke Risk (four-level risk for ages < 72 and <= 83; three-level for ages > 83)
     function calculateStrokeRisk() {
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
@@ -583,6 +596,7 @@
 
       let interpretation = '';
       let riskClass = '';
+      // For patients aged < 72 and those aged <=83, we use four interpretations; for ages >83, three interpretations.
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -627,7 +641,7 @@
             : "Very high risk of ICH (90%)";
           riskClass = 'very-high-risk';
         }
-      } else {
+      } else { // For patients aged > 83, use three-level interpretation
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
@@ -688,7 +702,7 @@
     window.onload = function() {
       document.getElementById('currentYear').innerText = new Date().getFullYear();
       restartApp();
-      switchLanguage('en');
+      // Auto-detect language and dark mode (set earlier in the load event listener)
       addEventListeners();
     };
   </script>
