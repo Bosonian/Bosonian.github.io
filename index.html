@@ -218,19 +218,19 @@
   <section id="moduleSelectionSection" class="container" style="display:none;">
     <h2 id="moduleSelectionTitle">Check probability for:</h2>
     <button class="primary" id="comaModuleButton" aria-label="Select Coma Module">
-      intracranial hemorrhage in comatose patients (GCS 3-8)
+      Intracranial Hemorrhage in Comatose Patients (GCS 3-8)
     </button>
     <button class="primary" id="strokeModuleButton" aria-label="Select Stroke Module">
-      intracerebral hemorrhage in patients with stroke symptoms
+      Intracerebral Hemorrhage in Patients with Stroke Symptoms
     </button>
   </section>
 
   <!-- Coma Module Screen -->
   <section id="comaModuleSection" class="container" style="display:none;">
-    <h2 id="comaModuleTitle">Probability of Intracranial Hemorrhage in Comatose Patients</h2>
+    <h2 id="comaModuleTitle">Intracranial Hemorrhage in Comatose Patients (GCS 3-8)</h2>
     <div class="input-group">
       <label for="gfapComaInput" id="gfapComaLabel">GFAP Value (pg/mL)</label>
-      <input type="number" id="gfapComaInput" min="29" max="10001" aria-label="GFAP Value for Coma">
+      <input type="number" id="gfapComaInput" min="29" max="10001" placeholder="GFAP Value (pg/mL)" aria-label="GFAP Value for Coma">
     </div>
     <button class="primary" id="calculateComaButton" aria-label="Calculate Coma Risk">Calculate Probability</button>
     <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
@@ -242,19 +242,19 @@
     <h2 id="strokePrerequisiteTitle">Prerequisites for Stroke Risk Calculation</h2>
     <div class="checkbox-group">
       <input type="checkbox" id="prerequisite1" aria-label="Confirmed time window less than 6 hours">
-      <label for="prerequisite1" id="prerequisite1Label">Gesichertes Zeitfenster &lt; 6 Stunden</label>
+      <label for="prerequisite1" id="prerequisite1Label">Confirmed time window &lt; 6 hours</label>
     </div>
     <div class="checkbox-group">
       <input type="checkbox" id="prerequisite2" aria-label="No neurological deficits before the event">
-      <label for="prerequisite2" id="prerequisite2Label">Keine neurologische Defizite in den Stunden / Tagen vor dem Ereignis</label>
+      <label for="prerequisite2" id="prerequisite2Label">No neurological deficits before the event</label>
     </div>
     <div class="checkbox-group">
       <input type="checkbox" id="prerequisite3" aria-label="No identifiable head trauma">
-      <label for="prerequisite3" id="prerequisite3Label">Kein erkennbares Schädel Hirn Trauma (schwerer Sturz)</label>
+      <label for="prerequisite3" id="prerequisite3Label">No identifiable head trauma (severe fall)</label>
     </div>
     <div class="checkbox-group">
       <input type="checkbox" id="prerequisite4" aria-label="FAST ED Score greater or equal to 3">
-      <label for="prerequisite4" id="prerequisite4Label">FAST ED Score >= 3 Punkte</label>
+      <label for="prerequisite4" id="prerequisite4Label">FAST ED Score &gt;= 3 points</label>
     </div>
     <button class="primary" id="proceedButton" aria-label="Proceed to Stroke Calculation">Proceed to Calculation</button>
     <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
@@ -263,14 +263,14 @@
 
   <!-- Stroke Module Screen -->
   <section id="strokeModuleSection" class="container" style="display:none;">
-    <h2 id="strokeModuleTitle">Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms</h2>
+    <h2 id="strokeModuleTitle">Intracerebral Hemorrhage in Patients with Stroke Symptoms</h2>
     <div class="input-group">
       <label for="ageInput" id="ageLabel">Patient Age (Years)</label>
-      <input type="number" id="ageInput" min="1" max="120" aria-label="Patient Age">
+      <input type="number" id="ageInput" min="1" max="120" placeholder="Patient Age (Years)" aria-label="Patient Age">
     </div>
     <div class="input-group">
       <label for="gfapStrokeInput" id="gfapStrokeLabel">GFAP Value (pg/mL)</label>
-      <input type="number" id="gfapStrokeInput" min="29" max="10001" aria-label="GFAP Value for Stroke">
+      <input type="number" id="gfapStrokeInput" min="29" max="10001" placeholder="GFAP Value (pg/mL)" aria-label="GFAP Value for Stroke">
     </div>
     <button class="primary" id="calculateStrokeButton" aria-label="Calculate Stroke Risk">Calculate Probability</button>
     <button class="secondary" onclick="restartApp()" aria-label="Go Back">⬅️ Back</button>
@@ -304,14 +304,14 @@
       de: { disclaimerConfirm: "Einverstanden", alreadyInstalled: "App bereits installiert." }
     };
 
-    // Language translations
+    // Language translations (including prerequisites keys)
     const translations = {
       en: {
         appTitle: "iGFAP Check",
         codePrompt: "🔑 Please enter your access code:",
         moduleSelectionTitle: "Check probability for:",
-        comaModuleTitle: "intracranial hemorrhage in comatose patients (GCS 3-8)",
-        strokeModuleTitle: "intracerebral hemorrhage in patients with stroke symptoms",
+        comaModuleTitle: "Probability of Intracranial Hemorrhage in Comatose Patients (GCS 3-8)",
+        strokeModuleTitle: "Probability of Intracerebral Hemorrhage in Patients with Stroke Symptoms",
         strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
         accessError: "Incorrect code. Please try again.",
         calculateButton: "Calculate Probability",
@@ -327,14 +327,18 @@
         riskLevel: "Risk Level",
         interpretation: "Interpretation",
         gfapLabel: "GFAP Value (pg/mL)",
-        ageLabel: "Patient Age (Years)"
+        ageLabel: "Patient Age (Years)",
+        prerequisite1: "Confirmed time window < 6 hours",
+        prerequisite2: "No neurological deficits before the event",
+        prerequisite3: "No identifiable head trauma (severe fall)",
+        prerequisite4: "FAST ED Score >= 3 points"
       },
       de: {
         appTitle: "iGFAP Check",
         codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
         moduleSelectionTitle: "Wahrscheinlichkeit prüfen für:",
-        comaModuleTitle: "intrakranielle Blutungen bei komatösen Patienten (GCS 3-8)",
-        strokeModuleTitle: "intracerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
+        comaModuleTitle: "Wahrscheinlichkeit für intrakranielle Blutungen bei komatösen Patienten (GCS 3-8)",
+        strokeModuleTitle: "Wahrscheinlichkeit für intracerebrale Blutungen bei Schlaganfallsymptomen",
         strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
         accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
         calculateButton: "Wahrscheinlichkeit berechnen",
@@ -350,7 +354,11 @@
         riskLevel: "Risikostufe",
         interpretation: "Interpretation",
         gfapLabel: "GFAP-Wert (pg/mL)",
-        ageLabel: "Patientenalter (Jahre)"
+        ageLabel: "Patientenalter (Jahre)",
+        prerequisite1: "Gesichertes Zeitfenster < 6 Stunden",
+        prerequisite2: "Keine neurologische Defizite in den Stunden/Dagen vor dem Ereignis",
+        prerequisite3: "Kein erkennbares Schädel-Hirn-Trauma (schwerer Sturz)",
+        prerequisite4: "FAST ED Score >= 3 Punkte"
       }
     };
 
@@ -424,7 +432,7 @@
       btn.addEventListener('click', handler);
     }
 
-    // Update UI text based on selected language
+    // Update UI text based on selected language (including headings, input placeholders, and prerequisites)
     function switchLanguage(lang) {
       currentLang = lang;
       const texts = translations[lang];
@@ -442,6 +450,18 @@
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
+      // Update module headings
+      document.getElementById('comaModuleTitle').innerText = texts.comaModuleTitle;
+      document.getElementById('strokeModuleTitle').innerText = texts.strokeModuleTitle;
+      // Update input placeholders
+      document.getElementById('gfapComaInput').setAttribute("placeholder", texts.gfapLabel);
+      document.getElementById('gfapStrokeInput').setAttribute("placeholder", texts.gfapLabel);
+      document.getElementById('ageInput').setAttribute("placeholder", texts.ageLabel);
+      // Update prerequisite labels
+      document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
+      document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
+      document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
+      document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
       console.log("Language switched to:", lang);
     }
 
