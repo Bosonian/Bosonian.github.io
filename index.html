@@ -18,7 +18,6 @@
       --background-color: #f8f9fa;
       --text-color: #333;
     }
-    /* Dark mode overrides */
     body.dark-mode {
       --primary-color: #3399ff;
       --primary-hover: #287ac7;
@@ -155,7 +154,6 @@
       border: 1px solid #ccc;
       border-radius: 3px;
     }
-    /* Dark Mode Toggle button styling */
     #darkModeToggle {
       background: none;
       border: none;
@@ -196,28 +194,27 @@
       border-radius: 10px;
       text-align: center;
     }
-    /* Dark mode override for modals */
     body.dark-mode .modal-content {
       background-color: #444;
       color: var(--text-color);
       border: 1px solid #555;
     }
-    /* Installation icons section */
-    .install-icons {
-      display: none; /* initially hidden */
-      justify-content: center;
-      margin-top: 20px;
+    /* Install button styling (fixed at bottom center, non-intrusive) */
+    #installButton {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
-    .install-icons img {
-      width: 40px;
-      height: 40px;
-      margin: 0 10px;
-      cursor: pointer;
-    }
-    .module-subtext {
-      font-size: 12px;
-      color: #666;
-      margin-top: 5px;
+    #installButton:hover {
+      background-color: var(--secondary-hover);
     }
   </style>
 </head>
@@ -311,44 +308,37 @@
     <div class="result" id="strokeResult"></div>
   </section>
 
-  <!-- Installation Icons -->
-  <div class="install-icons" id="installIcons">
-    <!-- Installation icons will be added here based on OS detection -->
-  </div>
+  <!-- Installation Icons Container is removed; instead, a fixed Install App button is added below -->
 
   <footer style="text-align: center; margin-top: 20px;">
     <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
   </footer>
 
-  <!-- iOS Install Modal (for future customization) -->
-  <div id="iosInstallModal" class="modal" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <div id="iosInstallContent"></div>
-    </div>
-  </div>
-
   <!-- Disclaimer Modal (only Confirm button) -->
-  <div id="disclaimerModal" class="modal" role="dialog" aria-modal="true">
+  <div id="disclaimerModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal-content">
       <p id="disclaimerText"></p>
       <button class="primary" id="disclaimerConfirmButton" aria-label="Confirm Disclaimer">Confirm</button>
     </div>
   </div>
 
+  <!-- Fixed Install App Button at the bottom center -->
+  <button id="installButton" aria-label="Install App">Install App</button>
+
   <script>
     let currentLang = 'en';
-    let deferredPrompt; // For storing the beforeinstallprompt event
+    let deferredPrompt = null;
     let pendingResult = null; // To store computed result until confirmation
 
-    // Extended translations for confirm button and alreadyInstalled message
+    // Extended translations for confirm button, alreadyInstalled message, and range error
     const extendedTranslations = {
       en: {
         disclaimerConfirm: "Confirm",
-        alreadyInstalled: "App already installed."
+        alreadyInstalled: "App already installed.",
       },
       de: {
         disclaimerConfirm: "Einverstanden",
-        alreadyInstalled: "App bereits installiert."
+        alreadyInstalled: "App bereits installiert.",
       }
     };
 
@@ -367,6 +357,7 @@
         calculateButton: "Calculate Probability",
         proceedButton: "Proceed to Calculation",
         invalidInput: "Please enter a valid value!",
+        rangeError: "Please enter a value between 29 and 10001 pg/mL.",
         lowRisk: "Low Risk",
         mediumRisk: "Medium Risk",
         highRisk: "High Risk",
@@ -396,6 +387,7 @@
         calculateButton: "Wahrscheinlichkeit berechnen",
         proceedButton: "Zur Berechnung fortfahren",
         invalidInput: "Bitte geben Sie einen gültigen Wert ein!",
+        rangeError: "Bitte geben Sie einen Wert zwischen 29 und 10001 pg/mL ein.",
         lowRisk: "Geringes Risiko",
         mediumRisk: "Mittleres Risiko",
         highRisk: "Hohes Risiko",
@@ -430,67 +422,50 @@
       }
     };
 
-    // Capture the beforeinstallprompt event for PWA install
+    // Capture beforeinstallprompt event for PWA installation
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      console.log("BeforeInstallPrompt event captured.");
-      // Show the install icons container
-      document.getElementById('installIcons').style.display = 'flex';
+      console.log("beforeinstallprompt event captured.");
+      // Make sure the install button is visible (it's fixed at bottom)
     });
 
-    // Function to install the app on Android
-    function installAndroid() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-          } else {
-            console.log('User dismissed the install prompt');
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        alert(translations[currentLang].alreadyInstalled);
-      }
+    // Helper: Detect mobile operating system
+    function getMobileOperatingSystem() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      if (/windows phone/i.test(userAgent)) return "Windows";
+      if (/android/i.test(userAgent)) return "Android";
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
+      return "unknown";
     }
 
-    // Show installation icons based on the detected OS
-    function showInstallIcons() {
+    // Install button click handler
+    document.getElementById('installButton').addEventListener('click', function() {
       const os = getMobileOperatingSystem();
-      const installIconsDiv = document.getElementById('installIcons');
-      installIconsDiv.innerHTML = ''; // Clear any previous icons
-
       if (os === 'Android') {
-        const androidIcon = document.createElement('img');
-        androidIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/3/31/Android_robot.svg';
-        androidIcon.alt = 'Install on Android';
-        androidIcon.style.cursor = 'pointer';
-        androidIcon.addEventListener('click', installAndroid);
-        installIconsDiv.appendChild(androidIcon);
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log("User accepted the install prompt.");
+            } else {
+              console.log("User dismissed the install prompt.");
+            }
+            deferredPrompt = null;
+          });
+        } else {
+          alert(translations[currentLang].alreadyInstalled);
+        }
       } else if (os === 'iOS') {
-        const appleIcon = document.createElement('img');
-        appleIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg';
-        appleIcon.alt = 'Install on iOS';
-        appleIcon.style.cursor = 'pointer';
-        appleIcon.addEventListener('click', function() {
-          alert("Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol und wählen Sie 'Zum Home-Bildschirm hinzufügen'.");
-        });
-        installIconsDiv.appendChild(appleIcon);
+        alert("Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol und wählen Sie 'Zum Home-Bildschirm hinzufügen'.");
       } else if (os === 'Windows') {
-        const windowsIcon = document.createElement('img');
-        windowsIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/4/48/Windows_logo_-_2012.svg';
-        windowsIcon.alt = 'Install on Windows';
-        windowsIcon.style.cursor = 'pointer';
-        windowsIcon.addEventListener('click', function() {
-          alert("Um die App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen 'Diese Seite als App installieren'.");
-        });
-        installIconsDiv.appendChild(windowsIcon);
+        alert("Um die App als Web App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen 'Diese Seite als App installieren'.");
+      } else {
+        alert("Installation not supported on this platform.");
       }
-    }
+    });
 
-    // Helper: Attach a one-time click handler to the confirm button
+    // Helper: Attach a one-time click handler to the disclaimer confirm button
     function attachDisclaimerConfirmHandler(callback) {
       const btn = document.getElementById('disclaimerConfirmButton');
       function handler() {
@@ -500,29 +475,13 @@
       btn.addEventListener('click', handler);
     }
 
-    // OS detection function
-    function getMobileOperatingSystem() {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      if (/windows phone/i.test(userAgent)) {
-        return "Windows";
-      }
-      if (/android/i.test(userAgent)) {
-        return "Android";
-      }
-      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return "iOS";
-      }
-      return "unknown";
-    }
-
-    // Update UI text based on the selected language
+    // Update UI text based on selected language
     function switchLanguage(lang) {
       currentLang = lang;
       const texts = translations[lang];
       document.getElementById('appTitle').innerText = texts.appTitle;
       document.getElementById('codePrompt').innerText = texts.codePrompt;
       document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-      // Update module selection buttons
       document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
       document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -537,21 +496,13 @@
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
-      // Update prerequisite error message text
       document.getElementById('prerequisiteError').innerText = texts.prerequisiteError;
-      // Update module screen headings if they exist:
-      if (document.getElementById('comaModuleTitle')) {
-        document.getElementById('comaModuleTitle').innerText = texts.comaRiskTitle;
-      }
-      if (document.getElementById('strokeModuleTitle')) {
-        document.getElementById('strokeModuleTitle').innerText = texts.strokeRiskTitle;
-      }
-      // Update the confirm button text in the disclaimer modal
+      // Update modal confirm button text
       document.getElementById('disclaimerConfirmButton').innerText = extendedTranslations[lang].disclaimerConfirm;
       console.log("Language switched to:", lang);
     }
 
-    // Restart app (navigate to module selection screen)
+    // Restart app (navigate to module selection)
     function restartApp() {
       document.getElementById('codeEntrySection').style.display = 'none';
       document.getElementById('moduleSelectionSection').style.display = 'block';
@@ -609,7 +560,7 @@
       console.log("Prerequisites validated.");
     }
 
-    // Display disclaimer using the modal with fade-in effect
+    // Display disclaimer using modal with fade-in effect
     function showDisclaimer() {
       const modal = document.getElementById('disclaimerModal');
       document.getElementById('disclaimerText').innerText = translations[currentLang].disclaimer;
@@ -626,17 +577,17 @@
       console.log("Disclaimer modal closed.");
     }
 
-    // Calculate coma risk (uses disclaimer modal; result revealed on confirm)
+    // Calculate coma risk (validate input first)
     function calculateComaRisk() {
-      showDisclaimer();
       const gfap = parseFloat(document.getElementById('gfapComaInput').value);
       const result = document.getElementById('comaResult');
       if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
-        result.innerText = translations[currentLang].invalidInput;
+        result.innerText = translations[currentLang].rangeError;
         result.className = 'result warning';
         result.style.display = 'block';
         return;
       }
+      showDisclaimer();
       const y = 36.72 * Math.log10(gfap) - 50.48;
       const probability = Math.min(Math.max(y, 0), 100);
       let riskLevel = '';
