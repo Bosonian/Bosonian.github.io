@@ -560,16 +560,21 @@
 
     // Calculate stroke risk with updated interpretation rules
     function calculateStrokeRisk() {
-      showDisclaimer();
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
       const result = document.getElementById('strokeResult');
+
+      // Validate inputs before proceeding
       if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
         result.innerText = (gfap < 29 || gfap > 10001) ? translations[currentLang].rangeError : translations[currentLang].invalidInput;
         result.className = 'result warning';
         result.style.display = 'block';
-        return;
+        return; // Exit early if inputs are invalid
       }
+
+      // Show disclaimer only if inputs are valid
+      showDisclaimer();
+
       let interpretation = '';
       let riskClass = '';
       // For patients aged < 72 years (4 categories)
