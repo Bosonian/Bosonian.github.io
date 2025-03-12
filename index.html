@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#007bff">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    /* CSS Variables for theme colors */
+    /* Default theme variables */
     :root {
       --primary-color: #007bff;
       --primary-hover: #0056b3;
@@ -18,16 +18,18 @@
       --background-color: #f8f9fa;
       --text-color: #333;
     }
-    body.dark-mode {
-      --primary-color: #3399ff;
-      --primary-hover: #287ac7;
-      --secondary-color: #e06666;
-      --secondary-hover: #cc5252;
-      --background-color: #333;
-      --text-color: #f8f9fa;
+    /* Professional theme overrides */
+    body.pro-theme {
+      --primary-color: #005f73;
+      --primary-hover: #0a9396;
+      --secondary-color: #ae2012;
+      --secondary-hover: #bb3e03;
+      --background-color: #f5f7fa;
+      --text-color: #333;
     }
+    /* Base styling using variables */
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
       background-color: var(--background-color);
@@ -37,12 +39,12 @@
       max-width: 500px;
       margin: 70px auto 20px auto;
       padding: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     body.dark-mode .container {
-      background-color: #444;
+      background: #444;
       color: var(--text-color);
     }
     .input-group, .checkbox-group {
@@ -69,29 +71,34 @@
       font-size: 18px;
       border: 2px solid var(--primary-color);
       border-radius: 5px;
+      transition: border-color 0.3s ease;
+    }
+    .input-group input:focus {
+      border-color: var(--primary-hover);
     }
     button {
       padding: 12px;
       margin-top: 15px;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.2s ease;
       width: 100%;
     }
-    .primary {
+    button.primary {
       background-color: var(--primary-color);
-      color: white;
+      color: #fff;
     }
-    .primary:hover {
+    button.primary:hover {
       background-color: var(--primary-hover);
+      transform: translateY(-2px);
     }
-    .secondary {
+    button.secondary {
       background-color: var(--secondary-color);
-      color: white;
+      color: #fff;
     }
-    .secondary:hover {
+    button.secondary:hover {
       background-color: var(--secondary-hover);
     }
     .result {
@@ -105,18 +112,19 @@
     }
     /* Risk Colour Coding */
     .low-risk { color: green; }
-    /* For three-level risk, medium-risk is yellow and high-risk is red */
+    /* For three-level risk: medium is yellow, high is red */
     .medium-risk { color: yellow; }
     .high-risk { color: red; }
-    /* For four-level risk, we expect: low-risk (green), medium-risk (yellow), high-risk (orange), very-high-risk (red) */
+    /* For four-level risk, we use: low (green), medium (yellow), high (orange), very-high (red) */
     .very-high-risk { color: red; }
+    /* Header styling */
     .app-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
       background-color: var(--primary-color);
-      color: white;
+      color: #fff;
       position: sticky;
       top: 0;
       z-index: 999;
@@ -126,16 +134,56 @@
     .language-switcher { display: flex; gap: 5px; }
     .language-switcher button { background: none; border: none; padding: 0; cursor: pointer; }
     .language-switcher button img { width: 24px; height: 16px; border: 1px solid #ccc; border-radius: 3px; }
-    #darkModeToggle { background: none; border: none; font-size: 20px; cursor: pointer; color: white; }
+    #darkModeToggle { background: none; border: none; font-size: 20px; cursor: pointer; color: #fff; }
     .home-button {
-      background: white;
+      background: #fff;
       color: var(--primary-color);
       border: none;
       padding: 5px 10px;
       border-radius: 4px;
       cursor: pointer;
     }
-    .home-button:hover { background-color: #f2f2f2; }
+    .home-button:hover { background: #f2f2f2; }
+    /* Toggle switch styling for theme toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
     /* Modal styling */
     .modal {
       display: none;
@@ -151,7 +199,7 @@
     }
     .modal.show { opacity: 1; }
     .modal-content {
-      background-color: #fff;
+      background: #fff;
       margin: 20% auto;
       padding: 20px;
       border: 1px solid #888;
@@ -161,7 +209,7 @@
       text-align: center;
     }
     body.dark-mode .modal-content {
-      background-color: #444;
+      background: #444;
       color: var(--text-color);
       border: 1px solid #555;
     }
@@ -170,8 +218,8 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background-color: var(--secondary-color);
-      color: white;
+      background: var(--secondary-color);
+      color: #fff;
       padding: 8px 12px;
       border-radius: 4px;
       font-size: 14px;
@@ -180,9 +228,9 @@
       display: none;
     }
     #installButton:hover {
-      background-color: var(--secondary-hover);
+      background: var(--secondary-hover);
     }
-    /* Prerequisite error styling */
+    /* Prerequisite error message styling */
     #prerequisiteError {
       color: red;
       font-size: 14px;
@@ -206,6 +254,11 @@
         </button>
       </div>
       <button id="darkModeToggle" aria-label="Toggle Dark Mode">🌙</button>
+      <!-- Inconspicuous theme toggle switch -->
+      <label class="switch" title="Toggle Professional Theme">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider"></span>
+      </label>
       <button class="home-button" onclick="restartApp()" aria-label="Home">🏠 Home</button>
     </div>
   </header>
@@ -364,15 +417,22 @@
 
     // Auto-detect system language and dark mode preference on load
     window.addEventListener('load', function() {
-      // Detect dark mode preference
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.body.classList.add('dark-mode');
       }
-      // Auto-detect language; if system language starts with 'de', switch to German
       if (navigator.language && navigator.language.toLowerCase().startsWith('de')) {
         switchLanguage('de');
       } else {
         switchLanguage('en');
+      }
+      // Restore theme from localStorage if set
+      const storedTheme = localStorage.getItem('theme');
+      const themeToggleInput = document.getElementById('themeToggle');
+      if (storedTheme === 'pro') {
+        document.body.classList.add('pro-theme');
+        themeToggleInput.checked = true;
+      } else {
+        themeToggleInput.checked = false;
       }
     });
 
@@ -425,6 +485,17 @@
       }
     });
 
+    // Theme toggle: using the checkbox input (the switch)
+    document.getElementById('themeToggle').addEventListener('change', function() {
+      if (this.checked) {
+        document.body.classList.add('pro-theme');
+        localStorage.setItem('theme', 'pro');
+      } else {
+        document.body.classList.remove('pro-theme');
+        localStorage.setItem('theme', 'default');
+      }
+    });
+
     // Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
@@ -453,7 +524,6 @@
       document.getElementById('appTitle').innerText = texts.appTitle;
       document.getElementById('codePrompt').innerText = texts.codePrompt;
       document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-      // Set button texts for module selection
       document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
       document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -465,14 +535,11 @@
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
-      // Update module headings
       document.getElementById('comaModuleTitle').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleTitle').innerText = texts.strokeModuleTitle;
-      // Update input placeholders
       document.getElementById('gfapComaInput').setAttribute("placeholder", texts.gfapLabel);
       document.getElementById('gfapStrokeInput').setAttribute("placeholder", texts.gfapLabel);
       document.getElementById('ageInput').setAttribute("placeholder", texts.ageLabel);
-      // Update prerequisite labels
       document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
       document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
       document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
@@ -489,7 +556,6 @@
       document.getElementById('strokePrerequisiteSection').style.display = 'none';
       document.getElementById('accessCodeInput').value = '';
       document.getElementById('accessError').style.display = 'none';
-      // Clear prerequisite error message
       document.getElementById('prerequisiteError').style.display = 'none';
       document.getElementById('prerequisiteError').innerText = "";
     }
@@ -528,7 +594,6 @@
       const prerequisite3 = document.getElementById('prerequisite3').checked;
       const prerequisite4 = document.getElementById('prerequisite4').checked;
       if (!(prerequisite1 && prerequisite2 && prerequisite3 && prerequisite4)) {
-        // Display inline error message in red at the bottom of the prerequisites screen
         document.getElementById('prerequisiteError').innerText = currentLang === 'de'
           ? "Alle Voraussetzungen müssen erfüllt sein, damit die Berechnung gültig ist."
           : "All prerequisites must be fulfilled for the calculation to be valid.";
@@ -575,7 +640,6 @@
       if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
       else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
       else riskLevel = translations[currentLang].highRisk;
-      // For three-level risk: assign low-risk (green), medium-risk (yellow), high-risk (red)
       let riskClass = (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : 
                        riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk');
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
@@ -608,7 +672,6 @@
 
       let interpretation = '';
       let riskClass = '';
-      // For patients aged < 72 and those aged <=83, we use four interpretations; for ages >83, three interpretations.
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -653,7 +716,7 @@
             : "Very high risk of ICH (90%)";
           riskClass = 'very-high-risk';
         }
-      } else { // For patients aged > 83, use three-level interpretation
+      } else {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
@@ -714,7 +777,6 @@
     window.onload = function() {
       document.getElementById('currentYear').innerText = new Date().getFullYear();
       restartApp();
-      // Auto-detect language and dark mode are set in the load event listener above
       addEventListeners();
     };
   </script>
