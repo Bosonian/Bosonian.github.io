@@ -110,7 +110,7 @@
     .medium-risk { 
       color: #daa520; 
     }
-    /* Instead of our previous high-risk, we now use red for both high and very high */
+    /* For both high risk in the Coma module and both high and very high risk in the Stroke module, force red */
     .red-risk { 
       color: #dc3545; 
     }
@@ -390,19 +390,23 @@
       }
     };
 
-    // Auto-detect system language and dark mode preference on load
+    // Function to check if the app is running in standalone mode
+    function isAppInstalled() {
+      return (window.matchMedia('(display-mode: standalone)').matches ||
+              window.navigator.standalone === true);
+    }
+
+    // Auto-detect system language, dark mode, and hide install button if installed
     window.addEventListener('load', function() {
-      // Detect dark mode preference
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.body.classList.add('dark-mode');
       }
-      // Auto-detect language; if system language starts with 'de', switch to German
       if (navigator.language && navigator.language.toLowerCase().startsWith('de')) {
         switchLanguage('de');
       } else {
         switchLanguage('en');
       }
-      // Add device-specific install button if not in standalone mode
+      // Add device-specific install button if app is not installed
       if (!isAppInstalled()) {
         addDeviceInstallButton();
       } else {
@@ -410,17 +414,18 @@
       }
     });
 
-    // Check if the app is running in standalone mode
-    function isAppInstalled() {
-      return (window.matchMedia('(display-mode: standalone)').matches ||
-              window.navigator.standalone === true);
-    }
+    // Listen for visibility change to hide install button in standalone mode (especially for Android)
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible' && isAppInstalled()) {
+        document.getElementById('deviceInstallContainer').style.display = 'none';
+      }
+    });
 
     // Device-specific Install Button for Android/iOS
     function addDeviceInstallButton() {
       const device = getMobileOperatingSystem();
       const container = document.getElementById('deviceInstallContainer');
-      container.innerHTML = ""; // Clear any existing content
+      container.innerHTML = "";
       if (device === "Android") {
         let btn = document.createElement('button');
         btn.id = "androidInstallButton";
@@ -492,7 +497,7 @@
       btn.addEventListener('click', handler);
     }
 
-    // Update UI text based on selected language (including headings, input placeholders, prerequisites, and button texts)
+    // Update UI text based on selected language
     function switchLanguage(lang) {
       currentLang = lang;
       const texts = translations[lang];
@@ -519,7 +524,7 @@
       document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
       document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
       document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
-      // Also update the device-specific install button text if present
+      // Update device-specific install button text if present
       addDeviceInstallButton();
       console.log("Language switched to:", lang);
     }
@@ -564,7 +569,7 @@
       console.log("Switched to Stroke Prerequisite Screen.");
     }
 
-    // Validate stroke prerequisites and show inline error if not all are fulfilled
+    // Validate stroke prerequisites and show inline error if not fulfilled
     function validatePrerequisites() {
       const prerequisite1 = document.getElementById('prerequisite1').checked;
       const prerequisite2 = document.getElementById('prerequisite2').checked;
@@ -619,11 +624,9 @@
       } else if (gfap <= 1000) {
         riskLevel = translations[currentLang].mediumRisk;
       } else {
-        // For coma module, if risk is high, force red.
-        riskLevel = translations[currentLang].highRisk;
+        riskLevel = translations[currentLang].highRisk; // Force red for high risk in Coma module
       }
-      // For coma module, set red for high risk.
-      let riskClass = (riskLevel === translations[currentLang].lowRisk ? 'low-risk' :
+      let riskClass = (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : 
                        riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'red-risk');
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
       result.style.display = 'none';
@@ -638,7 +641,7 @@
       });
     }
 
-    // Calculate Stroke Risk (four-level risk for ages < 72 and <=83; three-level for ages >83)
+    // Calculate Stroke Risk (four-level risk for ages <72 and <=83; three-level for ages >83)
     function calculateStrokeRisk() {
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
@@ -652,7 +655,6 @@
       showDisclaimer();
       let interpretation = '';
       let riskClass = '';
-      // For patients aged < 72 and those aged <=83, we use four interpretations; for ages >83, three interpretations.
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -665,7 +667,6 @@
             : "Test not conclusive";
           riskClass = 'medium-risk';
         } else if (gfap <= 54) {
-          // For stroke module, both "High Risk" and "Very High Risk" should be red.
           interpretation = currentLang === 'de'
             ? "Hohe Wahrscheinlichkeit für ICH (85%)"
             : "High risk of ICH (85%)";
@@ -698,7 +699,7 @@
             : "Very high risk of ICH (90%)";
           riskClass = 'red-risk';
         }
-      } else { // For patients aged > 83, use three-level interpretation.
+      } else {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
