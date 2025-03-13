@@ -169,7 +169,7 @@
       color: var(--text-color);
       border: 1px solid #555;
     }
-    /* iOS Install Instructions Modal */
+    /* iOS and Android Install Instructions Modal */
     #installInstructionsModal {
       display: none;
       position: fixed;
@@ -307,7 +307,7 @@
     </div>
   </div>
 
-  <!-- iOS Install Instructions Modal -->
+  <!-- Install Instructions Modal (for both iOS and Android) -->
   <div id="installInstructionsModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal-content">
       <p id="installInstructionsText"></p>
@@ -324,13 +324,13 @@
     let deferredPrompt = null;
     let pendingResult = null; // To store computed result until confirmation
 
-    // Extended translations for confirm button, alreadyInstalled message, etc.
+    // Extended translations for confirm button, etc.
     const extendedTranslations = {
       en: { disclaimerConfirm: "Confirm", alreadyInstalled: "App already installed." },
       de: { disclaimerConfirm: "Einverstanden", alreadyInstalled: "App bereits installiert." }
     };
 
-    // Language translations (including module texts, prerequisites, and install instructions)
+    // Language translations (including install instructions for Android and iOS)
     const translations = {
       en: {
         appTitle: "iGFAP Check",
@@ -358,7 +358,8 @@
         prerequisite2: "No neurological deficits before the event",
         prerequisite3: "No identifiable head trauma (severe fall)",
         prerequisite4: "FAST ED Score >= 3 points",
-        installInstructions: "To install the app on your Android device, tap the install button below. On iOS, tap the share icon at the bottom of the browser, scroll down, and select 'Add to Home Screen'."
+        androidInstallInstructions: "For Android users using Chrome or Samsung Internet: Tap the menu button (three dots or the menu icon) and select 'Add to Home screen' (for Samsung, it may appear as 'Add page to' then 'Home screen').",
+        installInstructions: "For iOS users: Tap the share icon at the bottom of the browser, scroll down, and select 'Add to Home Screen'."
       },
       de: {
         appTitle: "iGFAP Check",
@@ -386,7 +387,8 @@
         prerequisite2: "Keine neurologischen Defizite vor dem Ereignis",
         prerequisite3: "Kein erkennbares Schädel-Hirn-Trauma (schwerer Sturz)",
         prerequisite4: "FAST ED Score >= 3 Punkte",
-        installInstructions: "Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol (das Quadrat mit dem Pfeil) am unteren Rand des Browsers, scrollen Sie nach unten und wählen Sie 'Zum Home-Bildschirm hinzufügen'."
+        androidInstallInstructions: "Für Android-Nutzer (Chrome oder Samsung Internet): Tippen Sie auf das Menü (drei Punkte oder das Menüsymbol) und wählen Sie 'Zum Startbildschirm hinzufügen'. Für Samsung Internet erscheint eventuell 'Seite hinzufügen' und dann 'Startbildschirm'.",
+        installInstructions: "Für iPhone-Nutzer: Tippen Sie auf das Teilen-Symbol am unteren Rand des Browsers, scrollen Sie nach unten und wählen Sie 'Zum Home-Bildschirm hinzufügen'."
       }
     };
 
@@ -413,7 +415,7 @@
       }
     });
 
-    // Listen for visibility change to hide install button if app is installed
+    // Listen for visibility change to hide install button in standalone mode
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible' && isAppInstalled()) {
         document.getElementById('deviceInstallContainer').style.display = 'none';
@@ -431,17 +433,7 @@
         btn.className = "primary";
         btn.innerText = currentLang === 'de' ? "App installieren" : "Install App";
         btn.onclick = function(){
-          if(deferredPrompt){
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-              console.log("User outcome:", choiceResult.outcome);
-              deferredPrompt = null;
-              container.style.display = 'none';
-            });
-          } else {
-            // If deferredPrompt is null, simply hide the container.
-            container.style.display = 'none';
-          }
+          showAndroidInstallInstructions();
         };
         container.appendChild(btn);
       } else if (device === "iOS") {
@@ -458,6 +450,21 @@
       }
     }
 
+    // Show Android installation instructions in a modal
+    function showAndroidInstallInstructions() {
+      const modal = document.getElementById('installInstructionsModal');
+      const instructionsText = document.getElementById('installInstructionsText');
+      // Check if the browser is Samsung Internet by userAgent
+      const ua = navigator.userAgent;
+      if (ua.indexOf("SamsungBrowser") > -1) {
+        instructionsText.innerText = translations[currentLang].androidInstallInstructions;
+      } else {
+        instructionsText.innerText = translations[currentLang].androidInstallInstructions;
+      }
+      modal.style.display = 'block';
+      setTimeout(() => modal.classList.add('show'), 10);
+    }
+
     // Show iOS installation instructions in a modal
     function showIOSInstallInstructions() {
       const modal = document.getElementById('installInstructionsModal');
@@ -467,7 +474,7 @@
       setTimeout(() => modal.classList.add('show'), 10);
     }
 
-    // Close iOS installation instructions modal
+    // Close installation instructions modal
     document.getElementById('installInstructionsCloseButton').addEventListener('click', function(){
       const modal = document.getElementById('installInstructionsModal');
       modal.classList.remove('show');
