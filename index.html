@@ -110,7 +110,7 @@
     .medium-risk { 
       color: #daa520; 
     }
-    /* For both high risk in the Coma module and high/very-high in Stroke, force red */
+    /* For both high risk in Coma and high/very high in Stroke, force red */
     .red-risk { 
       color: #dc3545; 
     }
@@ -194,6 +194,12 @@
       max-width: 400px;
       border-radius: 10px;
       text-align: center;
+    }
+    /* Dark mode override for install instructions modal */
+    body.dark-mode #installInstructionsModal .modal-content {
+      background-color: #444;
+      color: var(--text-color);
+      border: 1px solid #555;
     }
     /* Device-specific Install Button container */
     #deviceInstallContainer {
@@ -307,7 +313,7 @@
     </div>
   </div>
 
-  <!-- Install Instructions Modal (for both iOS and Android) -->
+  <!-- Install Instructions Modal (for both Android and iOS) -->
   <div id="installInstructionsModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
     <div class="modal-content">
       <p id="installInstructionsText"></p>
@@ -358,7 +364,7 @@
         prerequisite2: "No neurological deficits before the event",
         prerequisite3: "No identifiable head trauma (severe fall)",
         prerequisite4: "FAST ED Score >= 3 points",
-        androidInstallInstructions: "For Android users using Chrome or Samsung Internet: Tap the menu button (three dots or the menu icon) and select 'Add to Home screen' (for Samsung, it may appear as 'Add page to' then 'Home screen').",
+        androidInstallInstructions: "For Android users (Chrome or Samsung Internet): Tap the menu (three dots or the menu icon) and select 'Add to Home screen'. For Samsung Internet, you may see 'Add page' and then 'Home screen'.",
         installInstructions: "For iOS users: Tap the share icon at the bottom of the browser, scroll down, and select 'Add to Home Screen'."
       },
       de: {
@@ -415,7 +421,7 @@
       }
     });
 
-    // Listen for visibility change to hide install button in standalone mode
+    // Listen for visibility change to hide install button if app is installed
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible' && isAppInstalled()) {
         document.getElementById('deviceInstallContainer').style.display = 'none';
@@ -454,13 +460,7 @@
     function showAndroidInstallInstructions() {
       const modal = document.getElementById('installInstructionsModal');
       const instructionsText = document.getElementById('installInstructionsText');
-      // Check if the browser is Samsung Internet by userAgent
-      const ua = navigator.userAgent;
-      if (ua.indexOf("SamsungBrowser") > -1) {
-        instructionsText.innerText = translations[currentLang].androidInstallInstructions;
-      } else {
-        instructionsText.innerText = translations[currentLang].androidInstallInstructions;
-      }
+      instructionsText.innerText = translations[currentLang].androidInstallInstructions;
       modal.style.display = 'block';
       setTimeout(() => modal.classList.add('show'), 10);
     }
