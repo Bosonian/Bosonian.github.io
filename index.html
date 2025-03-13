@@ -110,7 +110,7 @@
     .medium-risk { 
       color: #daa520; 
     }
-    /* For both high risk in the Coma module and both high and very high risk in the Stroke module, force red */
+    /* For both high risk in the Coma module and high/very-high in Stroke, force red */
     .red-risk { 
       color: #dc3545; 
     }
@@ -406,7 +406,6 @@
       } else {
         switchLanguage('en');
       }
-      // Add device-specific install button if app is not installed
       if (!isAppInstalled()) {
         addDeviceInstallButton();
       } else {
@@ -414,7 +413,7 @@
       }
     });
 
-    // Listen for visibility change to hide install button in standalone mode (especially for Android)
+    // Listen for visibility change to hide install button if app is installed
     document.addEventListener('visibilitychange', function() {
       if (document.visibilityState === 'visible' && isAppInstalled()) {
         document.getElementById('deviceInstallContainer').style.display = 'none';
@@ -435,16 +434,13 @@
           if(deferredPrompt){
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choiceResult) => {
-              if(choiceResult.outcome === 'accepted'){
-                console.log("User accepted the install prompt.");
-              } else {
-                console.log("User dismissed the install prompt.");
-              }
+              console.log("User outcome:", choiceResult.outcome);
               deferredPrompt = null;
               container.style.display = 'none';
             });
           } else {
-            alert(currentLang === 'de' ? "App bereits installiert." : "App already installed.");
+            // If deferredPrompt is null, simply hide the container.
+            container.style.display = 'none';
           }
         };
         container.appendChild(btn);
@@ -524,7 +520,6 @@
       document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
       document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
       document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
-      // Update device-specific install button text if present
       addDeviceInstallButton();
       console.log("Language switched to:", lang);
     }
@@ -605,7 +600,7 @@
       console.log("Disclaimer modal closed.");
     }
 
-    // Calculate Coma Risk (three-level risk: low, medium, and for high risk we force red)
+    // Calculate Coma Risk (three-level risk: low, medium, red for high)
     function calculateComaRisk() {
       const gfap = parseFloat(document.getElementById('gfapComaInput').value);
       const result = document.getElementById('comaResult');
