@@ -103,7 +103,7 @@
       display: none;
       text-align: center;
     }
-    /* Four-level risk color coding without drop shadow */
+    /* Four-level risk color coding without text-shadow */
     .low-risk { 
       color: #28a745; 
     }
@@ -171,29 +171,36 @@
       color: var(--text-color);
       border: 1px solid #555;
     }
-    /* Install Button styling (positioned bottom-right and hidden by default) */
-    #installButton {
+    /* Install Instructions Modal styling (for iOS) */
+    #installInstructionsModal {
+      display: none;
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: var(--secondary-color);
-      color: white;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 14px;
-      z-index: 1000;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      display: none;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
-    #installButton:hover {
-      background-color: var(--secondary-hover);
+    #installInstructionsModal.show {
+      opacity: 1;
     }
-    /* Prerequisite error styling */
-    #prerequisiteError {
-      color: red;
-      font-size: 14px;
-      margin-top: 10px;
-      display: none;
+    #installInstructionsModal .modal-content {
+      background-color: #fff;
+      margin: 20% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    /* Device-specific Install Button container */
+    #deviceInstallContainer {
+      text-align: center;
+      margin: 20px;
     }
   </style>
 </head>
@@ -295,8 +302,16 @@
     </div>
   </div>
 
-  <!-- Fixed Install App Button (hidden by default) -->
-  <button id="installButton" aria-label="Install App">Install App</button>
+  <!-- Install Instructions Modal for iOS -->
+  <div id="installInstructionsModal" class="modal" role="dialog" aria-modal="true" style="display:none;">
+    <div class="modal-content">
+      <p id="installInstructionsText"></p>
+      <button class="primary" id="installInstructionsCloseButton" aria-label="Close">Close</button>
+    </div>
+  </div>
+
+  <!-- Device-specific Install Button Container -->
+  <div id="deviceInstallContainer"></div>
 
   <!-- Inline JavaScript -->
   <script>
@@ -310,7 +325,7 @@
       de: { disclaimerConfirm: "Einverstanden", alreadyInstalled: "App bereits installiert." }
     };
 
-    // Language translations (including module texts and prerequisites)
+    // Language translations (including module texts, prerequisites, and install instructions)
     const translations = {
       en: {
         appTitle: "iGFAP Check",
@@ -337,7 +352,9 @@
         prerequisite1: "Confirmed time window < 6 hours",
         prerequisite2: "No neurological deficits before the event",
         prerequisite3: "No identifiable head trauma (severe fall)",
-        prerequisite4: "FAST ED Score >= 3 points"
+        prerequisite4: "FAST ED Score >= 3 points",
+        // Installation instructions for iOS
+        installInstructions: "To install the app on your iOS device, tap the share icon (the square with an arrow) at the bottom of the browser, scroll down, and tap 'Add to Home Screen'."
       },
       de: {
         appTitle: "iGFAP Check",
@@ -364,7 +381,9 @@
         prerequisite1: "Gesichertes Zeitfenster < 6 Stunden",
         prerequisite2: "Keine neurologischen Defizite vor dem Ereignis",
         prerequisite3: "Kein erkennbares Schädel-Hirn-Trauma (schwerer Sturz)",
-        prerequisite4: "FAST ED Score >= 3 Punkte"
+        prerequisite4: "FAST ED Score >= 3 Punkte",
+        // Installation instructions for iOS
+        installInstructions: "Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol (das Quadrat mit dem Pfeil) am unteren Rand des Browsers, scrollen Sie nach unten und wählen Sie 'Zum Home-Bildschirm hinzufügen'."
       }
     };
 
@@ -380,19 +399,25 @@
       } else {
         switchLanguage('en');
       }
+      // After language is set, add device-specific install button
+      addDeviceInstallButton();
     });
 
-    // Hide the install button by default
+    // Hide the global install button (if any) by default
     document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('installButton').style.display = 'none';
+      // (Not using the old #installButton now.)
     });
 
-    // Capture beforeinstallprompt event for PWA installation and show the install button
+    // Capture beforeinstallprompt event for Android installation
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       console.log("beforeinstallprompt event captured.");
-      document.getElementById('installButton').style.display = 'block';
+      // For Android, update the device install button if present
+      if(getMobileOperatingSystem() === "Android") {
+        const btn = document.getElementById('androidInstallButton');
+        if(btn) btn.style.display = 'block';
+      }
     });
 
     // Helper: Get mobile OS for install instructions
@@ -404,43 +429,62 @@
       return "unknown";
     }
 
-    // Install button click handler
-    document.getElementById('installButton').addEventListener('click', function() {
-      const os = getMobileOperatingSystem();
-      if (os === 'Android') {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log("User accepted the install prompt.");
-            } else {
-              console.log("User dismissed the install prompt.");
-            }
-            deferredPrompt = null;
-            document.getElementById('installButton').style.display = 'none';
-          });
-        } else {
-          alert(extendedTranslations[currentLang].alreadyInstalled);
-        }
-      } else if (os === 'iOS') {
-        alert("Um die App auf Ihrem iOS-Gerät zu installieren, tippen Sie auf das Teilen-Symbol und wählen Sie 'Zum Home-Bildschirm hinzufügen'.");
-      } else if (os === 'Windows') {
-        alert("Um die App als Web App auf Windows zu installieren, öffnen Sie das Browsermenü und wählen Sie 'Diese Seite als App installieren'.");
+    // Add device-specific install button to container
+    function addDeviceInstallButton() {
+      const device = getMobileOperatingSystem();
+      const container = document.getElementById('deviceInstallContainer');
+      container.innerHTML = ""; // Clear any existing content
+      if(device === "Android"){
+        let btn = document.createElement('button');
+        btn.id = "androidInstallButton";
+        btn.className = "primary";
+        btn.innerText = currentLang === 'de' ? "App installieren" : "Install App";
+        btn.onclick = function(){
+          if(deferredPrompt){
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+              if(choiceResult.outcome === 'accepted'){
+                console.log("User accepted the install prompt.");
+              } else {
+                console.log("User dismissed the install prompt.");
+              }
+              deferredPrompt = null;
+              container.style.display = 'none';
+            });
+          } else {
+            alert(currentLang === 'de' ? "App bereits installiert." : "App already installed.");
+          }
+        };
+        container.appendChild(btn);
+      } else if(device === "iOS"){
+        let btn = document.createElement('button');
+        btn.id = "iosInstallButton";
+        btn.className = "primary";
+        btn.innerText = currentLang === 'de' ? "App installieren" : "Install App";
+        btn.onclick = function(){
+          showIOSInstallInstructions();
+        };
+        container.appendChild(btn);
       } else {
-        alert("Installation not supported on this platform.");
+        container.style.display = 'none';
       }
-    });
-
-    // Service Worker Registration
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').then(function(registration) {
-          console.log('ServiceWorker registration successful with scope:', registration.scope);
-        }, function(err) {
-          console.log('ServiceWorker registration failed:', err);
-        });
-      });
     }
+
+    // Show iOS installation instructions in a modal
+    function showIOSInstallInstructions() {
+      const modal = document.getElementById('installInstructionsModal');
+      const instructionsText = document.getElementById('installInstructionsText');
+      instructionsText.innerText = translations[currentLang].installInstructions;
+      modal.style.display = 'block';
+      setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    // Close iOS installation instructions modal
+    document.getElementById('installInstructionsCloseButton').addEventListener('click', function(){
+      const modal = document.getElementById('installInstructionsModal');
+      modal.classList.remove('show');
+      setTimeout(() => { modal.style.display = 'none'; }, 300);
+    });
 
     // Helper: Attach one-time click handler for disclaimer confirm
     function attachDisclaimerConfirmHandler(callback) {
@@ -459,7 +503,6 @@
       document.getElementById('appTitle').innerText = texts.appTitle;
       document.getElementById('codePrompt').innerText = texts.codePrompt;
       document.getElementById('moduleSelectionTitle').innerText = texts.moduleSelectionTitle;
-      // Set button texts for module selection
       document.getElementById('comaModuleButton').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleButton').innerText = texts.strokeModuleTitle;
       document.getElementById('strokePrerequisiteTitle').innerText = texts.strokePrerequisiteTitle;
@@ -471,18 +514,17 @@
       document.getElementById('gfapComaLabel').innerText = texts.gfapLabel;
       document.getElementById('gfapStrokeLabel').innerText = texts.gfapLabel;
       document.getElementById('ageLabel').innerText = texts.ageLabel;
-      // Update module headings
       document.getElementById('comaModuleTitle').innerText = texts.comaModuleTitle;
       document.getElementById('strokeModuleTitle').innerText = texts.strokeModuleTitle;
-      // Update input placeholders
       document.getElementById('gfapComaInput').setAttribute("placeholder", texts.gfapLabel);
       document.getElementById('gfapStrokeInput').setAttribute("placeholder", texts.gfapLabel);
       document.getElementById('ageInput').setAttribute("placeholder", texts.ageLabel);
-      // Update prerequisite labels
       document.getElementById('prerequisite1Label').innerText = texts.prerequisite1;
       document.getElementById('prerequisite2Label').innerText = texts.prerequisite2;
       document.getElementById('prerequisite3Label').innerText = texts.prerequisite3;
       document.getElementById('prerequisite4Label').innerText = texts.prerequisite4;
+      // Also update the device-specific install button text if present
+      addDeviceInstallButton();
       console.log("Language switched to:", lang);
     }
 
@@ -495,7 +537,6 @@
       document.getElementById('strokePrerequisiteSection').style.display = 'none';
       document.getElementById('accessCodeInput').value = '';
       document.getElementById('accessError').style.display = 'none';
-      // Clear prerequisite error message
       document.getElementById('prerequisiteError').style.display = 'none';
       document.getElementById('prerequisiteError').innerText = "";
     }
@@ -580,7 +621,6 @@
       if (gfap <= 100) riskLevel = translations[currentLang].lowRisk;
       else if (gfap <= 1000) riskLevel = translations[currentLang].mediumRisk;
       else riskLevel = translations[currentLang].highRisk;
-      // For three-level risk: assign low-risk (green), medium-risk (yellow), high-risk (red)
       let riskClass = (riskLevel === translations[currentLang].lowRisk ? 'low-risk' : 
                        riskLevel === translations[currentLang].mediumRisk ? 'medium-risk' : 'high-risk');
       const computedResult = `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br><strong>${translations[currentLang].riskLevel}:</strong> ${riskLevel}`;
@@ -601,19 +641,15 @@
       const age = parseInt(document.getElementById('ageInput').value);
       const gfap = parseFloat(document.getElementById('gfapStrokeInput').value);
       const result = document.getElementById('strokeResult');
-
       if (isNaN(age) || isNaN(gfap) || age < 1 || age > 120 || gfap < 29 || gfap > 10001) {
         result.innerText = (gfap < 29 || gfap > 10001) ? translations[currentLang].rangeError : translations[currentLang].invalidInput;
         result.className = 'result warning';
         result.style.display = 'block';
         return;
       }
-
       showDisclaimer();
-
       let interpretation = '';
       let riskClass = '';
-      // For patients aged < 72 and those aged <=83, we use four interpretations; for ages >83, three interpretations.
       if (age < 72) {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
@@ -658,7 +694,7 @@
             : "Very high risk of ICH (90%)";
           riskClass = 'very-high-risk';
         }
-      } else { // For patients aged > 83, use three-level interpretation
+      } else {
         if (gfap >= 29 && gfap <= 36.8) {
           interpretation = currentLang === 'de'
             ? "Sehr hohe Wahrscheinlichkeit für Hirninfarkt. Bei FAST ED ≥ 4 hohe Wahrscheinlichkeit für Large Vessel Occlusion (LVO)"
@@ -719,7 +755,6 @@
     window.onload = function() {
       document.getElementById('currentYear').innerText = new Date().getFullYear();
       restartApp();
-      // Auto-detect language and dark mode are set in the load event listener above
       addEventListeners();
     };
   </script>
