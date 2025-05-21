@@ -1,5 +1,5 @@
 // Service worker for GFAP Risk App
-const CACHE_NAME = 'gfap-risk-app-v7.6';
+const CACHE_NAME = 'gfap-risk-app-v7.7';
 const ASSETS = [
   '/',
   '/index.html',
