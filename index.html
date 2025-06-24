@@ -1,826 +1,472 @@
 <!DOCTYPE html>
-<html lang="en"> <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>iGFAP Check</title>
-  <style>
-    :root {
-      --primary-color: #007bff;
-      --primary-hover: #0056b3;
-      --secondary-color: #dc3545;
-      --secondary-hover: #b52b3a;
-      --background-color: #f8f9fa;
-      --text-color: #333;
-      --warning-text-color: #856404;
-      --warning-bg-color: #fff3cd;
-      --warning-border-color: #ffeeba;
-    }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICH Prediction Tool</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover: #5a6268;
+            --background-color: #f8f9fa;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --result-high-bg: #f8d7da;
+            --result-high-text: #721c24;
+            --result-high-border: #f5c6cb;
+            --result-low-bg: #d4edda;
+            --result-low-text: #155724;
+            --result-low-border: #c3e6cb;
+        }
 
-    body.dark-mode {
-      --primary-color: #3399ff;
-      --primary-hover: #287ac7;
-      --secondary-color: #e06666;
-      --secondary-hover: #cc5252;
-      --background-color: #333;
-      --text-color: #f8f9fa;
-      --warning-text-color: #ffeeba;
-      --warning-bg-color: #533f03;
-      --warning-border-color: #856404;
-    }
+        body.dark-mode {
+            --primary-color: #3399ff;
+            --primary-hover: #287ac7;
+            --secondary-color: #8f9aa3;
+            --secondary-hover: #7c858d;
+            --background-color: #333;
+            --container-bg: #444;
+            --text-color: #f8f9fa;
+            --result-high-bg: #5c2a30;
+            --result-high-text: #f5c6cb;
+            --result-high-border: #721c24;
+            --result-low-bg: #2a5032;
+            --result-low-text: #c3e6cb;
+            --result-low-border: #155724;
+        }
 
-    *, *::before, *::after {
-      box-sizing: border-box; /* Global box-sizing */
-    }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-    .container {
-      max-width: 500px;
-      margin: 70px auto 20px auto;
-      padding: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-    }
+        .container {
+            max-width: 500px;
+            margin: 70px auto 20px auto;
+            padding: 20px;
+            background-color: var(--container-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s ease;
+        }
+        
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            position: fixed; /* Changed from sticky for better consistency */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
 
-    body.dark-mode .container {
-      background-color: #444;
-    }
+        .app-header h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-right button {
+            width: auto;
+            padding: 8px 12px;
+            margin-top: 0;
+        }
+        
+        .language-switcher img {
+            width: 24px;
+            height: 16px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
 
-    .input-group, .checkbox-group {
-      margin-bottom: 15px;
-      text-align: left;
-    }
+        .language-switcher button {
+            background: none;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
 
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-    }
-    .checkbox-group input[type="checkbox"] {
-      margin-right: 8px;
-    }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    .input-group input[type="number"],
-    .input-group input[type="password"] {
-      width: 100%; /* Simplified due to box-sizing: border-box */
-      padding: 12px;
-      font-size: 18px;
-      border: 2px solid var(--primary-color);
-      border-radius: 5px;
-      background-color: var(--background-color); /* Match body bg for inputs */
-      color: var(--text-color); /* Match body text for inputs */
-    }
-    body.dark-mode .input-group input[type="number"],
-    body.dark-mode .input-group input[type="password"] {
-        background-color: #555;
-        color: var(--text-color);
-        border-color: var(--primary-color);
-    }
+        .input-group, .select-group, .checkbox-group {
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group {
+             display: flex;
+             align-items: center;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+             margin-right: 10px;
+        }
 
-    .input-group input::placeholder {
-        color: #aaa; /* Default placeholder color */
-    }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-    body.dark-mode .input-group input::placeholder {
-        color: #888; /* Dark mode placeholder color */
-    }
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
 
+        button {
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            font-weight: bold;
+        }
 
-    button {
-      padding: 12px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
-      width: 100%;
-      font-weight: bold;
-    }
+        .primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
-    .primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    .primary:hover {
-      background-color: var(--primary-hover);
-    }
+        .primary:hover {
+            background-color: var(--primary-hover);
+        }
 
-    .secondary {
-      background-color: var(--secondary-color);
-      color: white;
-    }
-    .secondary:hover {
-      background-color: var(--secondary-hover);
-    }
+        .secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
 
-    .result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      border: 1px solid transparent; /* Base border */
-    }
+        .secondary:hover {
+            background-color: var(--secondary-hover);
+        }
 
-    .result.warning {
-      color: var(--warning-text-color);
-      background-color: var(--warning-bg-color);
-      border-color: var(--warning-border-color);
-    }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid;
+            display: none; /* Initially hidden */
+        }
+        
+        .result.high-risk {
+            background-color: var(--result-high-bg);
+            color: var(--result-high-text);
+            border-color: var(--result-high-border);
+        }
 
-    .low-risk { color: #28a745; }
-    .medium-risk { color: #daa520; } /* Goldenrod, good for light/dark */
-    .red-risk { color: #dc3545; }
+        .result.low-risk {
+            background-color: var(--result-low-bg);
+            color: var(--result-low-text);
+            border-color: var(--result-low-border);
+        }
+        
+        .result-prob {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .result-label {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .error-message {
+            color: var(--secondary-color);
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
 
-    body.dark-mode .low-risk { color: #34d399; } /* Lighter green for dark mode */
-    body.dark-mode .medium-risk { color: #f59e0b; } /* Lighter amber for dark mode */
-    body.dark-mode .red-risk { color: #f87171; } /* Lighter red for dark mode */
-
-
-    .app-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 20px;
-      background-color: var(--primary-color);
-      color: white;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-    }
-    .app-header h1 {
-        font-size: 1.5em;
-        margin: 0;
-    }
-    .header-right {
-        display: flex;
-        align-items: center;
-        gap: 10px; /* Space between buttons */
-    }
-    .header-right button { /* Style header buttons specifically */
-        width: auto; /* Override full width for header buttons */
-        padding: 8px 12px;
-        margin-top: 0; /* No top margin for header buttons */
-    }
-
-
-    .language-switcher img {
-      width: 24px;
-      height: 16px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      vertical-align: middle;
-    }
-    .language-switcher button {
-        background: none;
-        border: none;
-        padding: 5px;
-    }
-
-    .modal {
-      display: none; /* Initially hidden */
-      position: fixed;
-      z-index: 9999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      align-items: center; /* For centering modal content */
-      justify-content: center; /* For centering modal content */
-    }
-    .modal.show {
-      display: flex; /* Use flex to enable centering */
-      opacity: 1;
-    }
-
-    .modal-content {
-      background-color: #fff;
-      /* margin: 20% auto; Removed for flex centering */
-      padding: 20px;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 10px;
-      text-align: center;
-    }
-
-    body.dark-mode .modal-content {
-      background-color: #444;
-    }
-
-    #accessError, #prerequisiteError {
-      color: var(--secondary-color); /* Use theme color for errors */
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    body.dark-mode #accessError, body.dark-mode #prerequisiteError {
-        color: var(--secondary-color);
-    }
-
-
-    .hidden {
-      display: none !important; /* Utility class to hide sections */
-    }
-  </style>
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
-  <header class="app-header">
-    <div class="header-left">
-      <h1 id="appTitle">iGFAP Check</h1>
-    </div>
-    <div class="header-right">
-      <div class="language-switcher">
-        <button onclick="switchLanguage('en')" aria-label="Switch to English">
-          <img src="https://flagcdn.com/gb.svg" alt="English">
-        </button>
-        <button onclick="switchLanguage('de')" aria-label="Switch to German">
-          <img src="https://flagcdn.com/de.svg" alt="Deutsch">
-        </button>
-      </div>
-      <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
-      <button class="home-button" id="homeButton" onclick="navigateToModuleSelection()">🏠 Home</button>
-    </div>
-  </header>
 
-  <!-- IMPORTANT SECURITY NOTE: 
-    The access code validation below is client-side only. 
-    This is INSECURE for any production application. 
-    Anyone can view the page source to find the code.
-    For a real application, authentication MUST be handled server-side.
-    This is included for demonstration purposes of the application flow only. 
-  -->
-  <section id="codeEntrySection" class="container">
-    <p id="codePrompt">🔑 Please enter your access code:</p>
-    <div class="input-group">
-      <input type="password" id="accessCodeInput" placeholder="Enter code">
-    </div>
-    <button class="primary" id="accessCodeButton">Submit</button>
-    <p id="accessError" class="hidden"></p>
-  </section>
+    <header class="app-header">
+        <h1 id="appTitle">ICH Prediction</h1>
+        <div class="header-right">
+             <div class="language-switcher">
+                <button onclick="switchLanguage('en')" aria-label="Switch to English">
+                    <img src="https://flagcdn.com/gb.svg" alt="English">
+                </button>
+                <button onclick="switchLanguage('de')" aria-label="Switch to German">
+                    <img src="https://flagcdn.com/de.svg" alt="Deutsch">
+                </button>
+            </div>
+            <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+        </div>
+    </header>
 
-  <section id="moduleSelectionSection" class="container hidden">
-    <h2 id="moduleSelectionTitle">Check probability for:</h2>
-    <button class="primary" id="comaModuleButton">Coma Module</button>
-    <button class="primary" id="strokeModuleButton">Stroke Module</button>
-  </section>
+    <section id="mainSection" class="container">
+        <h2 id="strokeModuleTitle">Intracerebral Hemorrhage Prediction</h2>
+        <form id="ich-form">
+            <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <div class="input-group">
+                    <label for="age_years" id="ageLabel">Age (years)</label>
+                    <input type="number" id="age_years" placeholder="e.g., 75" required>
+                </div>
+                <div class="input-group">
+                    <label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label>
+                    <input type="number" id="systolic_bp" placeholder="e.g., 160" required>
+                </div>
+                <div class="input-group">
+                    <label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label>
+                    <input type="number" id="gfap_value" placeholder="e.g., 2875" required>
+                </div>
+                <div class="select-group">
+                    <label for="eye_deviation" id="eyeDeviationLabel">Eye Deviation?</label>
+                    <select id="eye_deviation">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label for="armparese" id="armpareseLabel">Arm Paresis?</label>
+                    <select id="armparese">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label for="beinparese" id="beinpareseLabel">Leg Paresis?</label>
+                    <select id="beinparese">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label for="atrial_fibrillation" id="afibLabel">History of Atrial Fibrillation?</label>
+                    <select id="atrial_fibrillation">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label for="antiplatelets" id="antiplateletsLabel">On Antiplatelets?</label>
+                    <select id="antiplatelets">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+                <div class="select-group" style="grid-column: 1 / -1;">
+                    <label for="headache" id="headacheLabel">Headache?</label>
+                    <select id="headache">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                        <option value="-1">Unknown</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
+        </form>
+        <div class="result" id="result-container">
+            <div class="result-label" id="result-title"></div>
+            <div class="result-prob" id="result-probability"></div>
+        </div>
+    </section>
 
-  <section id="comaModuleSection" class="container hidden">
-    <h2 id="comaModuleTitle">Intracranial hemorrhage in comatose patients (GCS 3-8)</h2>
-    <div class="input-group">
-      <label for="gfapComaInput" id="gfapComaLabel">GFAP Value (pg/mL)</label>
-      <input type="number" id="gfapComaInput" min="29" max="10001" placeholder="GFAP Value (pg/mL)">
-    </div>
-    <button class="primary" id="calculateComaButton">Calculate Probability</button>
-    <button class="secondary" id="comaBackButton" onclick="navigateToModuleSelection()">⬅️ Back</button>
-    <div class="result hidden" id="comaResult" aria-live="polite"></div>
-  </section>
+    <footer style="text-align:center; padding-bottom: 20px;">
+        <p>© <span id="currentYear"></span> All rights reserved.</p>
+    </footer>
 
-  <section id="strokePrerequisiteSection" class="container hidden">
-    <h2 id="strokePrerequisiteTitle">Prerequisites for Stroke Risk Calculation</h2>
-    <div class="checkbox-group">
-      <input type="checkbox" id="prerequisite1">
-      <label for="prerequisite1" id="prerequisite1Label">Confirmed time window < 6 hours</label>
-    </div>
-    <div class="checkbox-group">
-      <input type="checkbox" id="prerequisite2">
-      <label for="prerequisite2" id="prerequisite2Label">No neurological deficits before the event</label>
-    </div>
-    <div class="checkbox-group">
-      <input type="checkbox" id="prerequisite3">
-      <label for="prerequisite3" id="prerequisite3Label">No identifiable head trauma (severe fall)</label>
-    </div>
-    <div class="checkbox-group">
-      <input type="checkbox" id="prerequisite4">
-      <label for="prerequisite4" id="prerequisite4Label">FAST ED Score >= 3 points</label>
-    </div>
-    <button class="primary" id="proceedButton">Proceed to Calculation</button>
-    <button class="secondary" id="strokePrerequisiteBackButton" onclick="navigateToModuleSelection()">⬅️ Back</button>
-    <p id="prerequisiteError" class="hidden"></p>
-  </section>
+    <script>
+        // --- Parameters for JavaScript Implementation --- //
+        const INTERCEPT = -0.72549447;
+        const COEFFICIENTS = {
+            'age_years': -0.20927375, 'eye_deviation': -0.26763354, 'armparese': 0.11730522,
+            'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'systolic_bp': 0.36337294,
+            'antiplatelets': -0.52928134, 'gfap_value': 0.98845868, 'headache': 0.43796113,
+        };
+        const MEDIANS = {
+            'age_years': 78.0, 'eye_deviation': 0.0, 'armparese': 1.0, 'beinparese': 1.0,
+            'atrial_fibrillation': 0.0, 'systolic_bp': 160.0, 'antiplatelets': 0.0,
+            'gfap_value': 3.78418963, 'headache': 0.0,
+        };
+        const IQRS = {
+            'age_years': 18.0, 'eye_deviation': 1.0, 'armparese': 1.0, 'beinparese': 1.0,
+            'atrial_fibrillation': 1.0, 'systolic_bp': 41.5, 'antiplatelets': 1.0,
+            'gfap_value': 0.98704051, 'headache': 0.5,
+        };
+        const IMPUTED_HEADACHE = 0.0;
+        const OPTIMAL_THRESHOLD = 0.61;
 
-  <section id="strokeModuleSection" class="container hidden">
-    <h2 id="strokeModuleTitle">Intracerebral hemorrhage in patients with stroke symptoms</h2>
-    <div class="input-group">
-      <label for="ageInput" id="ageLabel">Patient Age (Years)</label>
-      <input type="number" id="ageInput" min="18" max="120" placeholder="Patient Age (Years)">
-    </div>
-    <div class="input-group">
-      <label for="gfapStrokeInput" id="gfapStrokeLabel">GFAP Value (pg/mL)</label>
-      <input type="number" id="gfapStrokeInput" min="29" max="10001" placeholder="GFAP Value (pg/mL)">
-    </div>
-    <div class="input-group">
-      <label for="sbpInput" id="sbpLabel">Systolic BP (mmHg)</label>
-      <input type="number" id="sbpInput" min="50" max="250" placeholder="Systolic BP (mmHg)">
-    </div>
-    <button class="primary" id="calculateStrokeButton">Calculate Probability</button>
-    <button class="secondary" id="strokeModuleBackButton" onclick="navigateToModuleSelection()">⬅️ Back</button>
-    <div class="result hidden" id="strokeResult" aria-live="polite"></div>
-  </section>
+        // --- Translation Data --- //
+        const translations = {
+            en: {
+                appTitle: "ICH Prediction",
+                strokeModuleTitle: "Intracerebral Hemorrhage Prediction",
+                ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)",
+                eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?",
+                afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?",
+                calculateButton: "Calculate Probability",
+                highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely",
+                darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode",
+            },
+            de: {
+                appTitle: "ICB-Vorhersage",
+                strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung",
+                ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)",
+                eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?",
+                afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?",
+                calculateButton: "Wahrscheinlichkeit berechnen",
+                highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich",
+                darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus",
+            }
+        };
+        
+        // --- App Logic --- //
+        document.addEventListener('DOMContentLoaded', () => {
+            const calculateBtn = document.getElementById('calculate-btn');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-  <footer style="text-align:center; margin-top:20px; padding-bottom: 20px;">
-    <p>© <span id="currentYear"></span> iGFAP. All rights reserved.</p>
-  </footer>
+            // Load saved preferences
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.textContent = '☀️';
+            }
+            const preferredLang = localStorage.getItem('language') || 'en';
+            switchLanguage(preferredLang);
 
-  <div id="disclaimerModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="disclaimerModalTitleText">
-    <div class="modal-content">
-      <p id="disclaimerModalTitleText" class="disclaimer-text">The calculations are for research purposes only, do not make clinical decisions based on it.</p>
-      <button class="primary" id="disclaimerConfirmButton">Confirm</button>
-    </div>
-  </div>
-
-  <script>
-    let currentLang = 'en';
-    let pendingResult = null;
-    const HARDCODED_ACCESS_CODE = '1234'; // Stored for clarity, still insecure client-side.
-
-    const translations = {
-      en: {
-        appTitle: "iGFAP Check",
-        codePrompt: "🔑 Please enter your access code:",
-        accessCodeButton: "Submit",
-        homeButton: "🏠 Home",
-        moduleSelectionTitle: "Check probability for:",
-        comaModuleButton: "Intracranial hemorrhage in comatose patients (GCS 3-8)", // Updated
-        strokeModuleButton: "Intracerebral hemorrhage in Patients with stroke symptoms", // Updated
-        comaModuleTitle: "Intracranial hemorrhage in comatose patients (GCS 3-8)",
-        strokeModuleTitle: "Intracerebral hemorrhage in patients with stroke symptoms",
-        strokePrerequisiteTitle: "Prerequisites for Stroke Risk Calculation",
-        accessError: "Incorrect code. Please try again.",
-        prerequisiteError: "All prerequisites must be met to proceed.",
-        calculateButton: "Calculate Probability",
-        proceedButton: "Proceed to Calculation",
-        backButton: "⬅️ Back",
-        rangeErrorGFAP: "Please enter a GFAP value between 29 and 10001 pg/mL.",
-        invalidInput: "Please enter a valid value!",
-        lowRisk: "Low Risk",
-        mediumRisk: "Medium Risk",
-        highRisk: "High Risk",
-        disclaimer: "The calculations are for research purposes only, do not make clinical decisions based on it.",
-        confirmButton: "Confirm",
-        probability: "Probability",
-        riskLevel: "Risk Level",
-        gfapLabel: "GFAP Value (pg/mL)",
-        ageLabel: "Patient Age (Years)",
-        sbpLabel: "Systolic BP (mmHg)",
-        sbpError: "Valid SBP range: 50-250 mmHg.",
-        invalidAge: "Please enter valid age (18-120).",
-        invalidGFAP: "Invalid GFAP value. Must be between 29 and 10001.",
-        prerequisite1: "Confirmed time window < 6 hours",
-        prerequisite2: "No neurological deficits before the event",
-        prerequisite3: "No identifiable head trauma (severe fall)",
-        prerequisite4: "FAST ED Score >= 3 points",
-        // Placeholders
-        gfapPlaceholder: "GFAP Value (pg/mL)",
-        agePlaceholder: "Patient Age (Years)",
-        sbpPlaceholder: "Systolic BP (mmHg)",
-        accessCodePlaceholder: "Enter code",
-        darkModeToggleLabelOn: "Switch to Light Mode",
-        darkModeToggleLabelOff: "Switch to Dark Mode",
-      },
-      de: {
-        appTitle: "iGFAP Check",
-        codePrompt: "🔑 Bitte geben Sie Ihren Zugangscode ein:",
-        accessCodeButton: "Senden",
-        homeButton: "🏠 Startseite",
-        moduleSelectionTitle: "Wahrscheinlichkeit prüfen für:",
-        comaModuleButton: "Intrakranielle Blutungen bei komatösen Patienten (GCS 3-8)", // Updated
-        strokeModuleButton: "Intrazerebrale Blutungen bei Patienten mit Schlaganfallsymptomen", // Updated
-        comaModuleTitle: "Intrakranielle Blutungen bei komatösen Patienten (GCS 3-8)",
-        strokeModuleTitle: "Intrazerebrale Blutungen bei Patienten mit Schlaganfallsymptomen",
-        strokePrerequisiteTitle: "Voraussetzungen für die Schlaganfallrisikoberechnung",
-        accessError: "Falscher Code. Bitte versuchen Sie es erneut.",
-        prerequisiteError: "Alle Voraussetzungen müssen erfüllt sein, um fortzufahren.",
-        calculateButton: "Wahrscheinlichkeit berechnen",
-        proceedButton: "Zur Berechnung fortfahren",
-        backButton: "⬅️ Zurück",
-        rangeErrorGFAP: "Bitte geben Sie einen GFAP-Wert zwischen 29 und 10001 pg/mL ein.",
-        invalidInput: "Bitte geben Sie einen gültigen Wert ein!",
-        lowRisk: "Geringes Risiko",
-        mediumRisk: "Mittleres Risiko",
-        highRisk: "Hohes Risiko",
-        disclaimer: "Die Berechnungen dienen nur Forschungszwecken, treffen Sie keine klinischen Entscheidungen basierend darauf.",
-        confirmButton: "Bestätigen",
-        probability: "Wahrscheinlichkeit",
-        riskLevel: "Risikostufe",
-        gfapLabel: "GFAP-Wert (pg/mL)",
-        ageLabel: "Patientenalter (Jahre)",
-        sbpLabel: "Systolischer RR (mmHg)",
-        sbpError: "Gültiger RR-Bereich: 50-250 mmHg.",
-        invalidAge: "Bitte gültiges Alter eingeben (18-120).",
-        invalidGFAP: "Ungültiger GFAP-Wert. Muss zwischen 29 und 10001 liegen.",
-        prerequisite1: "Gesichertes Zeitfenster < 6 Stunden",
-        prerequisite2: "Keine neurologischen Defizite vor dem Ereignis",
-        prerequisite3: "Kein erkennbares Schädel-Hirn-Trauma (schwerer Sturz)",
-        prerequisite4: "FAST ED Score >= 3 Punkte",
-        // Placeholders
-        gfapPlaceholder: "GFAP-Wert (pg/mL)",
-        agePlaceholder: "Patientenalter (Jahre)",
-        sbpPlaceholder: "Systolischer RR (mmHg)",
-        accessCodePlaceholder: "Code eingeben",
-        darkModeToggleLabelOn: "Heller Modus aktivieren",
-        darkModeToggleLabelOff: "Dunkler Modus aktivieren",
-      }
-    };
-
-    const ALL_SECTIONS = ['codeEntrySection', 'moduleSelectionSection', 'comaModuleSection', 'strokePrerequisiteSection', 'strokeModuleSection'];
-
-    function showSection(sectionIdToShow) {
-      ALL_SECTIONS.forEach(id => {
-        const section = document.getElementById(id);
-        if (id === sectionIdToShow) {
-          section.classList.remove('hidden');
-        } else {
-          section.classList.add('hidden');
-        }
-      });
-    }
-    
-    function updateTextContent(elementId, translationKey) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = translations[currentLang][translationKey];
-        }
-    }
-
-    function updatePlaceholder(elementId, translationKey) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.placeholder = translations[currentLang][translationKey];
-        }
-    }
-
-
-    function switchLanguage(lang) {
-      currentLang = lang;
-      document.documentElement.lang = lang; // Update HTML lang attribute
-      localStorage.setItem('language', lang); // Save language preference
-      const texts = translations[lang];
-
-      // Update general UI texts
-      updateTextContent('appTitle', 'appTitle');
-      updateTextContent('codePrompt', 'codePrompt');
-      updateTextContent('accessCodeButton', 'accessCodeButton');
-      updateTextContent('homeButton', 'homeButton');
-      
-      // Update module selection texts
-      updateTextContent('moduleSelectionTitle', 'moduleSelectionTitle');
-      updateTextContent('comaModuleButton', 'comaModuleButton');
-      updateTextContent('strokeModuleButton', 'strokeModuleButton');
-
-      // Update Coma module texts
-      updateTextContent('comaModuleTitle', 'comaModuleTitle');
-      updateTextContent('gfapComaLabel', 'gfapLabel');
-      updateTextContent('calculateComaButton', 'calculateButton');
-      updateTextContent('comaBackButton', 'backButton');
-      
-      // Update Stroke prerequisite texts
-      updateTextContent('strokePrerequisiteTitle', 'strokePrerequisiteTitle');
-      updateTextContent('prerequisite1Label', 'prerequisite1');
-      updateTextContent('prerequisite2Label', 'prerequisite2');
-      updateTextContent('prerequisite3Label', 'prerequisite3');
-      updateTextContent('prerequisite4Label', 'prerequisite4');
-      updateTextContent('proceedButton', 'proceedButton');
-      updateTextContent('strokePrerequisiteBackButton', 'backButton');
-
-      // Update Stroke module texts
-      updateTextContent('strokeModuleTitle', 'strokeModuleTitle');
-      updateTextContent('ageLabel', 'ageLabel');
-      updateTextContent('gfapStrokeLabel', 'gfapLabel');
-      updateTextContent('sbpLabel', 'sbpLabel');
-      updateTextContent('calculateStrokeButton', 'calculateButton');
-      updateTextContent('strokeModuleBackButton', 'backButton');
-      
-      // Update modal texts
-      updateTextContent('disclaimerModalTitleText', 'disclaimer');
-      updateTextContent('disclaimerConfirmButton', 'confirmButton');
-
-      // Update placeholders
-      updatePlaceholder('accessCodeInput', 'accessCodePlaceholder');
-      updatePlaceholder('gfapComaInput', 'gfapPlaceholder');
-      updatePlaceholder('ageInput', 'agePlaceholder');
-      updatePlaceholder('gfapStrokeInput', 'gfapPlaceholder');
-      updatePlaceholder('sbpInput', 'sbpPlaceholder');
-
-      // Update Dark Mode Toggle aria-label
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      if (document.body.classList.contains('dark-mode')) {
-        darkModeToggle.setAttribute('aria-label', texts.darkModeToggleLabelOn);
-      } else {
-        darkModeToggle.setAttribute('aria-label', texts.darkModeToggleLabelOff);
-      }
-
-      // Re-display errors if they were visible, now translated
-      if (!document.getElementById('accessError').classList.contains('hidden')) {
-          document.getElementById('accessError').textContent = texts.accessError;
-      }
-      if (!document.getElementById('prerequisiteError').classList.contains('hidden')) {
-          document.getElementById('prerequisiteError').textContent = texts.prerequisiteError;
-      }
-    }
-
-    function resetComaModuleInputs() {
-        document.getElementById('gfapComaInput').value = '';
-        const comaResult = document.getElementById('comaResult');
-        comaResult.classList.add('hidden');
-        comaResult.innerHTML = '';
-        comaResult.className = 'result hidden'; // Reset classes
-    }
-
-    function resetStrokeModuleInputs() {
-        document.getElementById('ageInput').value = '';
-        document.getElementById('gfapStrokeInput').value = '';
-        document.getElementById('sbpInput').value = '';
-        const strokeResult = document.getElementById('strokeResult');
-        strokeResult.classList.add('hidden');
-        strokeResult.innerHTML = '';
-        strokeResult.className = 'result hidden'; // Reset classes
-
-        // Reset prerequisites
-        ['prerequisite1', 'prerequisite2', 'prerequisite3', 'prerequisite4'].forEach(id => {
-            document.getElementById(id).checked = false;
+            calculateBtn.addEventListener('click', calculateProbability);
+            darkModeToggle.addEventListener('click', toggleDarkMode);
         });
-        document.getElementById('prerequisiteError').classList.add('hidden');
-    }
 
-    function navigateToModuleSelection() {
-      showSection('moduleSelectionSection');
-      resetComaModuleInputs();
-      resetStrokeModuleInputs();
-      document.getElementById('accessCodeInput').value = ''; // Clear access code field
-      document.getElementById('accessError').classList.add('hidden');
-      document.getElementById('prerequisiteError').classList.add('hidden');
-    }
-    
-    function navigateToCodeEntry() {
-        showSection('codeEntrySection');
-        resetComaModuleInputs();
-        resetStrokeModuleInputs();
-        document.getElementById('accessCodeInput').value = '';
-        document.getElementById('accessCodeInput').focus();
-        document.getElementById('accessError').classList.add('hidden');
-    }
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            const t = translations[lang];
+            
+            document.getElementById('appTitle').textContent = t.appTitle;
+            document.getElementById('strokeModuleTitle').textContent = t.strokeModuleTitle;
+            document.getElementById('ageLabel').textContent = t.ageLabel;
+            document.getElementById('sbpLabel').textContent = t.sbpLabel;
+            document.getElementById('gfapLabel').textContent = t.gfapLabel;
+            document.getElementById('eyeDeviationLabel').textContent = t.eyeDeviationLabel;
+            document.getElementById('armpareseLabel').textContent = t.armpareseLabel;
+            document.getElementById('beinpareseLabel').textContent = t.beinpareseLabel;
+            document.getElementById('afibLabel').textContent = t.afibLabel;
+            document.getElementById('antiplateletsLabel').textContent = t.antiplateletsLabel;
+            document.getElementById('headacheLabel').textContent = t.headacheLabel;
+            document.getElementById('calculate-btn').textContent = t.calculateButton;
 
-
-    function validateAccessCode() {
-      const accessCode = document.getElementById('accessCodeInput').value.trim();
-      const accessErrorEl = document.getElementById('accessError');
-      if (accessCode === HARDCODED_ACCESS_CODE) {
-        navigateToModuleSelection(); // Clears inputs and errors
-        accessErrorEl.classList.add('hidden');
-      } else {
-        accessErrorEl.textContent = translations[currentLang].accessError;
-        accessErrorEl.classList.remove('hidden');
-      }
-    }
-
-    function startComaModule() {
-      showSection('comaModuleSection');
-      resetComaModuleInputs(); // Reset inputs when entering module
-      document.getElementById('gfapComaInput').focus(); // Focus on the first input
-    }
-
-    function startStrokeModule() {
-      showSection('strokePrerequisiteSection');
-      resetStrokeModuleInputs(); // Reset inputs and prerequisites when entering
-      document.getElementById('prerequisite1').focus(); // Focus on the first prerequisite
-    }
-
-    function validatePrerequisites() {
-      const checks = [
-        document.getElementById('prerequisite1').checked,
-        document.getElementById('prerequisite2').checked,
-        document.getElementById('prerequisite3').checked,
-        document.getElementById('prerequisite4').checked
-      ];
-      const prerequisiteErrorEl = document.getElementById('prerequisiteError');
-      
-      if (checks.every(c => c)) {
-        showSection('strokeModuleSection');
-        document.getElementById('ageInput').focus(); // Focus on the first input in stroke module
-        prerequisiteErrorEl.classList.add('hidden');
-      } else {
-        prerequisiteErrorEl.textContent = translations[currentLang].prerequisiteError;
-        prerequisiteErrorEl.classList.remove('hidden');
-      }
-    }
-
-    function showDisclaimer() {
-      const modal = document.getElementById('disclaimerModal');
-      modal.style.display = 'flex'; // Use flex for centering
-      // Timeout to allow display property to take effect before opacity transition
-      setTimeout(() => {
-          modal.classList.add('show');
-          document.getElementById('disclaimerConfirmButton').focus(); // Focus on confirm button
-      }, 10); 
-    }
-
-    function closeDisclaimer() {
-      const modal = document.getElementById('disclaimerModal');
-      modal.classList.remove('show');
-      // Listen for transition end to set display: none
-      modal.addEventListener('transitionend', function handler() {
-        modal.style.display = 'none';
-        modal.removeEventListener('transitionend', handler); // Clean up listener
-        // Potentially focus back to the calculate button or result area
-        if (pendingResult && pendingResult.element.id === 'comaResult') {
-            document.getElementById('calculateComaButton').focus();
-        } else if (pendingResult && pendingResult.element.id === 'strokeResult') {
-            document.getElementById('calculateStrokeButton').focus();
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (document.body.classList.contains('dark-mode')) {
+                darkModeToggle.setAttribute('aria-label', t.darkModeToggleLabelOn);
+            } else {
+                darkModeToggle.setAttribute('aria-label', t.darkModeToggleLabelOff);
+            }
         }
 
-      }, { once: true }); // {once: true} automatically removes the listener after it fires
-    }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const t = translations[currentLang];
 
-    function calculateComaRisk() {
-      const gfapInput = document.getElementById('gfapComaInput');
-      const gfap = parseFloat(gfapInput.value);
-      const result = document.getElementById('comaResult');
-      
-      result.classList.add('hidden'); // Hide previous result first
-      result.className = 'result hidden'; // Reset classes
-
-      if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
-        result.textContent = translations[currentLang].rangeErrorGFAP;
-        result.classList.add('warning');
-        result.classList.remove('hidden');
-        gfapInput.focus(); // Focus back on the input with error
-        return;
-      }
-      
-      showDisclaimer(); // Show disclaimer before processing result
-      
-      // Formula for Coma Risk (example, replace with actual)
-      const y = 36.72 * Math.log10(gfap) - 50.48;
-      const probability = Math.min(Math.max(y, 0), 100); // Clamp between 0 and 100
-      
-      let riskLevel, riskClass;
-      if (gfap <= 100) {
-        riskLevel = translations[currentLang].lowRisk;
-        riskClass = 'low-risk';
-      } else if (gfap <= 1000) {
-        riskLevel = translations[currentLang].mediumRisk;
-        riskClass = 'medium-risk';
-      } else {
-        riskLevel = translations[currentLang].highRisk;
-        riskClass = 'red-risk';
-      }
-      
-      pendingResult = {
-        element: result,
-        html: `<strong>${translations[currentLang].probability}:</strong> ${probability.toFixed(1)}%<br>
-               <strong>${translations[currentLang].riskLevel}:</strong> <span class="${riskClass}">${riskLevel}</span>`,
-        baseClass: 'result', // Keep base class
-        riskClass: riskClass // Specific risk class for text color
-      };
-    }
-
-    function calculateStrokeRisk() {
-      const ageInput = document.getElementById('ageInput');
-      const gfapStrokeInput = document.getElementById('gfapStrokeInput');
-      const sbpInput = document.getElementById('sbpInput');
-
-      const age = parseInt(ageInput.value);
-      const gfap = parseFloat(gfapStrokeInput.value);
-      const sbp = parseFloat(sbpInput.value);
-      const result = document.getElementById('strokeResult');
-
-      result.classList.add('hidden'); // Hide previous result first
-      result.className = 'result hidden'; // Reset classes
-
-      // Validate inputs
-      if (isNaN(age) || age < 18 || age > 120) {
-        result.textContent = translations[currentLang].invalidAge;
-        result.classList.add('warning');
-        result.classList.remove('hidden');
-        ageInput.focus();
-        return;
-      }
-      if (isNaN(gfap) || gfap < 29 || gfap > 10001) {
-        result.textContent = translations[currentLang].invalidGFAP;
-        result.classList.add('warning');
-        result.classList.remove('hidden');
-        gfapStrokeInput.focus();
-        return;
-      }
-      if (isNaN(sbp) || sbp < 50 || sbp > 250) {
-        result.textContent = translations[currentLang].sbpError;
-        result.classList.add('warning');
-        result.classList.remove('hidden');
-        sbpInput.focus();
-        return;
-      }
-      
-      showDisclaimer(); // Show disclaimer before processing result
-      
-      // Logistic regression calculation
-      const logit_p = -9.4520 - (0.0504 * age) + (0.0168 * sbp) + (4.8941 * Math.log10(gfap));
-      const probability = 100 / (1 + Math.exp(-logit_p));
-      const clampedProbability = parseFloat(Math.min(Math.max(probability, 0), 100).toFixed(1));
-      
-      // Risk stratification
-      let riskLevel, riskClass;
-      if (clampedProbability < 15) {
-        riskLevel = translations[currentLang].lowRisk;
-        riskClass = 'low-risk';
-      } else if (clampedProbability <= 40) {
-        riskLevel = translations[currentLang].mediumRisk;
-        riskClass = 'medium-risk';
-      } else {
-        riskLevel = translations[currentLang].highRisk;
-        riskClass = 'red-risk';
-      }
-      
-      pendingResult = {
-        element: result,
-        html: `<strong>${translations[currentLang].probability}:</strong> ${clampedProbability}%<br>
-               <strong>${translations[currentLang].riskLevel}:</strong> <span class="${riskClass}">${riskLevel}</span>`,
-        baseClass: 'result',
-        riskClass: riskClass
-      };
-    }
-
-    // Initialize app
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('currentYear').textContent = new Date().getFullYear();
-      
-      // Initial setup
-      showSection('codeEntrySection'); // Start with code entry
-      document.getElementById('accessCodeInput').focus();
-
-
-      // Load preferences (example: dark mode)
-      if (localStorage.getItem('darkMode') === 'enabled') {
-          document.body.classList.add('dark-mode');
-          document.getElementById('darkModeToggle').textContent = '☀️';
-      } else {
-          document.getElementById('darkModeToggle').textContent = '🌙';
-      }
-      const preferredLang = localStorage.getItem('language') || 'en';
-      switchLanguage(preferredLang); // This will also save the lang to localStorage
-
-
-      // Event listeners
-      document.getElementById('accessCodeButton').addEventListener('click', validateAccessCode);
-      document.getElementById('accessCodeInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') validateAccessCode();
-      });
-      
-      document.getElementById('comaModuleButton').addEventListener('click', startComaModule);
-      document.getElementById('strokeModuleButton').addEventListener('click', startStrokeModule);
-      document.getElementById('proceedButton').addEventListener('click', validatePrerequisites);
-      
-      document.getElementById('calculateComaButton').addEventListener('click', calculateComaRisk);
-      document.getElementById('gfapComaInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') calculateComaRisk();
-      });
-      
-      document.getElementById('calculateStrokeButton').addEventListener('click', calculateStrokeRisk);
-      // Add Enter key listeners for stroke module inputs if desired
-      ['ageInput', 'gfapStrokeInput', 'sbpInput'].forEach(id => {
-        document.getElementById(id).addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') calculateStrokeRisk();
-        });
-      });
-
-
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      darkModeToggle.addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
-        const texts = translations[currentLang];
-        if (document.body.classList.contains('dark-mode')) {
-          darkModeToggle.textContent = '☀️';
-          darkModeToggle.setAttribute('aria-label', texts.darkModeToggleLabelOn);
-          localStorage.setItem('darkMode', 'enabled');
-        } else {
-          darkModeToggle.textContent = '🌙';
-          darkModeToggle.setAttribute('aria-label', texts.darkModeToggleLabelOff);
-          localStorage.setItem('darkMode', 'disabled');
+            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            darkModeToggle.setAttribute('aria-label', isDarkMode ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
         }
-      });
-      
-      document.getElementById('disclaimerConfirmButton').addEventListener('click', function() {
-        closeDisclaimer();
-        if (pendingResult) {
-          pendingResult.element.innerHTML = pendingResult.html;
-          // Apply base class and then specific risk class for text coloring
-          pendingResult.element.className = `${pendingResult.baseClass}`; // No specific color class on the main div
-          pendingResult.element.classList.remove('hidden');
-          pendingResult = null;
+
+        function calculateProbability() {
+            const form = document.getElementById('ich-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // 1. Get raw inputs
+            let inputs = {};
+            const featureKeys = Object.keys(COEFFICIENTS);
+            featureKeys.forEach(key => {
+                inputs[key] = parseFloat(document.getElementById(key).value);
+            });
+
+            // 2. Preprocess
+            if (inputs.headache === -1) {
+                inputs.headache = IMPUTED_HEADACHE;
+            }
+            inputs.gfap_value = Math.log1p(inputs.gfap_value);
+
+            let scaledInputs = {};
+            for (const key in inputs) {
+                if (IQRS[key] === 0) { // Avoid division by zero
+                    scaledInputs[key] = (inputs[key] - MEDIANS[key]) > 0 ? 1 : 0;
+                } else {
+                    scaledInputs[key] = (inputs[key] - MEDIANS[key]) / IQRS[key];
+                }
+            }
+            
+            // 3. Calculate Log-Odds (Z)
+            let logOdds = INTERCEPT;
+            for (const key in scaledInputs) {
+                logOdds += scaledInputs[key] * COEFFICIENTS[key];
+            }
+
+            // 4. Convert to Probability
+            const probability = 1 / (1 + Math.exp(-logOdds));
+
+            // 5. Make Decision
+            const finalDecision = probability >= OPTIMAL_THRESHOLD ? 'high-risk' : 'low-risk';
+
+            // 6. Display Results
+            displayResults(probability, finalDecision);
         }
-      });
-    });
-  </script>
+
+        function displayResults(probability, decision) {
+            const resultContainer = document.getElementById('result-container');
+            const resultTitle = document.getElementById('result-title');
+            const resultProbability = document.getElementById('result-probability');
+
+            resultProbability.textContent = `${(probability * 100).toFixed(1)}%`;
+            resultContainer.className = `result ${decision}`; // Reset classes and add new one
+            
+            const t = translations[currentLang];
+            resultTitle.textContent = (decision === 'high-risk') ? t.highRisk : t.lowRisk;
+
+            resultContainer.style.display = 'block';
+        }
+
+    </script>
 </body>
 </html>
