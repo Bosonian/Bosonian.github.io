@@ -1,472 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICH Prediction Tool</title>
-    <style>
-        :root {
-            --primary-color: #007bff;
-            --primary-hover: #0056b3;
-            --secondary-color: #6c757d;
-            --secondary-hover: #5a6268;
-            --background-color: #f8f9fa;
-            --container-bg: #ffffff;
-            --text-color: #333;
-            --result-high-bg: #f8d7da;
-            --result-high-text: #721c24;
-            --result-high-border: #f5c6cb;
-            --result-low-bg: #d4edda;
-            --result-low-text: #155724;
-            --result-low-border: #c3e6cb;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICH Prediction Tool</title>
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --primary-hover: #0056b3;
+      --background-color: #f8f9fa;
+      --container-bg: #ffffff;
+      --text-color: #333;
+      --result-high-bg: #f8d7da;
+      --result-high-text: #721c24;
+      --result-high-border: #f5c6cb;
+      --result-low-bg: #d4edda;
+      --result-low-text: #155724;
+      --result-low-border: #c3e6cb;
+    }
 
-        body.dark-mode {
-            --primary-color: #3399ff;
-            --primary-hover: #287ac7;
-            --secondary-color: #8f9aa3;
-            --secondary-hover: #7c858d;
-            --background-color: #333;
-            --container-bg: #444;
-            --text-color: #f8f9fa;
-            --result-high-bg: #5c2a30;
-            --result-high-text: #f5c6cb;
-            --result-high-border: #721c24;
-            --result-low-bg: #2a5032;
-            --result-low-text: #c3e6cb;
-            --result-low-border: #155724;
-        }
+    body.dark-mode {
+      --primary-color: #3399ff;
+      --primary-hover: #287ac7;
+      --background-color: #333;
+      --container-bg: #444;
+      --text-color: #f8f9fa;
+      --result-high-bg: #5c2a30;
+      --result-high-text: #f5c6cb;
+      --result-high-border: #721c24;
+      --result-low-bg: #2a5032;
+      --result-low-text: #c3e6cb;
+      --result-low-border: #155724;
+    }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-        .container {
-            max-width: 500px;
-            margin: 70px auto 20px auto;
-            padding: 20px;
-            background-color: var(--container-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: background-color 0.3s ease;
-        }
-        
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            position: fixed; /* Changed from sticky for better consistency */
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 999;
-        }
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+    }
 
-        .app-header h1 {
-            font-size: 1.5em;
-            margin: 0;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .header-right button {
-            width: auto;
-            padding: 8px 12px;
-            margin-top: 0;
-        }
-        
-        .language-switcher img {
-            width: 24px;
-            height: 16px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            vertical-align: middle;
-        }
+    .app-header h1 {
+      font-size: 1.5em;
+      margin: 0;
+    }
 
-        .language-switcher button {
-            background: none;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-        }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        h1, h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .header-right button {
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
 
-        .input-group, .select-group, .checkbox-group {
-            margin-bottom: 15px;
-        }
-        
-        .checkbox-group {
-             display: flex;
-             align-items: center;
-        }
-        
-        .checkbox-group input[type="checkbox"] {
-             margin-right: 10px;
-        }
+    .language-switcher img {
+      width: 24px; height: 16px;
+      border: 1px solid #ccc; border-radius: 3px;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+    .container {
+      max-width: 500px;
+      margin: 70px auto 20px;
+      padding: 20px;
+      background-color: var(--container-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+    }
 
-        input[type="number"], select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        
-        input:focus, select:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        button {
-            padding: 12px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            font-weight: bold;
-        }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
 
-        .primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
+    .input-group, .select-group {
+      margin-bottom: 15px;
+    }
 
-        .primary:hover {
-            background-color: var(--primary-hover);
-        }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
 
-        .secondary {
-            background-color: var(--secondary-color);
-            color: white;
-        }
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
 
-        .secondary:hover {
-            background-color: var(--secondary-hover);
-        }
+    input:focus,
+    select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px var(--primary-hover);
+    }
 
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid;
-            display: none; /* Initially hidden */
-        }
-        
-        .result.high-risk {
-            background-color: var(--result-high-bg);
-            color: var(--result-high-text);
-            border-color: var(--result-high-border);
-        }
+    button.primary {
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      width: 100%;
+      background-color: var(--primary-color);
+      color: white;
+      transition: background-color 0.3s ease;
+    }
 
-        .result.low-risk {
-            background-color: var(--result-low-bg);
-            color: var(--result-low-text);
-            border-color: var(--result-low-border);
-        }
-        
-        .result-prob {
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-        
-        .result-label {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .error-message {
-            color: var(--secondary-color);
-            margin-top: 10px;
-            font-weight: bold;
-            text-align: center;
-        }
+    button.primary:hover {
+      background-color: var(--primary-hover);
+    }
 
-        .hidden {
-            display: none !important;
-        }
-    </style>
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid;
+      display: none;
+    }
+
+    .result.high-risk {
+      background-color: var(--result-high-bg);
+      color: var(--result-high-text);
+      border-color: var(--result-high-border);
+    }
+
+    .result.low-risk {
+      background-color: var(--result-low-bg);
+      color: var(--result-low-text);
+      border-color: var(--result-low-border);
+    }
+
+    .result-prob {
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+
+    .result-label {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .app-footer {
+      text-align: center;
+      padding: 20px 0;
+      color: var(--secondary-color);
+    }
+  </style>
 </head>
 <body>
 
-    <header class="app-header">
-        <h1 id="appTitle">ICH Prediction</h1>
-        <div class="header-right">
-             <div class="language-switcher">
-                <button onclick="switchLanguage('en')" aria-label="Switch to English">
-                    <img src="https://flagcdn.com/gb.svg" alt="English">
-                </button>
-                <button onclick="switchLanguage('de')" aria-label="Switch to German">
-                    <img src="https://flagcdn.com/de.svg" alt="Deutsch">
-                </button>
-            </div>
-            <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+  <header class="app-header">
+    <h1 id="appTitle">ICH Prediction</h1>
+    <div class="header-right">
+      <div class="language-switcher">
+        <button onclick="switchLanguage('en')" aria-label="Switch to English">
+          <img src="https://flagcdn.com/gb.svg" alt="English">
+        </button>
+        <button onclick="switchLanguage('de')" aria-label="Switch to German">
+          <img src="https://flagcdn.com/de.svg" alt="Deutsch">
+        </button>
+      </div>
+      <button id="darkModeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <section class="container">
+    <h2 id="strokeModuleTitle">Intracerebral Hemorrhage Prediction</h2>
+    <form id="ich-form">
+      <div class="grid-container">
+        <div class="input-group">
+          <label for="age_years" id="ageLabel">Age (years)</label>
+          <input
+            type="number"
+            id="age_years"
+            min="18" max="120" step="1"
+            placeholder="e.g., 75"
+            required>
         </div>
-    </header>
-
-    <section id="mainSection" class="container">
-        <h2 id="strokeModuleTitle">Intracerebral Hemorrhage Prediction</h2>
-        <form id="ich-form">
-            <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <div class="input-group">
-                    <label for="age_years" id="ageLabel">Age (years)</label>
-                    <input type="number" id="age_years" placeholder="e.g., 75" required>
-                </div>
-                <div class="input-group">
-                    <label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label>
-                    <input type="number" id="systolic_bp" placeholder="e.g., 160" required>
-                </div>
-                <div class="input-group">
-                    <label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label>
-                    <input type="number" id="gfap_value" placeholder="e.g., 2875" required>
-                </div>
-                <div class="select-group">
-                    <label for="eye_deviation" id="eyeDeviationLabel">Eye Deviation?</label>
-                    <select id="eye_deviation">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="armparese" id="armpareseLabel">Arm Paresis?</label>
-                    <select id="armparese">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="beinparese" id="beinpareseLabel">Leg Paresis?</label>
-                    <select id="beinparese">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="atrial_fibrillation" id="afibLabel">History of Atrial Fibrillation?</label>
-                    <select id="atrial_fibrillation">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-                <div class="select-group">
-                    <label for="antiplatelets" id="antiplateletsLabel">On Antiplatelets?</label>
-                    <select id="antiplatelets">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
-                <div class="select-group" style="grid-column: 1 / -1;">
-                    <label for="headache" id="headacheLabel">Headache?</label>
-                    <select id="headache">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                        <option value="-1">Unknown</option>
-                    </select>
-                </div>
-            </div>
-            <button type="button" id="calculate-btn" class="primary">Calculate Probability</button>
-        </form>
-        <div class="result" id="result-container">
-            <div class="result-label" id="result-title"></div>
-            <div class="result-prob" id="result-probability"></div>
+        <div class="input-group">
+          <label for="systolic_bp" id="sbpLabel">Systolic BP (mmHg)</label>
+          <input
+            type="number"
+            id="systolic_bp"
+            min="80" max="300" step="1"
+            placeholder="e.g., 160"
+            required>
         </div>
-    </section>
+        <div class="input-group">
+          <label for="gfap_value" id="gfapLabel">GFAP Value (pg/mL)</label>
+          <input
+            type="number"
+            id="gfap_value"
+            min="29" max="10001" step="0.01"
+            placeholder="e.g., 2875"
+            required>
+        </div>
+        <div class="select-group">
+          <label for="eye_deviation" id="eyeDeviationLabel">Eye Deviation?</label>
+          <select id="eye_deviation">
+            <option value="" disabled selected>Choose…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="armparese" id="armpareseLabel">Arm Paresis?</label>
+          <select id="armparese">
+            <option value="" disabled selected>Choose…</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="beinparese" id="beinpareseLabel">Leg Paresis?</label>
+          <select id="beinparese">
+            <option value="" disabled selected>Choose…</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="atrial_fibrillation" id="afibLabel">History of Atrial Fibrillation?</label>
+          <select id="atrial_fibrillation">
+            <option value="" disabled selected>Choose…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+        <div class="select-group">
+          <label for="antiplatelets" id="antiplateletsLabel">On Antiplatelets?</label>
+          <select id="antiplatelets">
+            <option value="" disabled selected>Choose…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+        <div class="select-group" style="grid-column: 1 / -1;">
+          <label for="headache" id="headacheLabel">Headache?</label>
+          <select id="headache">
+            <option value="" disabled selected>Choose…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+            <option value="-1">Unknown</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" id="calculateButton" class="primary">
+        Calculate Probability
+      </button>
+    </form>
 
-    <footer style="text-align:center; padding-bottom: 20px;">
-        <p>© <span id="currentYear"></span> All rights reserved.</p>
-    </footer>
+    <div class="result" id="result-container">
+      <div class="result-label" id="result-title"></div>
+      <div class="result-prob" id="result-probability"></div>
+    </div>
+  </section>
 
-    <script>
-        // --- Parameters for JavaScript Implementation --- //
-        const INTERCEPT = -0.72549447;
-        const COEFFICIENTS = {
-            'age_years': -0.20927375, 'eye_deviation': -0.26763354, 'armparese': 0.11730522,
-            'beinparese': 0.42467409, 'atrial_fibrillation': -0.24686695, 'systolic_bp': 0.36337294,
-            'antiplatelets': -0.52928134, 'gfap_value': 0.98845868, 'headache': 0.43796113,
-        };
-        const MEDIANS = {
-            'age_years': 78.0, 'eye_deviation': 0.0, 'armparese': 1.0, 'beinparese': 1.0,
-            'atrial_fibrillation': 0.0, 'systolic_bp': 160.0, 'antiplatelets': 0.0,
-            'gfap_value': 3.78418963, 'headache': 0.0,
-        };
-        const IQRS = {
-            'age_years': 18.0, 'eye_deviation': 1.0, 'armparese': 1.0, 'beinparese': 1.0,
-            'atrial_fibrillation': 1.0, 'systolic_bp': 41.5, 'antiplatelets': 1.0,
-            'gfap_value': 0.98704051, 'headache': 0.5,
-        };
-        const IMPUTED_HEADACHE = 0.0;
-        const OPTIMAL_THRESHOLD = 0.61;
+  <footer class="app-footer">
+    <p>© <span id="currentYear"></span> All rights reserved.</p>
+  </footer>
 
-        // --- Translation Data --- //
-        const translations = {
-            en: {
-                appTitle: "ICH Prediction",
-                strokeModuleTitle: "Intracerebral Hemorrhage Prediction",
-                ageLabel: "Age (years)", sbpLabel: "Systolic BP (mmHg)", gfapLabel: "GFAP Value (pg/mL)",
-                eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?", beinpareseLabel: "Leg Paresis?",
-                afibLabel: "History of Atrial Fibrillation?", antiplateletsLabel: "On Antiplatelets?", headacheLabel: "Headache?",
-                calculateButton: "Calculate Probability",
-                highRisk: "High Risk: ICH Suspected", lowRisk: "Low Risk: ICH Unlikely",
-                darkModeToggleLabelOn: "Switch to Light Mode", darkModeToggleLabelOff: "Switch to Dark Mode",
-            },
-            de: {
-                appTitle: "ICB-Vorhersage",
-                strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung",
-                ageLabel: "Alter (Jahre)", sbpLabel: "Systolischer RR (mmHg)", gfapLabel: "GFAP-Wert (pg/mL)",
-                eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?", beinpareseLabel: "Beinparese?",
-                afibLabel: "Vorhofflimmern-Anamnese?", antiplateletsLabel: "Unter Thrombozytenaggregationshemmern?", headacheLabel: "Kopfschmerzen?",
-                calculateButton: "Wahrscheinlichkeit berechnen",
-                highRisk: "Hohes Risiko: ICB vermutet", lowRisk: "Geringes Risiko: ICB unwahrscheinlich",
-                darkModeToggleLabelOn: "Heller Modus", darkModeToggleLabelOff: "Dunkler Modus",
-            }
-        };
-        
-        // --- App Logic --- //
-        document.addEventListener('DOMContentLoaded', () => {
-            const calculateBtn = document.getElementById('calculate-btn');
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
+  <script>
+    // --- Model parameters ---
+    const INTERCEPT = -0.72549447;
+    const COEFFICIENTS = {
+      age_years: -0.20927375, eye_deviation: -0.26763354,
+      armparese: 0.11730522, beinparese: 0.42467409,
+      atrial_fibrillation: -0.24686695,
+      systolic_bp: 0.36337294,
+      antiplatelets: -0.52928134,
+      gfap_value: 0.98845868, headache: 0.43796113
+    };
+    const SCALER_MEDIANS = {
+      age_years: 78.0, eye_deviation: 0.0, armparese: 1.0,
+      beinparese: 1.0, atrial_fibrillation: 0.0,
+      systolic_bp: 160.0, antiplatelets: 0.0,
+      gfap_value: 3.78418963, headache: 0.0
+    };
+    const SCALER_IQRS = {
+      age_years: 18.0, eye_deviation: 1.0, armparese: 1.0,
+      beinparese: 1.0, atrial_fibrillation: 1.0,
+      systolic_bp: 41.5, antiplatelets: 1.0,
+      gfap_value: 0.98704051, headache: 0.5
+    };
+    const IMPUTED_HEADACHE = 0.0;
+    const OPTIMAL_THRESHOLD = 0.61;
 
-            // Load saved preferences
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.body.classList.add('dark-mode');
-                darkModeToggle.textContent = '☀️';
-            }
-            const preferredLang = localStorage.getItem('language') || 'en';
-            switchLanguage(preferredLang);
+    // --- Translations & placeholders ---
+    const translations = {
+      en: {
+        appTitle: "ICH Prediction",
+        strokeModuleTitle: "Intracerebral Hemorrhage Prediction",
+        ageLabel: "Age (years)", agePlaceholder: "e.g., 75",
+        sbpLabel: "Systolic BP (mmHg)", sbpPlaceholder: "e.g., 160",
+        gfapLabel: "GFAP Value (pg/mL)", gfapPlaceholder: "e.g., 2875",
+        eyeDeviationLabel: "Eye Deviation?", armpareseLabel: "Arm Paresis?",
+        beinpareseLabel: "Leg Paresis?",
+        afibLabel: "History of Atrial Fibrillation?",
+        antiplateletsLabel: "On Antiplatelets?",
+        headacheLabel: "Headache?",
+        calculateButton: "Calculate Probability",
+        highRisk: "High Risk: ICH Suspected",
+        lowRisk: "Low Risk: ICH Unlikely",
+        darkModeToggleLabelOn: "Switch to Light Mode",
+        darkModeToggleLabelOff: "Switch to Dark Mode"
+      },
+      de: {
+        appTitle: "ICB-Vorhersage",
+        strokeModuleTitle: "Vorhersage einer intrazerebralen Blutung",
+        ageLabel: "Alter (Jahre)", agePlaceholder: "z. B. 75",
+        sbpLabel: "Systolischer RR (mmHg)", sbpPlaceholder: "z. B. 160",
+        gfapLabel: "GFAP-Wert (pg/mL)", gfapPlaceholder: "z. B. 2875",
+        eyeDeviationLabel: "Blickdeviation?", armpareseLabel: "Armparese?",
+        beinpareseLabel: "Beinparese?",
+        afibLabel: "Vorhofflimmern-Anamnese?",
+        antiplateletsLabel: "Unter Thrombozytenaggregations-hemmern?",
+        headacheLabel: "Kopfschmerzen?",
+        calculateButton: "Wahrscheinlichkeit berechnen",
+        highRisk: "Hohes Risiko: ICB vermutet",
+        lowRisk: "Geringes Risiko: ICB unwahrscheinlich",
+        darkModeToggleLabelOn: "Heller Modus",
+        darkModeToggleLabelOff: "Dunkler Modus"
+      }
+    };
 
-            calculateBtn.addEventListener('click', calculateProbability);
-            darkModeToggle.addEventListener('click', toggleDarkMode);
-        });
+    let currentLang = 'en';
 
-        function switchLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('language', lang);
-            const t = translations[lang];
-            
-            document.getElementById('appTitle').textContent = t.appTitle;
-            document.getElementById('strokeModuleTitle').textContent = t.strokeModuleTitle;
-            document.getElementById('ageLabel').textContent = t.ageLabel;
-            document.getElementById('sbpLabel').textContent = t.sbpLabel;
-            document.getElementById('gfapLabel').textContent = t.gfapLabel;
-            document.getElementById('eyeDeviationLabel').textContent = t.eyeDeviationLabel;
-            document.getElementById('armpareseLabel').textContent = t.armpareseLabel;
-            document.getElementById('beinpareseLabel').textContent = t.beinpareseLabel;
-            document.getElementById('afibLabel').textContent = t.afibLabel;
-            document.getElementById('antiplateletsLabel').textContent = t.antiplateletsLabel;
-            document.getElementById('headacheLabel').textContent = t.headacheLabel;
-            document.getElementById('calculate-btn').textContent = t.calculateButton;
+    document.addEventListener('DOMContentLoaded', () => {
+      const calculateBtn = document.getElementById('calculateButton');
+      const darkModeToggle = document.getElementById('darkModeToggle');
 
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (document.body.classList.contains('dark-mode')) {
-                darkModeToggle.setAttribute('aria-label', t.darkModeToggleLabelOn);
-            } else {
-                darkModeToggle.setAttribute('aria-label', t.darkModeToggleLabelOff);
-            }
-        }
+      document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const t = translations[currentLang];
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.textContent = '☀️';
+      }
+      const storedLang = localStorage.getItem('language') || 'en';
+      switchLanguage(storedLang);
 
-            darkModeToggle.textContent = isDarkMode ? '☀️' : '🌙';
-            darkModeToggle.setAttribute('aria-label', isDarkMode ? t.darkModeToggleLabelOn : t.darkModeToggleLabelOff);
-            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        }
+      calculateBtn.addEventListener('click', calculateProbability);
+      darkModeToggle.addEventListener('click', toggleDarkMode);
+    });
 
-        function calculateProbability() {
-            const form = document.getElementById('ich-form');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+    function switchLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('language', lang);
+      const t = translations[lang];
 
-            // 1. Get raw inputs
-            let inputs = {};
-            const featureKeys = Object.keys(COEFFICIENTS);
-            featureKeys.forEach(key => {
-                inputs[key] = parseFloat(document.getElementById(key).value);
-            });
+      // text content
+      ['appTitle','strokeModuleTitle','ageLabel','sbpLabel','gfapLabel',
+       'eyeDeviationLabel','armpareseLabel','beinpareseLabel',
+       'afibLabel','antiplateletsLabel','headacheLabel',
+       'calculateButton','highRisk','lowRisk'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = t[id];
+      });
 
-            // 2. Preprocess
-            if (inputs.headache === -1) {
-                inputs.headache = IMPUTED_HEADACHE;
-            }
-            inputs.gfap_value = Math.log1p(inputs.gfap_value);
+      // placeholders
+      document.getElementById('age_years').placeholder       = t.agePlaceholder;
+      document.getElementById('systolic_bp').placeholder    = t.sbpPlaceholder;
+      document.getElementById('gfap_value').placeholder     = t.gfapPlaceholder;
 
-            let scaledInputs = {};
-            for (const key in inputs) {
-                if (IQRS[key] === 0) { // Avoid division by zero
-                    scaledInputs[key] = (inputs[key] - MEDIANS[key]) > 0 ? 1 : 0;
-                } else {
-                    scaledInputs[key] = (inputs[key] - MEDIANS[key]) / IQRS[key];
-                }
-            }
-            
-            // 3. Calculate Log-Odds (Z)
-            let logOdds = INTERCEPT;
-            for (const key in scaledInputs) {
-                logOdds += scaledInputs[key] * COEFFICIENTS[key];
-            }
+      // aria-label for dark mode
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      darkModeToggle.setAttribute(
+        'aria-label',
+        document.body.classList.contains('dark-mode')
+          ? t.darkModeToggleLabelOn
+          : t.darkModeToggleLabelOff
+      );
+    }
 
-            // 4. Convert to Probability
-            const probability = 1 / (1 + Math.exp(-logOdds));
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      const toggle = document.getElementById('darkModeToggle');
+      const t = translations[currentLang];
 
-            // 5. Make Decision
-            const finalDecision = probability >= OPTIMAL_THRESHOLD ? 'high-risk' : 'low-risk';
+      toggle.textContent = isDark ? '☀️' : '🌙';
+      toggle.setAttribute('aria-label', isDark
+        ? t.darkModeToggleLabelOn
+        : t.darkModeToggleLabelOff
+      );
+      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    }
 
-            // 6. Display Results
-            displayResults(probability, finalDecision);
-        }
+    function calculateProbability() {
+      const form = document.getElementById('ich-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
 
-        function displayResults(probability, decision) {
-            const resultContainer = document.getElementById('result-container');
-            const resultTitle = document.getElementById('result-title');
-            const resultProbability = document.getElementById('result-probability');
+      // 1) Gather inputs
+      let inputs = {};
+      Object.keys(COEFFICIENTS).forEach(key => {
+        inputs[key] = parseFloat(document.getElementById(key).value);
+      });
 
-            resultProbability.textContent = `${(probability * 100).toFixed(1)}%`;
-            resultContainer.className = `result ${decision}`; // Reset classes and add new one
-            
-            const t = translations[currentLang];
-            resultTitle.textContent = (decision === 'high-risk') ? t.highRisk : t.lowRisk;
+      // 2) Impute & log-transform
+      if (inputs.headache === -1) inputs.headache = IMPUTED_HEADACHE;
+      inputs.gfap_value = Math.log1p(inputs.gfap_value);
 
-            resultContainer.style.display = 'block';
-        }
+      // 3) Scale everything
+      let scaled = {};
+      Object.keys(inputs).forEach(key => {
+        const iqr = SCALER_IQRS[key];
+        scaled[key] = iqr === 0
+          ? 0
+          : (inputs[key] - SCALER_MEDIANS[key]) / iqr;
+      });
 
-    </script>
+      // 4) Compute log-odds & probability
+      let z = INTERCEPT;
+      Object.keys(scaled).forEach(key => {
+        z += scaled[key] * COEFFICIENTS[key];
+      });
+      const prob = 1 / (1 + Math.exp(-z));
+
+      // 5) Decision & display
+      const decision = prob >= OPTIMAL_THRESHOLD ? 'high-risk' : 'low-risk';
+      displayResults(prob, decision);
+    }
+
+    function displayResults(prob, decision) {
+      const container = document.getElementById('result-container');
+      const title = document.getElementById('result-title');
+      const pct   = document.getElementById('result-probability');
+      pct.textContent = `${(prob*100).toFixed(1)}%`;
+      container.className = `result ${decision}`;
+      container.style.display = 'block';
+    }
+  </script>
 </body>
 </html>
+
