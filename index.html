@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>iGFAP</title>
+    <meta name="theme-color" content="#0066CC" />
+    <meta
+      name="description"
+      content="Research preview of stroke triage assistant for clinical evaluation"
+    />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Stroke Triage" />
+    <meta name="msapplication-TileColor" content="#0066CC" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/icon-192x192.png" color="#0066CC" />
+    <script type="module" crossorigin src="/assets/index-BXkMkYrz.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DrHPEnic.css">
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header
+      class="bg-[#0059b0] dark:bg-gray-800 shadow-xl px-4 py-3 md:px-8 transition-colors duration-300"
+    >
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <!-- Logo + Title -->
+        <div class="flex items-center space-x-3">
+          <!-- Back Button - hidden by default, shown when there's history -->
+          <button
+            id="backButton"
+            data-action="goBack"
+            class="cursor-pointer w-10 h-10 items-center justify-center rounded-md bg-gradient-to-br from-gray-500 to-gray-400 shadow-md hover:from-gray-600 hover:to-gray-500 transition-all duration-200"
+            style="display: none;"
+            aria-label="Go back"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <!-- Home Button -->
+          <div
+            id="homeButton"
+            class="cursor-pointer w-10 h-10 flex items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-blue-400 shadow-md"
+          >
+            🏠
+          </div>
+
+          <!-- Text -->
+          <div class="hidden md:block">
+            <h1
+              class="text-xl font-extrabold text-white dark:text-white transition-colors duration-300"
+            >
+              iGFAP
+            </h1>
+            <small class="text-sm text-white dark:text-gray-400 transition-colors duration-300">
+              Stroke Triage Assistant
+            </small>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4 sm:space-x-2">
+          <button
+            id="helpButton"
+            class="px-3 py-3 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 border border-gray-200 hover:border-gray-300"
+          >
+            ❓
+          </button>
+          <button
+            id="darkModeToggle"
+            class="px-3 py-3 text-gray-700 rounded-full dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300 border border-gray-200 hover:border-gray-300"
+          >
+            🌙
+          </button>
+          <button
+            id="languageToggle"
+            data-lang="en"
+            class="px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors duration-300 border border-gray-200 hover:border-gray-300"
+          >
+            <svg
+              width="20px"
+              height="20px"
+              viewBox="0 0 36 36"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              aria-hidden="true"
+              role="img"
+              class="iconify iconify--twemoji"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path fill="#FFCD05" d="M0 27a4 4 0 0 0 4 4h28a4 4 0 0 0 4-4v-4H0v4z"></path>
+              <path fill="#ED1F24" d="M0 14h36v9H0z"></path>
+              <path fill="#141414" d="M32 5H4a4 4 0 0 0-4 4v5h36V9a4 4 0 0 0-4-4z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+    <div
+      id="loadingScreen"
+      class="fixed inset-0 flex items-center justify-center bg-white/80 z-50 hidden"
+    >
+      <div class="text-center">
+        <div
+          class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"
+        ></div>
+        <p class="mt-4 text-gray-700 text-lg font-medium">Loading...</p>
+      </div>
+    </div>
+
+    <div
+      id="appLoader"
+      class="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-900 z-50"
+    >
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 border-solid"
+      ></div>
+    </div>
+    <main role="main" class="flex-1 w-full flex pt-4 bg-white dark:bg-gray-700">
+      <div id="appContainer" class="flex flex-col justify-start items-center w-full"></div>
+    </main>
+
+    <footer
+      class="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm px-4 py-4 md:px-8 flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 transition-colors duration-300"
+      role="contentinfo"
+    >
+      <div class="flex flex-wrap gap-4 justify-center md:gap-6">
+        <a
+          href="#"
+          id="privacyLink"
+          class="hover:underline hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >Privacy Policy</a
+        >
+        <a
+          href="#"
+          id="disclaimerLink"
+          class="hover:underline hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >Medical Disclaimer</a
+        >
+        <a
+          href="#"
+          id="versionLink"
+          class="hover:underline hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >Version 2.1.0 - Research Preview</a
+        >
+      </div>
+
+      <p class="py-2">© <span id="currentYear"></span> iGFAP Project - Research Preview</p>
+    </footer>
+
+    <!-- Help Modal -->
+    <div
+      id="helpModal"
+      class="fixed inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center hidden z-50"
+      role="dialog"
+      aria-labelledby="modalTitle"
+      aria-hidden="true"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalTitle" class="text-lg font-bold text-gray-900 dark:text-white">
+            Quick Reference Guide
+          </h2>
+          <button
+            class="modal-close text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-xl font-bold"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <hr class="text-gray-200" />
+
+        <!-- Modal Body -->
+        <div class="overflow-x-auto mt-4">
+          <table
+            class="w-full border border-gray-300 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-200 rounded-lg"
+          >
+            <thead class="bg-gray-100 dark:bg-gray-700">
+              <tr>
+                <th class="px-4 py-2 text-left font-semibold">Category</th>
+                <th class="px-4 py-2 text-left font-semibold">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- GCS -->
+              <tr class="border-t border-gray-300 dark:border-gray-600">
+                <td class="px-4 py-2 font-semibold">Glasgow Coma Scale (GCS)</td>
+                <td class="px-4 py-2">
+                  <div><strong>&lt; 9:</strong> Comatose patient - use Coma Module</div>
+                  <div><strong>9-12:</strong> Moderate impairment</div>
+                  <div><strong>13-15:</strong> Mild impairment</div>
+                </td>
+              </tr>
+
+              <!-- FAST-ED -->
+              <tr class="border-t border-gray-300 dark:border-gray-600">
+                <td class="px-4 py-2 font-semibold">FAST-ED Components</td>
+                <td class="px-4 py-2">
+                  <div><strong>Facial Palsy:</strong> 0-1 points</div>
+                  <div><strong>Arm Weakness:</strong> 0-2 points</div>
+                  <div><strong>Speech Changes:</strong> 0-2 points</div>
+                  <div><strong>Time:</strong> Critical factor</div>
+                  <div><strong>Eye Deviation:</strong> 0-2 points</div>
+                  <div><strong>Denial/Neglect:</strong> 0-2 points</div>
+                </td>
+              </tr>
+
+              <!-- Critical Values -->
+              <tr class="border-t border-gray-300 dark:border-gray-600">
+                <td class="px-4 py-2 font-semibold">Critical Values</td>
+                <td class="px-4 py-2">
+                  <div><strong>Systolic BP &gt; 180:</strong> Increased ICH risk</div>
+                  <div><strong>GFAP &gt; 500 pg/mL:</strong> Significant marker</div>
+                  <div><strong>FAST-ED ≥ 4:</strong> Consider LVO</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Disclaimer -->
+          <div class="text-xs text-red-600 dark:text-red-400 mt-3">
+            <strong>⚠️ Clinical Disclaimer:</strong>
+            This tool is for clinical decision support only. Always use clinical judgment and follow
+            local protocols. Not a replacement for physician assessment.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="disclaimerModal"
+      class="fixed inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center hidden z-50"
+      role="dialog"
+      aria-labelledby="modalTitle"
+      aria-hidden="true"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalTitle" class="text-lg font-bold text-gray-900 dark:text-white">
+            Medical Disclaimer
+          </h2>
+          <button
+            class="modal-close text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-xl font-bold"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <hr class="text-gray-200" />
+
+        <!-- Modal Body -->
+        <div class="overflow-x-auto mt-4">
+          <!-- Disclaimer -->
+          <div class="text-lg mt-3">
+            This tool is for clinical decision support only. Always use clinical judgment and follow
+            local protocols.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="privacyPolicyModal"
+      class="fixed inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center hidden z-50"
+      role="dialog"
+      aria-labelledby="modalTitle"
+      aria-hidden="true"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h2 id="modalTitle" class="text-lg font-bold text-gray-900 dark:text-white">
+            Privacy Policy
+          </h2>
+          <button
+            class="modal-close text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-xl font-bold"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <hr class="text-gray-200" />
+
+        <!-- Modal Body -->
+        <div class="overflow-x-auto mt-4">
+          <!-- Disclaimer -->
+          <div class="text-lg mt-3">
+            This tool processes data locally. No patient data is stored or transmitted.
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      window.addEventListener("load", () => {
+        const loader = document.getElementById("appLoader");
+        if (loader) {
+          loader.classList.add("opacity-0", "transition-opacity", "duration-500");
+          setTimeout(() => loader.remove(), 500); // Remove from DOM after fade
+        }
+      });
+    </script>
+  </body>
+</html>
